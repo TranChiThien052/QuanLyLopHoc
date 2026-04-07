@@ -13,7 +13,6 @@ export default function MainLayout() {
   if (path.startsWith("/student")) {
     roleTitle = "Sinh Viên";
     menuItems = [
-      { label: "Dashboard", path: "/student/dashboard" },
       { label: "Thông tin cá nhân", path: "/student/profile" },
       { label: "Điểm danh", path: "/student/attendance" },
       { label: "Lịch sử điểm danh", path: "/student/attendance-history" },

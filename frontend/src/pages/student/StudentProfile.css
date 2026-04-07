@@ -1,0 +1,71 @@
+.profile-container {
+  padding: 20px;
+}
+
+.profile-title {
+  color: #31A7BF;
+  border-bottom: 2px solid #31A7BF;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* layout chính */
+.profile-content {
+  display: flex;
+  gap: 40px;
+}
+
+/* avatar */
+.profile-left {
+  width: 250px;
+  text-align: center;
+}
+
+.avatar-box {
+  width: 100%;
+  height: 260px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.avatar-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-edit-avatar {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background: #31A7BF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* form */
+.profile-right {
+  flex: 1;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.form-row label {
+  width: 180px;
+  font-weight: 600;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+}

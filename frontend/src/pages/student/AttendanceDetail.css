@@ -1,0 +1,63 @@
+.detail-container {
+  border: 2px solid black;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+/* HEADER */
+.detail-header {
+  background: #99E3FC;
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 20px;
+}
+
+/* SUBJECT */
+.detail-subject {
+  background: #9BBECA;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px;
+}
+
+/* TABLE */
+.table-wrapper {
+  padding: 20px;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendance-table th {
+  background: #84E598;
+  padding: 12px;
+  border: 1px solid black;
+  font-size: 16px;
+}
+
+.attendance-table td {
+  padding: 10px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+/* STATUS */
+.status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.status.present {
+  background: #62ff00;
+}
+
+.status.absent {
+  background: #ff4d4f;
+  color: white;
+}

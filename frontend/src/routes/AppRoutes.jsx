@@ -8,11 +8,10 @@ import Login from "../pages/auth/Login";
 import MainLayout from "../layouts/MainLayout";
 
 // Student
-import Dashboard from "../pages/student/Dashboard";
 import Profile from "../pages/student/Profile";
 import Attendance from "../pages/student/Attendance";
 import AttendanceHistory from "../pages/student/AttendanceHistory";
-
+import AttendanceDetail from "../pages/student/AttendanceDetail";
 // Teacher
 import TeacherProfile from "../pages/teacher/Profile";
 import ClassManagement from "../pages/teacher/ClassManagement";
@@ -32,10 +31,10 @@ function AppRoutes() {
 
         {/* STUDENT ROUTES */}
         <Route path="/student" element={<MainLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="attendance-history" element={<AttendanceHistory />} />
+          <Route path="attendance/:subjectId" element={<AttendanceDetail />} />
         </Route>
 
         {/* TEACHER ROUTES */}

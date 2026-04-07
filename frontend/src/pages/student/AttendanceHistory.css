@@ -1,0 +1,63 @@
+.history-container {
+  border: 2px solid black;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+/* HEADER */
+.history-header {
+  background: #99E3FC;
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  padding: 20px;
+}
+
+/* SUB HEADER */
+.history-subheader {
+  background: #9BBECA;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px;
+}
+
+/* LIST */
+.history-list {
+  padding: 10px;
+}
+
+/* ITEM */
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid black;
+  margin-bottom: 10px;
+  height: 70px;
+}
+
+/* SUBJECT */
+.history-subject {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* BUTTON */
+.history-btn {
+  width: 200px;
+  height: 100%;
+  background: #62C1E9;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.history-btn:hover {
+  background: #4aaed1;
+}

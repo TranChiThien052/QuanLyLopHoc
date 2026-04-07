@@ -1,32 +1,47 @@
-import React from 'react';
+import { useNavigate } from "react-router-dom";
+import "./AttendanceHistory.css";
 
-function AttendanceHistory() {
+const subjects = [
+  "Tiếng Anh 3",
+  "Lập Trình Web",
+  "Lập Trình Hướng Đối Tượng",
+  "Kỹ Năng Giao Tiếp",
+  "Thực Hành Mã Nguồn Mở",
+  "Cấu Trúc Dữ Liệu & Giải Thuật",
+];
+
+export default function AttendanceHistory() {
+  const navigate = useNavigate();
+
   return (
-    <div>
-      <h3>Lịch sử điểm danh</h3>
-      <table border="1" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f2f2f2' }}>
-            <th>Ngày</th>
-            <th>Môn học</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>01/01/2024</td>
-            <td>Lập trình Web</td>
-            <td style={{ color: 'green' }}>Có mặt</td>
-          </tr>
-          <tr>
-            <td>08/01/2024</td>
-            <td>Lập trình Web</td>
-            <td style={{ color: 'red' }}>Vắng</td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="history-container">
+      
+      {/* HEADER */}
+      <div className="history-header">
+        LỊCH SỬ ĐIỂM DANH
+      </div>
+
+      {/* SUB HEADER */}
+      <div className="history-subheader">
+        Lựa chọn môn học
+      </div>
+
+      {/* LIST */}
+      <div className="history-list">
+        {subjects.map((subject, index) => (
+          <div key={index} className="history-item">
+            <div className="history-subject">{subject}</div>
+
+            <button 
+              className="history-btn"
+              onClick={() => navigate(`/student/attendance/${index}`)}
+            >
+              Xem kết quả
+            </button>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 }
-
-export default AttendanceHistory;
