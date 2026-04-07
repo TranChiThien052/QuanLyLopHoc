@@ -1,63 +1,59 @@
-.detail-container {
-  border: 2px solid black;
-  border-radius: 8px;
-  overflow: hidden;
-  background: white;
-}
-
-/* HEADER */
-.detail-header {
-  background: #99E3FC;
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  padding: 20px;
-}
-
-/* SUBJECT */
-.detail-subject {
-  background: #9BBECA;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 15px;
-}
-
-/* TABLE */
 .table-wrapper {
-  padding: 20px;
-}
-
-.attendance-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.attendance-table th {
-  background: #84E598;
-  padding: 12px;
-  border: 1px solid black;
-  font-size: 16px;
-}
-
-.attendance-table td {
   padding: 10px;
-  border: 1px solid black;
-  text-align: center;
 }
 
-/* STATUS */
-.status {
-  padding: 5px 10px;
-  border-radius: 6px;
+/* Ẩn header trên mobile */
+.attendance-table thead {
+  display: none;
+}
+
+/* mỗi row thành card */
+.attendance-table tr {
+  display: block;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* mỗi cell */
+.attendance-table td {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+/* label giả */
+.attendance-table td::before {
   font-weight: bold;
 }
 
-.status.present {
-  background: #62ff00;
-}
+/* mapping label */
+.attendance-table td:nth-child(1)::before { content: "Mã buổi: "; }
+.attendance-table td:nth-child(2)::before { content: "Mã lớp: "; }
+.attendance-table td:nth-child(3)::before { content: "Ngày: "; }
+.attendance-table td:nth-child(4)::before { content: "Bắt đầu: "; }
+.attendance-table td:nth-child(5)::before { content: "Kết thúc: "; }
+.attendance-table td:nth-child(6)::before { content: "Trạng thái: "; }
 
-.status.absent {
-  background: #ff4d4f;
-  color: white;
+/* DESKTOP */
+@media (min-width: 768px) {
+  .attendance-table thead {
+    display: table-header-group;
+  }
+
+  .attendance-table tr {
+    display: table-row;
+    border: none;
+  }
+
+  .attendance-table td {
+    display: table-cell;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .attendance-table td::before {
+    content: none;
+  }
 }
