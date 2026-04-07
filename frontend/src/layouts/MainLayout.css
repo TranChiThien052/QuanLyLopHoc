@@ -1,107 +1,108 @@
 /* ===== RESET ===== */
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+    margin: 0;
+    font-family: Arial, sans-serif;
 }
 
 /* ===== LAYOUT ===== */
 .layout {
-  display: flex;
+    display: flex;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: -240px;
-  width: 220px;
-  height: 100%;
-  background: #31A7BF;
-  color: white;
-  padding: 20px 10px;
-  transition: 0.3s;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: -240px;
+    width: 220px;
+    height: 100%;
+    background: #31A7BF;
+    color: white;
+    padding: 20px 10px;
+    transition: 0.3s;
+    z-index: 1000;
 }
 
 .sidebar.open {
-  left: 0;
+    left: 0;
 }
 
 .logo {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 20px;
-  font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 /* NAV */
 .nav-link {
-  display: block;
-  padding: 12px;
-  margin: 6px 0;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: 0.2s;
+    display: block;
+    padding: 12px;
+    margin: 6px 0;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: 0.2s;
 }
 
 .nav-link:hover {
-  background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .nav-link.active {
-  background: #0099B8;
-  font-weight: bold;
+    background: #0099B8;
+    font-weight: bold;
 }
 
 /* ===== OVERLAY ===== */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
 }
 
 /* ===== MAIN ===== */
 .main {
-  flex: 1;
-  width: 100%;
+    flex: 1;
+    width: 100%;
 }
 
 /* ===== HEADER ===== */
 .header {
-  background: #0099B8;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
+    background: #0099B8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
 }
 
 .menu-btn {
-  font-size: 22px;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
+    font-size: 22px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
 }
 
 .title {
-  font-size: 16px;
-  margin: 0;
-  font-weight: 600;
+    font-size: 16px;
+    margin: 0;
+    font-weight: 600;
 }
 
 .role {
-  font-size: 12px;
-  opacity: 0.9;
+    font-size: 12px;
+    opacity: 0.9;
 }
 
 /* ===== CONTENT ===== */
 .content {
-  padding: 15px;
-  background: #f5f5f5;
-  min-height: calc(100vh - 55px);
+    padding: 15px;
+    background: #f5f7fa;
+    /* nhẹ hơn */
+    min-height: calc(100vh - 55px);
 }
 
 /* ========================= */
@@ -109,30 +110,30 @@ body {
 /* ========================= */
 @media (min-width: 768px) {
 
-  .sidebar {
-    left: 0;
-    width: 180px;
-  }
+    .sidebar {
+        left: 0;
+        width: 180px;
+    }
 
-  .overlay {
-    display: none;
-  }
+    .overlay {
+        display: none;
+    }
 
-  .main {
-    margin-left: 180px;
-  }
+    .main {
+        margin-left: 180px;
+    }
 
-  .menu-btn {
-    display: none;
-  }
+    .menu-btn {
+        display: none;
+    }
 
-  .title {
-    font-size: 18px;
-  }
+    .title {
+        font-size: 18px;
+    }
 
-  .role {
-    font-size: 14px;
-  }
+    .role {
+        font-size: 14px;
+    }
 }
 
 /* ========================= */
@@ -140,30 +141,30 @@ body {
 /* ========================= */
 @media (min-width: 1024px) {
 
-  .sidebar {
-    width: 220px;
-  }
+    .sidebar {
+        width: 220px;
+    }
 
-  .main {
-    margin-left: 220px;
-  }
+    .main {
+        margin-left: 220px;
+    }
 
-  .content {
-    padding: 25px 40px;
-  }
+    .content {
+        padding: 30px 50px;
+    }
 
-  .title {
-    font-size: 20px;
-  }
+    .title {
+        font-size: 20px;
+    }
 
-  .role {
-    font-size: 15px;
-  }
+    .role {
+        font-size: 15px;
+    }
 
-  .nav-link {
-    font-size: 15px;
-    padding: 14px;
-  }
+    .nav-link {
+        font-size: 15px;
+        padding: 14px;
+    }
 }
 
 /* ========================= */
@@ -171,8 +172,8 @@ body {
 /* ========================= */
 @media (min-width: 1280px) {
 
-  .content {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+    .content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 }

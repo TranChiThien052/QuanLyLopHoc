@@ -1,59 +1,43 @@
 .table-wrapper {
-  padding: 10px;
+  padding: 0;
 }
 
-/* Ẩn header trên mobile */
-.attendance-table thead {
-  display: none;
-}
-
-/* mỗi row thành card */
+/* CARD MOBILE */
 .attendance-table tr {
-  display: block;
-  border: 1px solid #ccc;
+  background: white;
+  border-radius: 10px;
   margin-bottom: 10px;
-  border-radius: 8px;
   padding: 10px;
 }
 
-/* mỗi cell */
-.attendance-table td {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
+/* STATUS */
+.status-present {
+  color: green;
+  font-weight: 600;
 }
 
-/* label giả */
-.attendance-table td::before {
-  font-weight: bold;
+.status-absent {
+  color: red;
+  font-weight: 600;
 }
-
-/* mapping label */
-.attendance-table td:nth-child(1)::before { content: "Mã buổi: "; }
-.attendance-table td:nth-child(2)::before { content: "Mã lớp: "; }
-.attendance-table td:nth-child(3)::before { content: "Ngày: "; }
-.attendance-table td:nth-child(4)::before { content: "Bắt đầu: "; }
-.attendance-table td:nth-child(5)::before { content: "Kết thúc: "; }
-.attendance-table td:nth-child(6)::before { content: "Trạng thái: "; }
 
 /* DESKTOP */
 @media (min-width: 768px) {
-  .attendance-table thead {
-    display: table-header-group;
+  .attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
   }
 
-  .attendance-table tr {
-    display: table-row;
-    border: none;
-  }
-
-  .attendance-table td {
-    display: table-cell;
-    text-align: center;
+  .attendance-table th {
+    background: #31A7BF;
+    color: white;
     padding: 10px;
   }
 
-  .attendance-table td::before {
-    content: none;
+  .attendance-table td {
+    border-bottom: 1px solid #eee;
   }
 }
