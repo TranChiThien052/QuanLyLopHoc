@@ -1,0 +1,275 @@
+/* AccountManagement.css */
+
+.admin-page-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-card {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+}
+
+/* Header & Controls */
+.admin-header {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.search-input:focus {
+  border-color: #31A7BF;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(49, 167, 191, 0.1);
+}
+
+.btn-add {
+  background-color: #0099B8;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+.btn-add:hover {
+  background-color: #007d96;
+  transform: translateY(-1px);
+}
+
+/* Tabs */
+.tab-container {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #64748b;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #31A7BF;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Table - Cập nhật theo Figma */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #edf2f7;
+}
+
+.account-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.account-table th {
+  background-color: #f8fafc; /* Màu xám nhạt như Figma */
+  color: #1a202c;
+  font-weight: 700;
+  padding: 16px;
+  text-align: left;
+  border-bottom: 2px solid #edf2f7;
+}
+
+.account-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #4a5568;
+  font-size: 14px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.text-id { font-family: 'Courier New', Courier, monospace; color: #4a5568; }
+.text-bold { font-weight: 700; color: #1a202c; }
+
+/* Căn giữa cột Thao tác */
+.account-table th:last-child,
+.account-table td:last-child {
+  text-align: center;
+  width: 100px;
+}
+
+/* Action Buttons (Đỏ & Xanh theo Figma) */
+.action-box {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.icon-btn {
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  color: white;
+}
+
+.icon-btn.delete {
+  background-color: #E63946; /* Đỏ thùng rác */
+}
+
+.icon-btn.edit {
+  background-color: #31A7BF; /* Xanh STU */
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+}
+
+/* Phân trang - Nút tròn đỏ theo Figma */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 30px;
+  padding: 10px 0;
+}
+
+.page-nav {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.page-number {
+  border: none;
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #4a5568;
+}
+
+.page-number.active {
+  background-color: #E63946; /* Nút tròn đỏ Figma */
+  color: white;
+}
+
+.page-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Desktop Styles */
+@media (min-width: 768px) {
+  .admin-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .search-input { width: 320px; }
+  .admin-card { padding: 32px; }
+  .tab-btn { max-width: 200px; }
+}
+
+/* Responsive Mobile - Ẩn bớt cột để không tràn */
+/* Responsive Mobile - Chỉ hiện 4 cột tùy theo Tab */
+@media (max-width: 600px) {
+  /* 1. Lệnh ẩn cột - phải cực kỳ mạnh để đè các lệnh khác */
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* 2. Chỉ định style cho các ô hiển thị (không dùng !important cho display ở đây) */
+  .account-table th, 
+  .account-table td {
+    display: table-cell; 
+    padding: 10px 4px !important;
+    font-size: 11px !important;
+    text-align: center;
+    word-break: break-word;
+    border-bottom: 1px solid #eee;
+  }
+
+  .account-table {
+    width: 100%;
+    table-layout: fixed; /* Ép 4 cột chia đều 100% */
+  }
+
+  /* 3. Chia lại tỉ lệ cho 4 cột còn lại (Tổng 100%) */
+  /* Mã TK/Tài khoản: 22%, Họ tên: 38%, Lớp/Tài khoản: 20%, Thao tác: 20% */
+  .account-table th:nth-child(1), .account-table td:nth-child(1) { width: 22%; }
+  .account-table th:nth-child(2), .account-table td:nth-child(2) { width: 22%; }
+  .account-table th:nth-child(3), .account-table td:nth-child(3) { width: 36%; }
+  .account-table th:nth-child(4), .account-table td:nth-child(4) { width: 20%; }
+  
+  /* Cột thao tác luôn nằm cuối */
+  .account-table th:last-child, .account-table td:last-child { width: 20%; }
+
+  /* 4. Thu nhỏ nút thao tác như Tuệ muốn */
+  .action-box { gap: 4px; justify-content: center; }
+  .btn-icon {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 10px !important;
+    padding: 0 !important;
+  }
+}

@@ -1,0 +1,43 @@
+.table-wrapper {
+  padding: 0;
+}
+
+/* CARD MOBILE */
+.attendance-table tr {
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+/* STATUS */
+.status-present {
+  color: green;
+  font-weight: 600;
+}
+
+.status-absent {
+  color: red;
+  font-weight: 600;
+}
+
+/* DESKTOP */
+@media (min-width: 768px) {
+  .attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .attendance-table th {
+    background: #31A7BF;
+    color: white;
+    padding: 10px;
+  }
+
+  .attendance-table td {
+    border-bottom: 1px solid #eee;
+  }
+}
