@@ -1,4 +1,4 @@
-const classRepo = require('../repotories/classRepository');
+const classRepo = require('../repotosiries/classRepository');
 
 const findAll = async () => {
     return await classRepo.findAll();

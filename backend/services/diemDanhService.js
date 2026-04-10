@@ -1,4 +1,4 @@
-const diemDanhRepo = require('../repotories/diemdanhRepository');
+const diemDanhRepo = require('../repotosiries/diemdanhRepository');
 
 const findAll = async () => {
     return await diemDanhRepo.findAll();
