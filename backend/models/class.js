@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
                 allowNull: false,
                 unique: true,
             },
-            TenLop: {
+            tenlop: {
                 type: DataTypes.STRING(50),
                 allowNull: false,
             },
