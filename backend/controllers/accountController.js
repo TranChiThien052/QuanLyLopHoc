@@ -1,4 +1,4 @@
-﻿const accountService = require('../services/accountService');
+const accountService = require('../services/accountService');
 
 const findAll = async (req, res) => {
     try {
@@ -14,7 +14,7 @@ const findByUsername = async (req, res) => {
     try {
         const account = await accountService.findByUsername(username);
         if (!account) {
-            return res.status(404).json({ error: 'TÃ i khoáº£n khÃ´ng tá»“n táº¡i' });
+            return res.status(404).json({ error: 'Tài khoản không tồn tại' });
         }
         res.json(account);
     } catch (error) {
@@ -47,7 +47,7 @@ const deleteAccount = async (req, res) => {
     const { username } = req.params;
     try {
         await accountService.deleteAccount(username);
-        res.json({ message: 'XÃ³a tÃ i khoáº£n thÃ nh cÃ´ng' });
+        res.json({ message: 'Xóa tài khoản thành công' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
