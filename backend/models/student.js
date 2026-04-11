@@ -36,7 +36,7 @@ module.exports = (sequelize) => {
         allowNull: false,
         unique: true,
         validate: {
-          isSdt: /^[0-9]{10}$/,
+          is: /^[0-9]{10}$/,
         },
       },
       malop: {
