@@ -9,7 +9,6 @@ function getJwtConfigError(){
     return null;
 }
 
-// Hàm lấy Token từ header và xác minh người dùng
 function getUserFromAuthHeader(req){
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
