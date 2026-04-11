@@ -12,6 +12,8 @@ const classRoutes = require("./routes/classRoute");
 const diemDanhRoutes = require("./routes/diemDanhRoute");
 const studentRoutes = require("./routes/studentRoute");
 const teacherRoutes = require("./routes/teacherRoute");
+const lopsinhvienRoutes = require("./routes/lopsinhvienRoute");
+const lessonRoutes = require("./routes/lessonRoute");
 
 //======Middleware======
 
@@ -22,6 +24,8 @@ app.use("/classes", classRoutes);
 app.use("/diemDanh", diemDanhRoutes);
 app.use("/students", studentRoutes);
 app.use("/teachers", teacherRoutes);
+app.use("/lopsinhvien", lopsinhvienRoutes);
+app.use("/lessons", lessonRoutes);
 
 app.get("/", (req, res) => {
   res.send("Xin chào từ Node.js!");

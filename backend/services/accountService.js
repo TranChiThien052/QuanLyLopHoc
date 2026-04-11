@@ -1,4 +1,4 @@
-﻿const accountRepo = require('../repotosiries/accountRepository');
+﻿const accountRepo = require('../repositories/accountRepository');
 
 const findAll = async () => {
     return await accountRepo.findAll();

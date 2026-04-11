@@ -1,4 +1,4 @@
-const teacherRepository = require("../repotosiries/teacherRepository");
+const teacherRepository = require("../repositories/teacherRepository");
 
 const getAll = async () => {
   return await teacherRepository.findAll();
