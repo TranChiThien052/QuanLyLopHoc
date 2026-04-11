@@ -57,5 +57,7 @@ module.exports = {
   Lop_SinhVien,
   account: TaiKhoan,
   class: LopHoc,
-  diemdanh: DiemDanh
+  diemdanh: DiemDanh,
+  lesson: BuoiHoc,
+  lopsinhvien: Lop_SinhVien
 };

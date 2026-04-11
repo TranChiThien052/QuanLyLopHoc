@@ -4,17 +4,19 @@ module.exports = (sequelize) => {
   const Lop_SinhVien = sequelize.define(
     "Lop_SinhVien",
     {
-      MaLop: { 
-        type: DataTypes.INTEGER, 
-        primaryKey: true 
-    },
-      MaSinhVien: { 
-        type: DataTypes.CHAR(10), 
-        primaryKey: true 
-    },
+      malop: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        allowNull: false,
+      },
+      masinhvien: {
+        type: DataTypes.CHAR(10),
+        primaryKey: true,
+        allowNull: false,
+      },
     },
     { 
-        tableName: "Lop_SinhVien", 
+        tableName: "lop_sinhvien", 
         timestamps: false 
     },
   );
