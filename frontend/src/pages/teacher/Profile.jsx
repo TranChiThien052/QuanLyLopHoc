@@ -1,4 +1,4 @@
-import "./TeacherProfile.css";
+import "./Profile.css";
 
 export default function TeacherProfile() {
   return (
