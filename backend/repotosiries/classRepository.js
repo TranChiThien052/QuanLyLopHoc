@@ -50,3 +50,11 @@ const deleteClass = async (MaLop) => {
     }
     return await lop.destroy();
 }
+
+module.exports = {
+    findAll,
+    findById,
+    create,
+    update,
+    deleteClass
+}

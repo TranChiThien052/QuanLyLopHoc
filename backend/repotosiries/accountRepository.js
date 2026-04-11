@@ -1,4 +1,4 @@
-const { account : Account } = required('../models');
+const { account : Account } = require('../models');
 
 const findAll = async () => {
     return await Account.findAll();
