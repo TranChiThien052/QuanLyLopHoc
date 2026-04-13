@@ -9,7 +9,6 @@ module.exports = (sequelize) => {
         primaryKey: true,
         unique: true,
         allowNull: false,
-        autoIncrement: true,
       },
       username: {
         type: DataTypes.CHAR(10),

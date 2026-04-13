@@ -12,24 +12,25 @@ const findByUsername = async (username) => {
     );
 };
 
-const create = async (userId, username, password, role) => {
+const create = async (mataikhoan, username, password, role) => {
     return await Account.create({
-        userId,
+        mataikhoan,
         username,
         password,
         role
     });
 };
 
-const update = async (userId, username, password, role) => {
+const update = async (mataikhoan, username, password, role) => {
     const account = await Account.findOne(
         { 
-            where: { userid : userId, username: username }
+            where: { username: username }
         }
     );
     if (!account) {
         throw new Error("Tài khoản không tồn tại");
     }
+    account.mataikhoan = mataikhoan;
     account.password = password;
     account.role = role;
     return await account.save();

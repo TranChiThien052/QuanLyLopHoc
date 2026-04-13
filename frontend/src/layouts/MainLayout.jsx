@@ -23,7 +23,6 @@ export default function MainLayout() {
       { label: "Thông tin", path: "/teacher/profile" },
       { label: "Lớp học", path: "/teacher/classes" },
       { label: "Điểm danh", path: "/teacher/attendance" },
-      { label: "Thống kê", path: "/teacher/statistics" },
     ];
   } else if (path.startsWith("/admin")) {
     roleTitle = "Admin";

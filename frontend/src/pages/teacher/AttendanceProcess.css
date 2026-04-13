@@ -1,0 +1,274 @@
+:root {
+    --border-thick: 2px solid #000;
+    --border-thin: 1px solid #000;
+    --bg-green-light: #86EAAD;
+    --bg-red-light: #FF7272;
+    --bg-green-bright: #0DFF29;
+    --bg-gray-header: #D9D9D9;
+    --bg-yellow-choice: #F5E217;
+}
+
+.process-container {
+    max-width: 1090px;
+    margin: 20px auto;
+    font-family: 'Roboto', sans-serif;
+    background: #fff;
+}
+
+/* --- PHẦN THÔNG TIN BUỔI HỌC (TOP) --- */
+.info-header {
+    border: var(--border-thick);
+    padding-bottom: 20px;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.header-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    padding: 15px 0;
+    border-bottom: var(--border-thin);
+}
+
+.info-grid {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    gap: 20px;
+}
+
+.info-text p {
+    font-size: 24px;
+    /* Thu nhỏ nhẹ so với 32px để dễ nhìn trên web */
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.info-text strong {
+    font-weight: 700;
+}
+
+/* Khối thống kê (Manual Mode) */
+.stats-box {
+    width: 311px;
+    border: var(--border-thick);
+}
+
+.stat-item {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 400;
+    border-bottom: var(--border-thick);
+}
+
+.stat-item.present {
+    background-color: var(--bg-green-light);
+}
+
+.stat-item.absent {
+    background-color: var(--bg-red-light);
+    border-bottom: none;
+}
+
+.btn-bulk {
+    margin-top: 15px;
+    width: 100%;
+    height: 45px;
+    background-color: var(--bg-green-bright);
+    border: var(--border-thick);
+    font-size: 24px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Khối QR (Face Mode) */
+.qr-section {
+    text-align: center;
+}
+
+.qr-section img {
+    width: 200px;
+    height: 200px;
+    border: var(--border-thin);
+    margin-bottom: 10px;
+}
+
+.btn-zoom {
+    width: 100%;
+    background-color: var(--bg-green-bright);
+    border: var(--border-thick);
+    padding: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* --- PHẦN BẢNG DANH SÁCH SINH VIÊN --- */
+.student-list-section {
+    border: var(--border-thick);
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modern-table thead {
+    background-color: var(--bg-gray-header);
+}
+
+.modern-table th {
+    padding: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    border-right: var(--border-thin);
+    border-bottom: var(--border-thin);
+}
+
+.modern-table td {
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
+    border-right: var(--border-thin);
+    border-bottom: var(--border-thin);
+}
+
+.modern-table th:last-child,
+.modern-table td:last-child {
+    border-right: none;
+}
+
+/* Trạng thái điểm danh */
+.status-btn {
+    width: 150px;
+    padding: 8px;
+    border: none;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.status-btn.success {
+    background-color: var(--bg-green-bright);
+}
+
+.status-btn.choice {
+    background-color: var(--bg-yellow-choice);
+    border: 2px solid #000;
+}
+
+.status-btn.absent {
+    background: none;
+    color: #000;
+}
+
+/* Nút quay lại */
+.back-btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 768px) {
+    .info-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-text p {
+        font-size: 18px;
+    }
+
+    .modern-table thead {
+        display: none;
+    }
+
+    .modern-table tr {
+        display: block;
+        border-bottom: var(--border-thick);
+        padding: 10px;
+    }
+
+    .modern-table td {
+        display: flex;
+        justify-content: space-between;
+        text-align: right;
+        border: none;
+    }
+
+    .modern-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        float: left;
+    }
+}
+
+/* --- PHẦN SELECT BOX TRẠNG THÁI --- */
+.status-select {
+    width: 100%;
+    max-width: 180px;
+    padding: 8px 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    border: var(--border-thick);
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease;
+}
+
+/* Lựa chọn: Màu vàng */
+.status-select.choice {
+    background-color: var(--bg-yellow-choice);
+    color: #000;
+}
+
+/* Đã điểm danh: Màu xanh lá */
+.status-select.present {
+    background-color: var(--bg-green-bright);
+    color: #000;
+}
+
+/* Vắng: Màu đỏ */
+.status-select.absent {
+    background-color: var(--bg-red-light);
+    color: #000;
+}
+
+/* Tùy chỉnh các option bên trong để luôn có nền trắng cho dễ đọc */
+.status-select option {
+    background-color: #fff;
+    color: #000;
+    font-weight: normal;
+}
+
+/* Điều chỉnh lại cột cuối cùng của bảng để không bị chật */
+.modern-table td:last-child {
+    min-width: 200px;
+}
+
+/* --- THANH TÌM KIẾM (Bổ sung để đồng bộ style) --- */
+.student-search-bar {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.student-search-bar input {
+    padding: 10px 15px;
+    border: var(--border-thick);
+    border-radius: 10px;
+    width: 300px;
+    font-size: 18px;
+}
