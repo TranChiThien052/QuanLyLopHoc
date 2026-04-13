@@ -24,11 +24,12 @@ const getLessonById = async (req, res) => {
 
 const createLesson = async (req, res) => {
     try {
-        const { mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc } = req.body;
-        const lesson = await lessonService.createLesson(mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
-        return res.status(200).json(lesson);
+        const { malop, giobatdau, gioketthuc, noidungbuoihoc } = req.body;
+        const lesson = await lessonService.createLesson(malop, giobatdau, gioketthuc, noidungbuoihoc);
+        return res.status(201).json(lesson);
     } catch (error) {
-        return res.status(500).json({ code: 999, message: error.message });
+        const status = error.status || 500;
+        return res.status(status).json({ code: status, message: error.message });
     }
 };
 
@@ -39,7 +40,8 @@ const updateLesson = async (req, res) => {
         const lesson = await lessonService.updateLesson(mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
         return res.status(200).json(lesson);
     } catch (error) {
-        return res.status(500).json({ code: 999, message: error.message });
+        const status = error.status || 500;
+        return res.status(status).json({ code: status, message: error.message });
     }
 };
 
