@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
             mabuoihoc: {
                 type: DataTypes.STRING(15),
                 primaryKey: true,
-                autoIncrement: true,
+                allowNull: false,
             },
             malop: {
                 type: DataTypes.INTEGER,
