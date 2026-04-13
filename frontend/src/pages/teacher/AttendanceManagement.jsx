@@ -1,28 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import './AttendanceManagement.css';
 
-const sessions = [
-  { id: "BH122026", className: "Lớp CNTT TH10", studentCount: 70, time: "7:00 - 12:00" },
-  { id: "BH12242", className: "Lớp Quản trị kinh doanh KD07", studentCount: 79, time: "12:35 - 15:00" },
-  { id: "BH122786", className: "Lớp Thiết Kế Đồ Họa 06", studentCount: 90, time: "15:10 - 17:40" },
-  { id: "BH125526", className: "Lớp CNTT TH10", studentCount: 80, time: "7:00 - 9:15" },
-  { id: "BH1213226", className: "Lớp Thiết Kế Đồ Họa 06", studentCount: 69, time: "7:00 - 12:00" },
-  { id: "BH122029", className: "Lớp Marketing MK01", studentCount: 50, time: "13:00 - 15:00" }, // Dữ liệu giả thêm để test phân trang
+const sessionsData = [
+  { id: "BH122026", classId: "cntt-th10", className: "Lớp CNTT TH10", studentCount: 70, time: "7:00 - 12:00" },
+  { id: "BH12242", classId: "qtkd-kd07", className: "Lớp Quản trị kinh doanh KD07", studentCount: 79, time: "12:35 - 15:00" },
+  { id: "BH122786", classId: "tkdh-06", className: "Lớp Thiết Kế Đồ Họa 06", studentCount: 90, time: "15:10 - 17:40" },
+  { id: "BH125526", classId: "cntt-th10", className: "Lớp CNTT TH10", studentCount: 80, time: "7:00 - 9:15" },
+  { id: "BH1213226", classId: "tkdh-06", className: "Lớp Thiết Kế Đồ Họa 06", studentCount: 69, time: "7:00 - 12:00" },
+  { id: "BH122029", classId: "mkt-mk01", className: "Lớp Marketing MK01", studentCount: 50, time: "13:00 - 15:00" }, // Dữ liệu giả thêm để test phân trang
 ];
 
 export default function AttendanceManagement() {
+  const { classId } = useParams();
+  const [showOptions, setShowOptions] = useState(false);
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Số lượng buổi học mỗi trang
 
+  const handleOpenOptions = (id) => {
+    setSelectedSessionId(id);
+    setShowOptions(true);
+  };
+
+  const handleSelectMode = (mode) => {
+    setShowOptions(false);
+    // Chuyển hướng sang trang xử lý điểm danh với tham số mode
+    navigate(`/teacher/attendance/process/${selectedSessionId}?type=${mode}`);
+  };
   // Mỗi khi tìm kiếm, reset về trang 1
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
+  const classSessions = sessionsData.filter(s => s.classId === classId);
+  const displayClassName = classSessions.length > 0 ? classSessions[0].className : "Lớp học không xác định";
+
   // 1. Logic lọc danh sách theo từ khóa tìm kiếm
-  const filteredSessions = sessions.filter((session) =>
-    session.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredSessions = classSessions.filter((session) =>
     session.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -36,11 +53,11 @@ export default function AttendanceManagement() {
     <div className="mgmt-container">
       {/* TOP BAR: Title & Search */}
       <div className="mgmt-top-bar">
-        <h1 className="mgmt-title">Quản lý điểm danh</h1>
+        <h1 className="mgmt-title">Quản lý điểm danh - {displayClassName}</h1>
         <div className="search-group">
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm lớp học..." 
+          <input
+            type="text"
+            placeholder="Tìm kiếm buổi học..."
             className="search-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -50,8 +67,24 @@ export default function AttendanceManagement() {
       </div>
 
       {/* DATE BANNER */}
-      <div className="date-banner">
-        DANH SÁCH CÁC BUỔI HỌC HÔM NAY: 12/2/2026
+      <div className="date-banner" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            position: 'absolute',
+            left: '15px',
+            backgroundColor: '#6c757d',
+            color: 'white',
+            border: 'none',
+            padding: '8px 15px',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}>
+          &larr; Quay lại
+        </button>
+        <span>DANH SÁCH CÁC BUỔI HỌC </span>
       </div>
 
       {/* TABLE SECTION */}
@@ -76,13 +109,38 @@ export default function AttendanceManagement() {
                     <strong>{session.studentCount}</strong> sinh viên
                   </td>
                   <td data-label="Thời gian">{session.time}</td>
-                  <td data-label="Thao tác">
-                    <button 
+                  <td data-label="Thao tác" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                    <button
                       className="btn-create-code"
-                      onClick={() => alert(`Tạo mã cho buổi: ${session.id}`)}
+                      style={{ backgroundColor: '#28a745' }}
+                      onClick={() => navigate(`/teacher/statistics/${session.id}`, { state: { className: session.className } })}
+                    >
+                      Thống kê buổi
+                    </button>
+                    <button
+                      className="btn-create-code"
+                      onClick={() => handleOpenOptions(session.id)}
                     >
                       Tạo mã điểm danh
                     </button>
+                    {/* MODAL LỰA CHỌN PHƯƠNG THỨC */}
+                    {showOptions && (
+                      <div className="modal-overlay" onClick={() => setShowOptions(false)}>
+                        {/* Ngăn sự kiện click bị lan ra ngoài khi bấm vào bên trong hộp thoại */}
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                          <h3>Chọn phương thức điểm danh</h3>
+                          <div className="options-group">
+                            <button onClick={() => handleSelectMode('manual')} className="opt-btn manual">
+                              🖐 Điểm danh thủ công
+                            </button>
+                            <button onClick={() => handleSelectMode('face')} className="opt-btn face">
+                              📸 Điểm danh khuôn mặt (QR)
+                            </button>
+                          </div>
+                          <button onClick={() => setShowOptions(false)} className="close-btn">Hủy bỏ</button>
+                        </div>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))
@@ -100,17 +158,17 @@ export default function AttendanceManagement() {
       {/* PAGINATION SECTION */}
       {totalPages > 1 && (
         <div className="mgmt-pagination">
-          <button 
-            className="page-btn-nav" 
+          <button
+            className="page-btn-nav"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => prev - 1)}
           >
             ‹
           </button>
-          
+
           {[...Array(totalPages)].map((_, i) => (
-            <button 
-              key={i + 1} 
+            <button
+              key={i + 1}
               className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`}
               onClick={() => setCurrentPage(i + 1)}
             >
@@ -118,8 +176,8 @@ export default function AttendanceManagement() {
             </button>
           ))}
 
-          <button 
-            className="page-btn-nav" 
+          <button
+            className="page-btn-nav"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(prev => prev + 1)}
           >

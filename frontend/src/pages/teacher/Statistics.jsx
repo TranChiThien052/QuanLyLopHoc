@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './Statistics.css';
 
 // Dữ liệu mẫu danh sách buổi học
@@ -22,21 +23,29 @@ const MOCK_DETAILS = [
 ];
 
 const Statistics = () => {
-  const [selectedSession, setSelectedSession] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const { sessionId } = useParams();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
+  const selectedSession = MOCK_SESSIONS.find(s => s.id === sessionId) || {
+    id: sessionId || 'Unknown',
+    maLop: state?.className || 'Lớp học không xác định',
+    ngayHoc: '--/--/----',
+    batDau: '--:--',
+    ketThuc: '--:--'
+  };
+
   const [detailSearch, setDetailSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Reset về trang 1 khi tìm kiếm hoặc đổi giao diện
+  // Reset về trang 1 khi tìm kiếm
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, detailSearch, selectedSession]);
+  }, [detailSearch, sessionId]);
 
-  // Logic lọc dữ liệu
-  const filteredData = selectedSession 
-    ? MOCK_DETAILS.filter(d => d.mssv.toLowerCase().includes(detailSearch.toLowerCase()))
-    : MOCK_SESSIONS.filter(s => s.id.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Logic lọc dữ liệu sinh viên trong buổi
+  const filteredData = MOCK_DETAILS.filter(d => d.mssv.toLowerCase().includes(detailSearch.toLowerCase()));
 
   // Logic phân trang
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -48,25 +57,25 @@ const Statistics = () => {
   const Pagination = () => (
     totalPages > 1 && (
       <div className="modern-pagination">
-        <button 
-          className="p-nav" 
-          disabled={currentPage === 1} 
+        <button
+          className="p-nav"
+          disabled={currentPage === 1}
           onClick={() => setCurrentPage(prev => prev - 1)}
         >
           ‹
         </button>
         {[...Array(totalPages)].map((_, i) => (
-          <button 
-            key={i + 1} 
+          <button
+            key={i + 1}
             className={`p-num ${currentPage === i + 1 ? 'active' : ''}`}
             onClick={() => setCurrentPage(i + 1)}
           >
             {i + 1}
           </button>
         ))}
-        <button 
-          className="p-nav" 
-          disabled={currentPage === totalPages} 
+        <button
+          className="p-nav"
+          disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(prev => prev + 1)}
         >
           ›
@@ -78,120 +87,73 @@ const Statistics = () => {
   return (
     <div className="attendance-page">
       <div className="main-card">
-        {!selectedSession ? (
-          /* GIAO DIỆN DANH SÁCH BUỔI HỌC */
-          <div className="list-section">
-            <div className="page-header">
-              <div className="title-group">
-                <h2 className="main-title">Báo cáo điểm danh</h2>
-                <p className="sub-title">Xem danh sách các buổi học đã diễn ra</p>
-              </div>
-              <div className="modern-search">
-                <input 
-                  type="text" 
-                  placeholder="Tìm kiếm mã buổi..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button className="search-icon-btn">🔍</button>
-              </div>
+        {/* GIAO DIỆN CHI TIẾT ĐIỂM DANH */}
+        <div className="detail-section">
+          <div className="detail-header-row">
+            <button className="back-btn-modern" onClick={() => navigate(-1)}>
+              ← Trở lại
+            </button>
+            <div className="modern-search detail-search">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sinh viên..."
+                value={detailSearch}
+                onChange={(e) => setDetailSearch(e.target.value)}
+              />
+              <button className="search-icon-btn">🔍</button>
             </div>
-
-            <div className="glass-table-wrapper">
-              <table className="modern-table">
-                <thead>
-                  <tr>
-                    <th>Mã buổi</th>
-                    <th>Mã lớp</th>
-                    <th>Ngày học</th>
-                    <th>Bắt đầu</th>
-                    <th>Kết thúc</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((s) => (
-                    <tr key={s.id} onClick={() => setSelectedSession(s)} className="clickable-row">
-                      <td className="session-tag">{s.id}</td>
-                      <td className="font-600">{s.maLop}</td>
-                      <td>{s.ngayHoc}</td>
-                      <td>{s.batDau}</td>
-                      <td>{s.ketThuc}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <Pagination />
           </div>
-        ) : (
-          /* GIAO DIỆN CHI TIẾT ĐIỂM DANH */
-          <div className="detail-section">
-            <div className="detail-header-row">
-              <button className="back-btn-modern" onClick={() => setSelectedSession(null)}>
-                 ← Trở lại
-              </button>
-              <div className="modern-search detail-search">
-                <input 
-                  type="text" 
-                  placeholder="Tìm kiếm sinh viên..." 
-                  value={detailSearch}
-                  onChange={(e) => setDetailSearch(e.target.value)}
-                />
-                <button className="search-icon-btn">🔍</button>
-              </div>
-            </div>
-            
-            <div className="detail-top-card">
-              <div className="session-summary">
-                <h3>Lớp: <span>{selectedSession.maLop}</span></h3>
-                <div className="summary-pills">
-                  <span>Mã: {selectedSession.id}</span>
-                  <span>📅 {selectedSession.ngayHoc}</span>
-                </div>
-              </div>
-              <div className="session-metrics">
-                <div className="metric-item">
-                  <span className="m-val">55</span>
-                  <span className="m-lbl">SỈ SỐ</span>
-                </div>
-                <div className="metric-item highlight">
-                  <span className="m-val">40</span>
-                  <span className="m-lbl">HIỆN DIỆN</span>
-                </div>
-              </div>
-            </div>
 
-            <div className="glass-table-wrapper">
-              <table className="modern-table">
-                <thead>
-                  <tr>
-                    <th>MSSV</th>
-                    <th>MÃ LỚP</th>
-                    <th>CẬP NHẬT</th>
-                    <th className="hide-sm">GHI CHÚ</th>
-                    <th>TRẠNG THÁI</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((d, i) => (
-                    <tr key={i}>
-                      <td className="font-600">{d.mssv}</td>
-                      <td>{d.maLop}</td>
-                      <td className="font-600">{d.thoiGian}</td>
-                      <td className="hide-sm">{d.ghiChu}</td>
-                      <td>
-                        <span className={`status-text ${d.trangThai === 'Đã điểm danh' ? 'text-present' : 'text-absent'}`}>
-                          {d.trangThai}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="detail-top-card">
+            <div className="session-summary">
+              <h3>Lớp: <span>{selectedSession.maLop}</span></h3>
+              <div className="summary-pills">
+                <span>Mã: {selectedSession.id}</span>
+                <span>📅 {selectedSession.ngayHoc}</span>
+              </div>
             </div>
-            <Pagination />
+            <div className="session-metrics">
+              <div className="metric-item">
+                <span className="m-val">55</span>
+                <span className="m-lbl">SỈ SỐ</span>
+              </div>
+              <div className="metric-item highlight">
+                <span className="m-val">40</span>
+                <span className="m-lbl">HIỆN DIỆN</span>
+              </div>
+            </div>
           </div>
-        )}
+
+          <div className="glass-table-wrapper">
+            <table className="modern-table">
+              <thead>
+                <tr>
+                  <th>MSSV</th>
+                  <th>MÃ LỚP</th>
+                  <th>CẬP NHẬT</th>
+                  <th className="hide-sm">GHI CHÚ</th>
+                  <th>TRẠNG THÁI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.map((d, i) => (
+                  <tr key={i}>
+                    <td className="font-600">{d.mssv}</td>
+                    <td>{d.maLop}</td>
+                    <td className="font-600">{d.thoiGian}</td>
+                    <td className="hide-sm">{d.ghiChu}</td>
+                    <td>
+                      <span className={`status-text ${d.trangThai === 'Đã điểm danh' ? 'text-present' : 'text-absent'}`}>
+                        {d.trangThai}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination />
+        </div>
       </div>
     </div>
   );
