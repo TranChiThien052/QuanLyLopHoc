@@ -3,16 +3,16 @@ import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import './AttendanceProcess.css';
 
 const MOCK_STUDENTS = [
-    { mssv: 'DH51245', maLop: 'D22_TH02', updateTime: '7:10', note: 'Đi trễ', status: 'present' },
-    { mssv: 'DH51246', maLop: 'D22_TH02', updateTime: '7:09', note: 'Xin nghỉ có phép', status: 'choice' },
+    { mssv: 'DH51245', maLop: 'D22_TH02', updateTime: '7:10', note: 'Đi trễ', status: 'late' },
+    { mssv: 'DH51246', maLop: 'D22_TH02', updateTime: '7:09', note: 'Xin nghỉ có phép', status: 'excused' },
     { mssv: 'DH51247', maLop: 'D22_TH02', updateTime: '7:00', note: '--', status: 'choice' },
     { mssv: 'DH51248', maLop: 'D22_TH02', updateTime: '7:02', note: '--', status: 'present' },
-    { mssv: 'DH51249', maLop: 'D22_TH02', updateTime: '--', note: '--', status: 'absent' },
+    { mssv: 'DH51249', maLop: 'D22_TH02', updateTime: '--', note: '--', status: 'unexcused' },
     { mssv: 'DH51250', maLop: 'D22_TH02', updateTime: '7:05', note: 'Quên thẻ', status: 'present' },
     { mssv: 'DH51251', maLop: 'D22_TH02', updateTime: '7:15', note: 'Lý do cá nhân', status: 'choice' },
-    { mssv: 'DH51252', maLop: 'D22_TH02', updateTime: '--', note: '--', status: 'absent' },
+    { mssv: 'DH51252', maLop: 'D22_TH02', updateTime: '--', note: '--', status: 'unexcused' },
     { mssv: 'DH51253', maLop: 'D22_TH02', updateTime: '7:00', note: '--', status: 'present' },
-    { mssv: 'DH51254', maLop: 'D22_TH02', updateTime: '7:12', note: 'Đi trễ', status: 'present' },
+    { mssv: 'DH51254', maLop: 'D22_TH02', updateTime: '7:12', note: 'Đi trễ', status: 'late' },
 ];
 
 export default function AttendanceProcess() {
@@ -25,14 +25,18 @@ export default function AttendanceProcess() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // QUAN TRỌNG: Mọi thay đổi phải diễn ra trên state này
     const [students, setStudents] = useState(MOCK_STUDENTS);
 
     const handleStatusChange = (mssv, newStatus) => {
-        const updatedStudents = students.map(s =>
+        setStudents(prev => prev.map(s =>
             s.mssv === mssv ? { ...s, status: newStatus } : s
-        );
-        setStudents(updatedStudents);
+        ));
+    };
+    // MỚI: Hàm xử lý thay đổi Ghi chú
+    const handleNoteChange = (mssv, newNote) => {
+        setStudents(prev => prev.map(s =>
+            s.mssv === mssv ? { ...s, note: newNote } : s
+        ));
     };
 
     useEffect(() => {
@@ -44,12 +48,13 @@ export default function AttendanceProcess() {
         sessionId: sessionId,
         className: "CNTT TH10",
         students: 70,
-        present: students.filter(s => s.status === 'present').length, // Tính toán động
-        absent: students.filter(s => s.status === 'absent').length,   // Tính toán động
+        // Có mặt = present + late
+        present: students.filter(s => s.status === 'present' || s.status === 'late').length,
+        // Vắng = excused + unexcused
+        absent: students.filter(s => s.status === 'excused' || s.status === 'unexcused').length,
         time: "7:00 - 12:00"
     };
 
-    // SỬA LỖI: Lọc từ state 'students' thay vì 'MOCK_STUDENTS'
     const filteredStudents = students.filter(s =>
         s.mssv.toLowerCase().includes(studentSearch.toLowerCase())
     );
@@ -108,29 +113,36 @@ export default function AttendanceProcess() {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentStudents.length > 0 ? (
-                            currentStudents.map((student) => (
-                                <tr key={student.mssv}>
-                                    <td>{student.mssv}</td>
-                                    <td>{student.maLop}</td>
-                                    <td style={{ fontWeight: '900' }}>{student.updateTime}</td>
-                                    <td>{student.note}</td>
-                                    <td>
-                                        <select
-                                            className={`status-select ${student.status}`}
-                                            value={student.status} // Dùng value thay cho defaultValue để đồng bộ state
-                                            onChange={(e) => handleStatusChange(student.mssv, e.target.value)}
-                                        >
-                                            <option value="choice">Lựa chọn</option>
-                                            <option value="present">Đã điểm danh</option>
-                                            <option value="absent">Vắng</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr><td colSpan="5" style={{ textAlign: 'center' }}>Không tìm thấy sinh viên</td></tr>
-                        )}
+                        {currentStudents.map((student) => (
+                            <tr key={student.mssv}>
+                                <td>{student.mssv}</td>
+                                <td>{student.maLop}</td>
+                                <td style={{ fontWeight: '900' }}>{student.updateTime}</td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        className="note-input"
+                                        // Nếu note là '--' thì để trống, ngược lại hiện giá trị note
+                                        value={student.note === '--' ? '' : student.note}
+                                        placeholder="Thêm ghi chú..."
+                                        onChange={(e) => handleNoteChange(student.mssv, e.target.value)}
+                                    />
+                                </td>
+                                <td>
+                                    <select
+                                        className={`status-select ${student.status}`}
+                                        value={student.status}
+                                        onChange={(e) => handleStatusChange(student.mssv, e.target.value)}
+                                    >
+                                        <option value="choice">Lựa chọn</option>
+                                        <option value="present">Có mặt</option>
+                                        <option value="excused">Vắng có phép</option>
+                                        <option value="unexcused">Vắng không phép</option>
+                                        <option value="late">Đi trễ</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
