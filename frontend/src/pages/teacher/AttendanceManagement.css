@@ -1,0 +1,306 @@
+:root {
+  --primary-blue: #4973F2;
+  --light-cyan: #8DE1F0;
+  --header-gray: #D9D9D9;
+  --border-black: #000000;
+}
+
+.mgmt-container {
+  max-width: 1090px;
+  margin: 20px auto;
+  padding: 0 15px;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* TOP BAR */
+.mgmt-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.mgmt-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.search-group {
+  display: flex;
+  gap: 10px;
+  flex-grow: 1;
+  max-width: 550px;
+}
+
+.search-input {
+  flex-grow: 1;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--border-black);
+  font-size: 16px;
+}
+
+.btn-search {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* DATE BANNER */
+.date-banner {
+  background-color: var(--light-cyan);
+  padding: 15px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-black);
+}
+
+/* TABLE STYLES */
+.mgmt-table-wrapper {
+  background: white;
+  border-radius: 30px;
+  border: 1px solid var(--border-black);
+  overflow: hidden;
+}
+
+.mgmt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mgmt-table thead {
+  background-color: var(--header-gray);
+}
+
+.mgmt-table th {
+  padding: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: left;
+  border-right: 1px solid var(--border-black);
+}
+
+.mgmt-table td {
+  padding: 15px 20px;
+  font-size: 16px;
+  border-top: 1px solid var(--border-black);
+  border-right: 1px solid var(--border-black);
+}
+
+.mgmt-table th:last-child,
+.mgmt-table td:last-child {
+  border-right: none;
+}
+
+/* BUTTON CREATE CODE */
+.btn-create-code {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 15px;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* PAGINATION */
+.mgmt-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  gap: 15px;
+}
+
+.page-btn {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 1px solid var(--border-black);
+  background: white;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.page-btn.active {
+  background-color: #FB0505;
+  color: white;
+  border: none;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 768px) {
+  .mgmt-title {
+    font-size: 24px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .search-group {
+    width: 100%;
+  }
+
+  .date-banner {
+    font-size: 16px;
+  }
+
+  .mgmt-table thead {
+    display: none;
+  }
+
+  .mgmt-table tr {
+    display: block;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-black);
+  }
+
+  .mgmt-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right: none;
+    text-align: right;
+    border-top: 1px solid #eee;
+  }
+
+  .mgmt-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    float: left;
+    color: #333;
+  }
+
+  .btn-create-code {
+    width: auto;
+    padding: 8px 20px;
+  }
+}
+
+/* --- MODAL OVERLAY --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  /* Làm mờ nền phía sau cho hiện đại */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* --- MODAL CONTENT BOX --- */
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 30px;
+  border: 3px solid var(--border-black);
+  /* Đường viền dày theo style Figma */
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2);
+  /* Đổ bóng cứng kiểu retro */
+  animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  font-size: 24px;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* --- OPTIONS GROUP --- */
+.options-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.opt-btn {
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 15px;
+  border: 2px solid var(--border-black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Màu cho từng phương thức */
+.opt-btn.manual {
+  background-color: #86EAAD;
+  /* Xanh lá nhạt giống Figma điểm danh */
+  color: #000;
+}
+
+.opt-btn.face {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.opt-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.opt-btn:active {
+  transform: translateY(0);
+}
+
+/* --- CLOSE BUTTON --- */
+.close-btn {
+  background: none;
+  border: none;
+  color: #666;
+  text-decoration: underline;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.close-btn:hover {
+  color: #FB0505;
+}
+
+/* Mobile: Làm các nút to hơn để dễ bấm */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 20px;
+  }
+
+  .opt-btn {
+    font-size: 16px;
+  }
+}

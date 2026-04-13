@@ -1,0 +1,169 @@
+/* Login.css */
+:root {
+  --primary-blue: #31A7BF;
+  --dark-navy: #1D3557;
+  --soft-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--soft-bg);
+  padding: 20px;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 50px 40px;
+  border-radius: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+/* Hiệu ứng vào trang */
+.fade-in {
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stu-logo {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--dark-navy);
+  margin-bottom: 5px;
+}
+
+.stu-logo span { color: var(--primary-blue); }
+
+.welcome-text {
+  color: #718096;
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark-navy);
+  margin-bottom: 8px;
+  margin-left: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(49, 167, 191, 0.1);
+}
+
+/* Nút ẩn hiện mật khẩu */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 12px; /* Canh lề phải */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* Hiệu ứng hover tròn */
+  transition: 0.2s;
+}
+
+/* Hiệu ứng nền khi di chuột qua Icon */
+.toggle-password-btn:hover {
+  background-color: rgba(49, 167, 191, 0.1); /* Màu xanh nhạt của STU */
+}
+
+/* Định dạng Icon SVG */
+.toggle-password-btn svg {
+  width: 20px; /* Kích thước Icon */
+  height: 20px;
+  color: #a0aec0; /* Màu xám mặc định */
+  transition: 0.2s;
+}
+
+/* Đổi màu Icon khi di chuột qua nút */
+.toggle-password-btn:hover svg {
+  color: var(--primary-blue); /* Màu xanh STU */
+}
+
+/* Tăng padding phải của ô Input để chữ không bị đè lên Icon */
+.input-group input[type="password"],
+.input-group input[type="text"] {
+  padding-right: 45px !important; 
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+}
+
+.forgot-link-btn {
+  background: none;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.forgot-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Nút Đăng nhập phong cách Modern */
+.btn-login-modern {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.4s;
+  box-shadow: 0 8px 20px rgba(49, 167, 191, 0.3);
+}
+
+.btn-login-modern:hover {
+  background: var(--dark-navy);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(29, 53, 87, 0.2);
+}

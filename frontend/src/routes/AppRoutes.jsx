@@ -15,8 +15,11 @@ import AttendanceDetail from "../pages/student/AttendanceDetail";
 // Teacher
 import TeacherProfile from "../pages/teacher/Profile";
 import ClassManagement from "../pages/teacher/ClassManagement";
+import AttendanceManagementClass from "../pages/teacher/AttendanceManagementClass";
 import AttendanceManagement from "../pages/teacher/AttendanceManagement";
 import Statistics from "../pages/teacher/Statistics";
+import ClassStatistics from "../pages/teacher/ClassStatistics";
+import AttendanceProcess from "../pages/teacher/AttendanceProcess";
 
 // Admin
 import AccountManagement from "../pages/admin/AccountManagement";
@@ -41,8 +44,11 @@ function AppRoutes() {
         <Route path="/teacher" element={<MainLayout />}>
           <Route path="profile" element={<TeacherProfile />} />
           <Route path="classes" element={<ClassManagement />} />
-          <Route path="attendance" element={<AttendanceManagement />} />
-          <Route path="statistics" element={<Statistics />} />
+          <Route path="attendance" element={<AttendanceManagementClass />} />
+          <Route path="attendance/:classId" element={<AttendanceManagement />} />
+          <Route path="statistics/:sessionId" element={<Statistics />} />
+          <Route path="class-statistics/:classId" element={<ClassStatistics />} />
+          <Route path="attendance/process/:sessionId" element={<AttendanceProcess />} />
         </Route>
 
         {/* ADMIN ROUTES */}

@@ -1,4 +1,5 @@
 const accountService = require('../services/accountService');
+const bcrypt = require('bcrypt');
 
 const findAll = async (req, res) => {
     try {
@@ -23,9 +24,10 @@ const findByUsername = async (req, res) => {
 };
 
 const create = async (req, res) => {
-    const { userId, username, password, role } = req.body;
+    const { mataikhoan, username, password, role } = req.body;
     try {
-        const newAccount = await accountService.create(userId, username, password, role);
+        const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS));
+        const newAccount = await accountService.create(mataikhoan, username, hashedPassword, role);
         res.status(201).json(newAccount);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -34,9 +36,10 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const { username } = req.params;
-    const { userId, password, role } = req.body;
+    const { mataikhoan, password, role } = req.body;
     try {
-        const updatedAccount = await accountService.update(userId, username, password, role);
+        const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS));
+        const updatedAccount = await accountService.update(mataikhoan, username, hashedPassword, role);
         res.json(updatedAccount);
     } catch (error) {
         res.status(500).json({ error: error.message });

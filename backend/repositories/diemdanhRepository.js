@@ -5,7 +5,7 @@ const findAll = async () => {
 };
 
 const findBySinhVienId = async (maSinhVien) => {
-    return await DiemDanh.findOne(
+    return await DiemDanh.findAll(
         {
             where: { masinhvien : maSinhVien }
         }
@@ -13,7 +13,7 @@ const findBySinhVienId = async (maSinhVien) => {
 };
 
 const findByBuoiHocId = async (maBuoiHoc) => {
-    return await DiemDanh.findOne(
+    return await DiemDanh.findAll(
         {
             where: { mabuoihoc : maBuoiHoc }
         }
@@ -21,34 +21,34 @@ const findByBuoiHocId = async (maBuoiHoc) => {
 };
 
 const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
-    const maDiemDanh = masinhvien + "_" + maBuoiHoc;
+    const maDiemDanh = maSinhVien + "_" + maBuoiHoc;
     return await DiemDanh.create({
-        maDiemDanh,
-        maSinhVien,
-        maBuoiHoc,
-        trangThai,
-        ghiChu,
-        thoiGianCapNhat,
-        maNguoiCapNhat
+        madiemdanh: maDiemDanh,
+        masinhvien: maSinhVien,
+        mabuoihoc: maBuoiHoc,
+        trangthai: trangThai,
+        ghichu: ghiChu,
+        thoigiancapnhat: thoiGianCapNhat,
+        manguoicapnhat: maNguoiCapNhat
     });
 };
 
-const update = async (maDiemDanh, maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
+const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
     const diemdanh = await DiemDanh.findOne(
         {
             where: 
             {
-                maDiemDanh : maDiemDanh 
+                madiemdanh : maDiemDanh 
             }
         }
     );
     if (!diemdanh) {
         throw new Error("Điểm danh không tồn tại");
     }
-    diemdanh.trangThai = trangThai;
-    diemdanh.ghiChu = ghiChu;
-    diemdanh.thoiGianCapNhat = thoiGianCapNhat;
-    diemdanh.maNguoiCapNhat = maNguoiCapNhat;
+    diemdanh.trangthai = trangThai;
+    diemdanh.ghichu = ghiChu;
+    diemdanh.thoigiancapnhat = thoiGianCapNhat;
+    diemdanh.manguoicapnhat = maNguoiCapNhat;
     return await diemdanh.save();
 }
 
@@ -57,7 +57,7 @@ const deleteDiemDanh = async (maDiemDanh) => {
         {
             where:
             {
-                maDiemDanh : maDiemDanh
+                madiemdanh : maDiemDanh
             }
         }
     );

@@ -12,11 +12,11 @@ const findById = async (id) => {
     );
 };
 
-const create = async (TenLop, MonHoc , MaGiangVien) => {
+const create = async (tenlop, monhoc , magiangvien) => {
     return await Class.create({
-        TenLop,
-        MonHoc,
-        MaGiangVien
+        tenlop,
+        monhoc,
+        magiangvien
     });
 };
 
@@ -24,16 +24,16 @@ const update = async (MaLop, TenLop, MonHoc, MaGiangVien) => {
     const lop = await Class.findOne(
         {
             where: {
-                MaLop : MaLop
+                malop : MaLop
             }
         }
     );
     if (!lop) {
         throw new Error("Lớp học không tồn tại");
     }
-    lop.TenLop = TenLop;
-    lop.MonHoc = MonHoc;
-    lop.MaGiangVien = MaGiangVien;
+    lop.tenlop = TenLop;
+    lop.monhoc = MonHoc;
+    lop.magiangvien = MaGiangVien;
     return await lop.save();
 }
 
@@ -41,7 +41,7 @@ const deleteClass = async (MaLop) => {
     const lop = await Class.findOne(
         {
             where: {
-                MaLop : MaLop
+                malop : MaLop
             }
         }
     );
