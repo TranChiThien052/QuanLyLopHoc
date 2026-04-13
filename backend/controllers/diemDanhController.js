@@ -36,7 +36,8 @@ const findByBuoiHocId = async (req, res) => {
 };
 
 const create = async (req, res) => {
-    const { maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat } = req.body;
+    const { maSinhVien, maBuoiHoc, trangThai, ghiChu, maNguoiCapNhat } = req.body;
+    const thoiGianCapNhat = new Date();
     try {
         const newDiemDanh = await diemDanhService.create(
             maSinhVien,
@@ -54,12 +55,11 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const { maDiemDanh } = req.params;
-    const { maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat } = req.body;
+    const { trangThai, ghiChu, maNguoiCapNhat } = req.body;
+    const thoiGianCapNhat = new Date();
     try {
         const updatedDiemDanh = await diemDanhService.update(
             maDiemDanh,
-            maSinhVien,
-            maBuoiHoc,
             trangThai,
             ghiChu,
             thoiGianCapNhat,
