@@ -11,18 +11,18 @@ const findByUsername = async (username) => {
     return await accountRepo.findByUsername(username);
 };
 
-const create = async (userId, username, password, role) => {
-    if (!userId || !username || !password || !role) {
+const create = async (mataikhoan, username, password, role) => {
+    if (!mataikhoan || !username || !password || !role) {
         throw new Error('Thiếu dữ liệu để tạo tài khoản');
     }
-    return await accountRepo.create(userId, username, password, role);
+    return await accountRepo.create(mataikhoan, username, password, role);
 };
 
-const update = async (userId, username, password, role) => {
-    if (!userId || !username || !password || !role) {
+const update = async (mataikhoan, username, password, role) => {
+    if (!mataikhoan || !username || !password || !role) {
         throw new Error('Thiếu dữ liệu để cập nhật tài khoản');
     }
-    return await accountRepo.update(userId, username, password, role);
+    return await accountRepo.update(mataikhoan, username, password, role);
 };
 
 const deleteAccount = async (username) => {

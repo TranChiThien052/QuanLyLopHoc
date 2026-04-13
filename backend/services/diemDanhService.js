@@ -22,10 +22,10 @@ const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat,
     return await diemDanhRepo.create(maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat);
 }
 
-const update = async (maDiemDanh, maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
-    if (!maDiemDanh || !maSinhVien || !maBuoiHoc || !trangThai || !thoiGianCapNhat || !maNguoiCapNhat)
+const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
+    if (!maDiemDanh || !trangThai || !ghiChu || !thoiGianCapNhat || !maNguoiCapNhat)
         throw new Error("Thiếu dữ liệu để cập nhật điểm danh");
-    return await diemDanhRepo.update(maDiemDanh, maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat);
+    return await diemDanhRepo.update(maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat);
 }
 
 const deleteDiemDanh = async (maDiemDanh) => {
