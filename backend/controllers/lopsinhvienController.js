@@ -71,7 +71,10 @@ const deleteLopSinhVien = async (req, res) => {
     try {
         const {malop, masinhvien} = req.body
         const lopsinhvien = await lopsinhvienService.deleteLopSinhVien(malop, masinhvien);
-        res.status(200).json(lopsinhvien);
+        if(!lopsinhvien){
+            return res.status(404).json({ code: 404, message: "Không tìm thấy lớp sinh viên !" });
+        }
+        res.status(200).json({ code: 200, message: "Xóa lớp sinh viên thành công !" });
     } catch (error) {
         res.status(500).json(
             {
