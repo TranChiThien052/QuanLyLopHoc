@@ -16,6 +16,13 @@ const sequelize = new Sequelize(
         rejectUnauthorized: false,
       },
     },
+    pool: {
+      max: 6,
+      min: 0,
+      acquire: 25000,
+      idle: 10000,
+      evict: 10000,
+    },
   },
 );
 
