@@ -20,7 +20,7 @@ const login = async (req, res) => {
         message: "Đăng nhập thành công",
         token,
         user: {
-            id: account.userId,
+            id: account.mataikhoan,
             role: account.role
         }
     });
