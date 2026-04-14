@@ -1,8 +1,28 @@
-const { account : Account } = require('../models');
+const { account : Account, sequelize } = require('../models');
 
 const findAll = async () => {
     return await Account.findAll();
 };
+
+const findAllSinhVien = async () => {
+    const [rows] = await sequelize.query(`
+        SELECT tk.*, (sv.holot || ' ' || sv.ten) AS hoten
+        FROM taikhoan AS tk
+        JOIN sinhvien AS sv
+        ON tk.mataikhoan = sv.masinhvien`
+    );
+    return rows;
+}
+
+const findAllGiangVien = async () => {
+    const [rows] = await sequelize.query(`
+        SELECT tk.*, (sv.holot || ' ' || sv.ten) AS hoten
+        FROM taikhoan AS tk
+        JOIN giangvien AS sv
+        ON tk.mataikhoan = sv.magiangvien`
+    );
+    return rows;
+}
 
 const findByUsername = async (username) => {
     return await Account.findOne(
@@ -50,6 +70,8 @@ const deleteAccount = async (username) => {
 
 module.exports = {
     findAll,
+    findAllSinhVien,
+    findAllGiangVien,
     findByUsername,
     create,
     update,

@@ -4,6 +4,14 @@ const findAll = async () => {
     return await accountRepo.findAll();
 };
 
+const findAllSinhVien = async () => {
+    return await accountRepo.findAllSinhVien();
+}
+
+const findAllGiangVien = async () => {
+    return await accountRepo.findAllGiangVien();
+}
+
 const findByUsername = async (username) => {
     if (!username) {
         throw new Error('Thiếu dữ liệu tên đăng nhập');
@@ -34,6 +42,8 @@ const deleteAccount = async (username) => {
 
 module.exports = {
     findAll,
+    findAllSinhVien,
+    findAllGiangVien,
     findByUsername,
     create,
     update,
