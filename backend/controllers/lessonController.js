@@ -33,6 +33,17 @@ const createLesson = async (req, res) => {
     }
 };
 
+const createBulkLessons = async (req, res) => {
+    try {
+        const { malop, giobatdau, gioketthuc, ngaybatdau, ngayketthuc, thuTrongTuan } = req.body;
+        const result = await lessonService.createBulkLessons(malop, giobatdau, gioketthuc, ngaybatdau, ngayketthuc, thuTrongTuan);
+        return res.status(201).json(result);
+    } catch (error) {
+        const status = error.status || 500;
+        return res.status(status).json({ code: status, message: error.message });
+    }   
+};
+
 const updateLesson = async (req, res) => {
     try {
         const { mabuoihoc } = req.params;
@@ -64,4 +75,5 @@ module.exports = {
     createLesson,
     updateLesson,
     deleteLesson,
+    createBulkLessons
 };
