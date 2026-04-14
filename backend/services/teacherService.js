@@ -1,4 +1,6 @@
 const teacherRepository = require("../repositories/teacherRepository");
+const accountRepository  = require("../repositories/accountRepository");
+const bcrypt = require('bcrypt');
 
 const getAll = async () => {
   return await teacherRepository.findAll();
@@ -18,25 +20,43 @@ const createTeacher = async (magiangvien,ten,holot,ngaysinh,email,sodienthoai) =
     if( !ten || !holot || !email)
         throw new Error("Thiếu thông tin email và họ tên giảng viên!");
 
-    return await teacherRepository.create(magiangvien,ten,holot,ngaysinh,email,sodienthoai);
+    if(await teacherRepository.findByMaGiangVien(magiangvien) !== null)
+        throw new Error("Mã giảng viên đã tồn tại !");
+
+    const hashedPassword = await bcrypt.hash(magiangvien, Number(process.env.SALT_ROUNDS));
+    let giangvien = await await teacherRepository.create(magiangvien,ten,holot,ngaysinh,email,sodienthoai);
+    let account = await accountRepository.create(magiangvien, magiangvien, hashedPassword, 'teacher');
+
+    if(account === null){
+        await teacherRepository.deleteStudentById(magiangvien);
+        throw new Error("Không thể tạo tạo giảng viên mói, vui lòng thử lại sau !");
+    }
+    return giangvien
+
 };
 
 const deleteTeacherById = async (magiangvien) => {
     if(!magiangvien)
-        throw new Error("Vui long truyen ma !");
+        throw new Error("Vui lòng truyền mã !");
+    let teacherDelete = await teacherRepository.destroy(magiangvien);
 
-    return await teacherRepository.destroy(magiangvien);
+    if(!teacherDelete)
+        throw new Error("Không tìm thấy giảng viên !")
+
+    await accountRepository.deleteAccount(magiangvien);
+
+    return teacherDelete
 }
 
 const updateInfoTeacher = async (magiangvien,ten,holot,ngaysinh,email,sodienthoai) => {
     if(!magiangvien)
-        throw new Error("Vui long truyen ma !");
+        throw new Error("Vui lòng truyền mã !");
 
     if(ten.indexOf(" ") !== -1)
         throw new Error("Tên không được chứa khoảng trắng !");
 
     if(!holot || !ten || !email || !sodienthoai)
-        throw new Error("Thieu thong tin dau vao !");
+        throw new Error("Thiếu thông tin đầu vào !");
 
     return await teacherRepository.update(magiangvien,ten,holot,ngaysinh,email,sodienthoai);
 }
