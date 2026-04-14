@@ -19,6 +19,26 @@ module.exports = (sequelize) => {
                 type: DataTypes.STRING(40),
                 allowNull: false,
             },
+            ngaybatdau: {
+                type: DataTypes.DATEONLY,
+                allowNull: false,
+            },
+            ngayketthuc: {
+                type: DataTypes.DATEONLY,
+                allowNull: false,
+            },
+            ngayhoccodinh: {
+                type: DataTypes.STRING(20),
+                allowNull: false,
+            },
+            giobatdau: {
+                type: DataTypes.TIME,
+                allowNull: false,
+            },
+            gioketthuc: {
+                type: DataTypes.TIME,
+                allowNull: false,
+            },
             magiangvien: {
                 type: DataTypes.STRING(10),
                 allowNull: false,

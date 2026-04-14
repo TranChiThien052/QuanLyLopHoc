@@ -10,6 +10,24 @@ const findAll = async (req, res) => {
     }
 };
 
+const findAllSinhVien = async (req, res) => {
+    try {
+        const accounts = await accountService.findAllSinhVien();
+        res.json(accounts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const findAllGiangVien = async (req, res) => {
+    try {
+        const accounts = await accountService.findAllGiangVien();
+        res.json(accounts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const findByUsername = async (req, res) => {
     const { username } = req.params;
     try {
@@ -58,6 +76,8 @@ const deleteAccount = async (req, res) => {
 
 module.exports = {
     findAll,
+    findAllSinhVien,
+    findAllGiangVien,
     findByUsername,
     create,
     update,

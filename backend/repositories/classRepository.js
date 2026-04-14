@@ -12,15 +12,20 @@ const findById = async (id) => {
     );
 };
 
-const create = async (tenlop, monhoc , magiangvien) => {
+const create = async (tenlop, monhoc, ngaybatdau, ngayketthuc, ngayhoccodinh, giobatdau, gioketthuc, magiangvien) => {
     return await Class.create({
         tenlop,
         monhoc,
+        ngaybatdau,
+        ngayketthuc,
+        ngayhoccodinh,
+        giobatdau,
+        gioketthuc,
         magiangvien
     });
 };
 
-const update = async (MaLop, TenLop, MonHoc, MaGiangVien) => {
+const update = async (MaLop, TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien) => {
     const lop = await Class.findOne(
         {
             where: {
@@ -33,6 +38,11 @@ const update = async (MaLop, TenLop, MonHoc, MaGiangVien) => {
     }
     lop.tenlop = TenLop;
     lop.monhoc = MonHoc;
+    lop.ngaybatdau = NgayBatDau;
+    lop.ngayketthuc = NgayKetThuc;
+    lop.ngayhoccodinh = NgayHocCoDinh;
+    lop.giobatdau = GioBatDau;
+    lop.gioketthuc = GioKetThuc;
     lop.magiangvien = MaGiangVien;
     return await lop.save();
 }

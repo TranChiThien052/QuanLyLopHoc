@@ -24,14 +24,14 @@ const findById = async (req, res) => {
 };
 
 const create = async (req, res) => {
-    const { MonHoc, MaGiangVien } = req.body;
+    const { MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien } = req.body;
     const teacher = await teacherService.getTeacherById(MaGiangVien);
     if (!teacher) {
         return res.status(400).json({ error: 'Mã giảng viên không hợp lệ' });
     }
     const TenLop = MonHoc + '_' + teacher.holot + " " + teacher.ten;
     try {
-        const newClass = await classService.create(TenLop, MonHoc, MaGiangVien);
+        const newClass = await classService.create(TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien);
         res.status(201).json(newClass);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -40,7 +40,7 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const { MaLop } = req.params;
-    const { MonHoc, MaGiangVien } = req.body;
+    const { MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien } = req.body;
     const lop = await classService.findById(MaLop);
     if (!lop) {
         return res.status(404).json({ error: 'Lớp học không tồn tại' });
@@ -51,7 +51,7 @@ const update = async (req, res) => {
     }
     const TenLop = MonHoc + "_" + teacher.holot + " " + teacher.ten;
     try {
-        const updatedClass = await classService.update(MaLop, TenLop, MonHoc, MaGiangVien);
+        const updatedClass = await classService.update(MaLop, TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien);
         res.json(updatedClass);
     } catch (error) {
         res.status(500).json({ error: error.message });
