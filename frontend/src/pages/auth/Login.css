@@ -167,3 +167,19 @@
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(29, 53, 87, 0.2);
 }
+
+.error-message {
+  background: #fff5f5;
+  color: #c53030;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #fed7d7;
+  text-align: left;
+}
+
+input:disabled, button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}
