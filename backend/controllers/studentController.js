@@ -64,7 +64,7 @@ const deleteStudentById = async (req,res) => {
             response.message = "Không tìm thấy sinh viên !";
         }
         else{
-            response.message = `Đã xóa thành công ${masinhvien}} !`;
+            response.message = `Đã xóa thành công ${masinhvien} !`;
             response.masinhvien = masinhvien
         }
 
