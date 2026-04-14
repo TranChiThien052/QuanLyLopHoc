@@ -138,3 +138,156 @@
     min-width: 280px;
     padding: 10px 15px;
 }
+
+/* --- QR GENERATION UI --- */
+.btn-init-qr {
+    background: #FF9800;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+    transition: 0.3s;
+}
+
+.btn-init-qr:hover {
+    background: #F57C00;
+    transform: translateY(-2px);
+}
+
+.qr-setup-box {
+    background: #fff3e0;
+    padding: 20px;
+    border: 2px dashed #FF9800;
+    border-radius: 15px;
+    margin: 10px 30px;
+    text-align: center;
+}
+
+.qr-setup-box label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.qr-setup-box input {
+    padding: 10px;
+    font-size: 18px;
+    width: 100px;
+    text-align: center;
+    border: 2px solid #FF9800;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.setup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-confirm-qr {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-cancel-setup {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* --- QR MODAL --- */
+.qr-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+.qr-modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+
+.qr-modal-content h2 {
+    margin-top: 0;
+    color: #333;
+    font-size: 24px;
+}
+
+.qr-display {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.qr-display img {
+    width: 250px;
+    height: 250px;
+    display: block;
+}
+
+.timer-display {
+    font-size: 20px;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+.timer-display strong {
+    color: #d9534f;
+    font-size: 28px;
+}
+
+.btn-cancel-qr {
+    padding: 15px 40px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cancel-qr:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* --- LOCKDOWN STATE --- */
+.process-container.locked {
+    pointer-events: none;
+    user-select: none;
+    filter: grayscale(0.5);
+    opacity: 0.8;
+}
+
+.qr-modal-overlay {
+    pointer-events: auto; /* Re-enable for modal */
+}
