@@ -10,16 +10,16 @@ const findById = async (id) => {
     return await classRepo.findById(id);
 }
 
-const create = async (TenLop, MonHoc, MaGiangVien) => {
-    if (!TenLop || !MonHoc || !MaGiangVien)
+const create = async (TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien) => {
+    if (!TenLop || !MonHoc || !NgayBatDau || !NgayKetThuc || !NgayHocCoDinh || !GioBatDau || !GioKetThuc || !MaGiangVien)
         throw new Error("Thiếu dữ liệu để tạo lớp học");
-    return await classRepo.create(TenLop, MonHoc, MaGiangVien);
+    return await classRepo.create(TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien);
 }
 
-const update = async (MaLop, TenLop, MonHoc, MaGiangVien) => {
-    if (!MaLop || !TenLop || !MonHoc || !MaGiangVien)
+const update = async (MaLop, TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien) => {
+    if (!MaLop || !TenLop || !MonHoc || !NgayBatDau || !NgayKetThuc || !NgayHocCoDinh || !GioBatDau || !GioKetThuc || !MaGiangVien)
         throw new Error("Thiếu dữ liệu để cập nhật lớp học");
-    return await classRepo.update(MaLop, TenLop, MonHoc, MaGiangVien);
+    return await classRepo.update(MaLop, TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien);
 }
 
 const deleteClass = async (MaLop) => {
