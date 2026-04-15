@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const { lesson: Lesson } = require("../models");
 
 const findAll = async () => {
@@ -8,6 +9,12 @@ const findByMaBuoiHoc = async (mabuoihoc) => {
     return await Lesson.findOne({
         where: { mabuoihoc }
     });
+}
+
+const findByMaLop = async (malop) => {
+    return await Lesson.findAll({
+        where: {malop}
+    })
 }
 
 const create = async (mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc) => {
@@ -50,6 +57,7 @@ const remove = async (mabuoihoc) => {
 module.exports = {
     findAll,
     findByMaBuoiHoc,
+    findByMaLop,
     create,
     update,
     remove

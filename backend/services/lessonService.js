@@ -31,6 +31,13 @@ const getLessonById = async (mabuoihoc) => {
     return await lessonRepository.findByMaBuoiHoc(mabuoihoc);
 }
 
+const getLessonsByMaLop = async (malop) =>{
+    if(!malop){
+        throw new Error("Thiếu mã lớp học");
+    }
+    return await lessonRepository.findByMaLop(malop);
+}
+
 const createLesson = async (malop, giobatdau, gioketthuc, noidungbuoihoc) => {
     if (!malop || !giobatdau || !gioketthuc) {
         const err = new Error("Thiếu thông tin để tạo buổi học");
@@ -129,6 +136,7 @@ const deleteLesson = async (mabuoihoc) => {
 module.exports = {
     getAllLessons,
     getLessonById,
+    getLessonsByMaLop,
     createLesson,
     updateLesson,
     deleteLesson,
