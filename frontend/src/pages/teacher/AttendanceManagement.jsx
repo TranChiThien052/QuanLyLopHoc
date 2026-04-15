@@ -13,23 +13,11 @@ const sessionsData = [
 
 export default function AttendanceManagement() {
   const { classId } = useParams();
-  const [showOptions, setShowOptions] = useState(false);
-  const [selectedSessionId, setSelectedSessionId] = useState(null);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Số lượng buổi học mỗi trang
 
-  const handleOpenOptions = (id) => {
-    setSelectedSessionId(id);
-    setShowOptions(true);
-  };
-
-  const handleSelectMode = (mode) => {
-    setShowOptions(false);
-    // Chuyển hướng sang trang xử lý điểm danh với tham số mode
-    navigate(`/teacher/attendance/process/${selectedSessionId}?type=${mode}`);
-  };
   // Mỗi khi tìm kiếm, reset về trang 1
   useEffect(() => {
     setCurrentPage(1);
@@ -119,28 +107,10 @@ export default function AttendanceManagement() {
                     </button>
                     <button
                       className="btn-create-code"
-                      onClick={() => handleOpenOptions(session.id)}
+                      onClick={() => navigate(`/teacher/attendance/process/${session.id}?type=face`)}
                     >
                       Tạo mã điểm danh
                     </button>
-                    {/* MODAL LỰA CHỌN PHƯƠNG THỨC */}
-                    {showOptions && (
-                      <div className="modal-overlay" onClick={() => setShowOptions(false)}>
-                        {/* Ngăn sự kiện click bị lan ra ngoài khi bấm vào bên trong hộp thoại */}
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                          <h3>Chọn phương thức điểm danh</h3>
-                          <div className="options-group">
-                            <button onClick={() => handleSelectMode('manual')} className="opt-btn manual">
-                              🖐 Điểm danh thủ công
-                            </button>
-                            <button onClick={() => handleSelectMode('face')} className="opt-btn face">
-                              📸 Điểm danh khuôn mặt (QR)
-                            </button>
-                          </div>
-                          <button onClick={() => setShowOptions(false)} className="close-btn">Hủy bỏ</button>
-                        </div>
-                      </div>
-                    )}
                   </td>
                 </tr>
               ))
