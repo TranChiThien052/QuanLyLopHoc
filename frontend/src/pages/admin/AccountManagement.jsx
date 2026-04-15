@@ -2,15 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './AccountManagement.css';
 
-const api = axios.create({ baseURL: 'http://localhost:3000' });
+const api = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 
 const AccountManagement = () => {
   const [allProfiles, setAllProfiles] = useState([]); 
-  const [profiles, setProfiles] = useState([]);       
+  const [profiles, setProfiles] = useState([]);         
   const [activeTab, setActiveTab] = useState('sinhvien');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -89,7 +89,7 @@ const AccountManagement = () => {
         setAllProfiles(updated);
         setProfiles(updated);
         
-        alert("Đã xoá triệt để dữ liệu!");
+        alert("Đã xoá thành công!");
       } catch (error) {
         console.error("Lỗi xoá:", error);
         alert("Lỗi: Có thể bạn đã xoá hồ sơ nhưng tài khoản chưa được xoá, hoặc ngược lại.");
@@ -102,9 +102,9 @@ const AccountManagement = () => {
     let newErrors = {};
     const cleanMa = formData.ma.trim().toLowerCase();
     if (!isEdit) {
-      if (!cleanMa) newErrors.ma = "Trống mã số";
+      if (!cleanMa) newErrors.ma = "Trống mã tài khoản";
       else if (allProfiles.some(p => (p.masinhvien || p.magiangvien || "").toString().trim().toLowerCase() === cleanMa)) {
-        newErrors.ma = "Mã số này đã tồn tại!";
+        newErrors.ma = "Mã tài khoản này đã tồn tại!";
       }
     }
     if (!formData.ho.trim()) newErrors.ho = "Vui lòng nhập họ";
@@ -170,13 +170,13 @@ const AccountManagement = () => {
 
     const username = account.username.trim();
 
-    if (window.confirm(`Bạn có chắc muốn đặt mật khẩu của ${username} về "123"?`)) {
+    if (window.confirm(`Bạn có chắc muốn đặt mật khẩu của ${username}?`)) {
       try {
         // Backend (accountController.js) yêu cầu: mataikhoan, password, role
         const updateData = {
-          mataikhoan: account.mataikhoan || username,
-          password: "123",
-          role: account.role || 'sv'
+          mataikhoan: username,
+          password: username,
+          role: account.role
         };
 
         await api.put(`/accounts/${username}`, updateData);
@@ -216,7 +216,7 @@ const AccountManagement = () => {
         <div className="admin-header">
           <h2 className="header-title">Quản lý STU</h2>
           <div className="header-controls">
-            <input type="text" placeholder="Tìm mã số..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input type="text" placeholder="Tìm mã tài khoản..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             <button className="btn-add" onClick={() => { setShowAddModal(true); setErrors({}); setFormData({ma:'',ho:'',ten:'',ngaySinh:'',email:'',sodienthoai:'',malop:''}); }}>+ Thêm mới</button>
           </div>
         </div>
@@ -230,8 +230,8 @@ const AccountManagement = () => {
           <table className="account-table">
             <thead>
               <tr>
-                <th>Mã số</th>
-                <th>Họ & Tên</th>
+                <th>Mã tài khoản</th>
+                <th>Họ và tên</th>
                 <th className="hide-mobile">Ngày sinh</th>
                 {/* Cột động: SV hiện Lớp, GV hiện Email */}
                 <th>{activeTab === 'sinhvien' ? 'Lớp' : 'Email'}</th> 
@@ -277,7 +277,7 @@ const AccountManagement = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header-centered"><h3>Thêm hồ sơ mới</h3><button className="close-btn-round" onClick={() => setShowAddModal(false)}>&times;</button></div>
             <form onSubmit={handleAddSubmit} className="modal-body-form">
-              <div className="form-group-centered"><label>Mã số</label><input type="text" placeholder="Nhập mã số..." onChange={e => setFormData({...formData, ma: e.target.value})} /></div>
+              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" placeholder="Nhập mã tài khoản..." onChange={e => setFormData({...formData, ma: e.target.value})} /></div>
               
               <div className="form-row">
                 <div className="form-group-centered" style={{flex:1}}><label>Họ lót</label><input type="text" placeholder="Nhập họ..." onChange={e => setFormData({...formData, ho: e.target.value})} /></div>
@@ -310,7 +310,7 @@ const AccountManagement = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header-centered"><h3>Sửa hồ sơ</h3><button className="close-btn-round" onClick={() => setShowEditModal(false)}>&times;</button></div>
             <form onSubmit={handleEditSubmit} className="modal-body-form">
-              <div className="form-group-centered"><label>Mã số (Không sửa)</label><input type="text" value={formData.ma} disabled style={{opacity:0.6}} /></div>
+              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" value={formData.ma} disabled style={{opacity:0.6}} /></div>
               <div className="form-row">
                 <div className="form-group-centered" style={{flex:1}}><label>Họ lót</label><input type="text" value={formData.ho} onChange={e => setFormData({...formData, ho: e.target.value})} /></div>
                 <div className="form-group-centered" style={{flex:1}}><label>Tên</label><input type="text" value={formData.ten} onChange={e => setFormData({...formData, ten: e.target.value})} /></div>
@@ -333,7 +333,6 @@ const AccountManagement = () => {
             </div>
             <div className="modal-body-detail">
               <div className="info-row"><strong>Tên đăng nhập:</strong> <span>{selectedAccount.username}</span></div>
-              <div className="info-row"><strong>Mật khẩu hiện tại:</strong> <code className="hash-text">{selectedAccount.password}</code></div>
               <div className="info-row"><strong>Vai trò:</strong> <span>{selectedAccount.role === 'sv' ? 'Sinh viên' : 'Giảng viên'}</span></div>
               
               {/* Nút Reset mật khẩu mới */}
@@ -343,7 +342,7 @@ const AccountManagement = () => {
                   className="btn-reset-pw" 
                   onClick={() => handleResetPassword(selectedAccount)} // Truyền nguyên object này vào
                 >
-                  🔄 Reset mật khẩu (123)
+                  🔄 Reset mật khẩu
                 </button>
               </div>
             </div>
