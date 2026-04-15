@@ -41,6 +41,20 @@ const create = async (mataikhoan, username, password, role) => {
     });
 };
 
+const createBulk = async (listAccount) => {
+    const accountObjects = listAccount.map(account => {
+        return {
+            mataikhoan: account.mataikhoan,
+            username: account.username,
+            password: account.password,
+            role: account.role
+        };
+    });
+    return await Account.bulkCreate(accountObjects, {
+        ignoreDuplicates: true 
+    });
+}
+
 const update = async (mataikhoan, username, password, role) => {
     const account = await Account.findOne(
         { 
@@ -74,6 +88,7 @@ module.exports = {
     findAllGiangVien,
     findByUsername,
     create,
+    createBulk,
     update,
     deleteAccount
 }

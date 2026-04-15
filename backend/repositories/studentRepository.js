@@ -1,4 +1,5 @@
 const {  SinhVien } = require('../models');
+
 const findAll = async () => {
     return await SinhVien.findAll();
 };
@@ -34,6 +35,23 @@ const create = async ( masinhvien,ten,holot,ngaysinh,email,sodienthoai,malop) =>
     return await SinhVien.create({ masinhvien,ten,holot,ngaysinh,email,sodienthoai,malop });
 };
 
+const createBulk = async (listSinhVien) => {
+    const sinhVienObjects = listSinhVien.map(sinhvien => {
+        return {
+            masinhvien: sinhvien.MaSinhVien,
+            ten: sinhvien.Ten,
+            holot: sinhvien.HoLot,
+            ngaysinh: sinhvien.NgaySinh,
+            email: sinhvien.Email,
+            sodienthoai: sinhvien.SoDienThoai,
+            malop: sinhvien.MaLop
+        };
+    });
+    return await SinhVien.bulkCreate(sinhVienObjects, {
+        ignoreDuplicates: true 
+    });
+}
+
 const updateFaceId = async ( masinhvien,faceid) => {
     const student = await SinhVien.findOne({
         where: {
@@ -43,4 +61,4 @@ const updateFaceId = async ( masinhvien,faceid) => {
     return await student.update({faceid});
 };
 
-module.exports = { findAll, findByMaSinhVien, create, update, destroy, updateFaceId };
+module.exports = { findAll, findByMaSinhVien, create, createBulk, update, destroy, updateFaceId };

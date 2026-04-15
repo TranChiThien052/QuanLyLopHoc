@@ -33,6 +33,13 @@ const createStudent = async (masinhvien,ten,holot,ngaysinh,email,sodienthoai,mal
     return sinhvien
 };
 
+const createBulk = async (listSinhVien) => {
+    if (!listSinhVien || !Array.isArray(listSinhVien) || listSinhVien.length === 0) {
+        throw new Error('Thiếu dữ liệu để tạo sinh viên hàng loạt');
+    }
+    return await studentRepository.createBulk(listSinhVien);
+};
+
 const deleteStudentById = async (masinhvien) => {
     if(!masinhvien)
         throw new Error("Vui lòng truyền mã !");
@@ -69,4 +76,4 @@ const updateFaceIdStudent = async (masinhvien,faceid) => {
     return student
 }
 
-module.exports = { getAll, getStudentById, createStudent, deleteStudentById, updateInfoStudent,updateFaceIdStudent};
+module.exports = { getAll, getStudentById, createStudent, createBulk, deleteStudentById, updateInfoStudent,updateFaceIdStudent};
