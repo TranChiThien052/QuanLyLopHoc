@@ -20,7 +20,7 @@ const AccountManagement = () => {
   const [formData, setFormData] = useState({
     ma: '', ho: '', ten: '', ngaySinh: '', email: '', sodienthoai: '', malop: ''
   });
-  const [errors, setErrors] = useState({});
+  const [ errors, setErrors] = useState({});
 
   // 1. Tải dữ liệu
   const loadProfiles = useCallback(async () => {
@@ -277,11 +277,23 @@ const AccountManagement = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header-centered"><h3>Thêm hồ sơ mới</h3><button className="close-btn-round" onClick={() => setShowAddModal(false)}>&times;</button></div>
             <form onSubmit={handleAddSubmit} className="modal-body-form">
-              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" placeholder="Nhập mã tài khoản..." onChange={e => setFormData({...formData, ma: e.target.value})} /></div>
+              <div className="form-group-centered">
+                <label>Mã tài khoản</label>
+                <input type="text" placeholder="Nhập mã tài khoản..." onChange={e => setFormData({...formData, ma: e.target.value})} />
+                {errors.ma && <small className="field-error">{errors.ma}</small>}
+              </div>
               
               <div className="form-row">
-                <div className="form-group-centered" style={{flex:1}}><label>Họ lót</label><input type="text" placeholder="Nhập họ..." onChange={e => setFormData({...formData, ho: e.target.value})} /></div>
-                <div className="form-group-centered" style={{flex:1}}><label>Tên</label><input type="text" placeholder="Tên..." onChange={e => setFormData({...formData, ten: e.target.value})} /></div>
+                <div className="form-group-centered" style={{flex:1}}>
+                  <label>Họ lót</label>
+                  <input type="text" placeholder="Nhập họ..." onChange={e => setFormData({...formData, ho: e.target.value})} />
+                  {errors.ho && <small className="field-error">{errors.ho}</small>}
+                </div>
+                <div className="form-group-centered" style={{flex:1}}>
+                  <label>Tên</label>
+                  <input type="text" placeholder="Tên..." onChange={e => setFormData({...formData, ten: e.target.value})} />
+                  {errors.ten && <small className="field-error">{errors.ten}</small>}
+                </div>
               </div>
 
               <div className="form-row">
