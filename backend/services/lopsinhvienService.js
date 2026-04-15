@@ -18,6 +18,16 @@ const createLopSinhVien = async(malop, masinhvien) => {
     return await lopsinhvienRepository.create(malop, masinhvien);
 }
 
+const createLopSinhVienBulk = async(malop, listmasinhvien) => {
+    if(!malop){
+        throw new Error("Thiếu mã lớp để tạo lớp sinh viên");
+    }
+    if(!listmasinhvien || !Array.isArray(listmasinhvien) || listmasinhvien.length === 0){
+        throw new Error("Thiếu danh sách mã sinh viên để tạo lớp sinh viên");
+    }
+    return await lopsinhvienRepository.bulkCreate(malop, listmasinhvien);
+}
+
 const updateLopSinhVien = async (malop, masinhvien) => {
     if (!malop || !masinhvien) {
         throw new Error("Thiếu thông tin để cập nhật lớp sinh viên");
@@ -37,5 +47,6 @@ module.exports = {
     getLopSinhVienById,
     createLopSinhVien,
     updateLopSinhVien,
+    createLopSinhVienBulk,
     deleteLopSinhVien
 }

@@ -52,6 +52,26 @@ const createLopSinhVien = async (req, res) => {
     }
 };
 
+const createLopSinhVienBulk = async (req, res) => {
+    try {
+        const {malop, listmasinhvien} = req.body
+        const result = await lopsinhvienService.createLopSinhVienBulk(malop, listmasinhvien);
+        res.status(200).json({
+            code: 200,
+            message: `Tạo lớp sinh viên thành công với mã lớp ${malop} và ${result.length} sinh viên.`,
+            data: result
+        });
+        
+    } catch (error) {
+        res.status(500).json(
+            {
+                code: 999,
+                message: error.message
+            }
+        );
+    }
+}
+
 const updateLopSinhVien = async (req, res) => {
     try {
         const {malop, masinhvien} = req.body
@@ -89,6 +109,7 @@ module.exports = {
     getAllLopSinhVien,
     getLopSinhVienById,
     createLopSinhVien,
+    createLopSinhVienBulk,
     updateLopSinhVien,
     deleteLopSinhVien
 }
