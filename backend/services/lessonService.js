@@ -49,6 +49,69 @@ const createLesson = async (malop, giobatdau, gioketthuc, noidungbuoihoc) => {
     return await lessonRepository.create(mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
 }
 
+const dayMap = {
+    'Chủ nhật': 0,
+    'Hai': 1,
+    'Ba': 2,
+    'Tư': 3,
+    'Năm': 4,
+    'Sáu': 5,
+    'Bảy': 6
+}
+
+const getMatchingDates = (startDate, endDate, dayOfWeek) => {
+    const targetDay = dayMap[dayOfWeek];
+    if (targetDay === undefined) {
+        throw new Error(`Ngày ${dayOfWeek} không hợp lệ`);
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const dates = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)){
+        if (d.getDay() === targetDay) {
+            const formatted = d.toLocaleDateString('Vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-');
+            dates.push(formatted);
+        }
+    }
+    return dates;
+}
+
+const createBulkLessons = async (malop, giobatdau, gioketthuc, ngaybatdau, ngayketthuc, thuTrongTuan) => {
+    if (!malop || !ngaybatdau || !ngayketthuc || !giobatdau || !gioketthuc) {
+        const err = new Error("Thiếu thông tin để tạo buổi học");
+        err.status = 400;
+        throw err;
+    }
+    const validDates = getMatchingDates(ngaybatdau, ngayketthuc, thuTrongTuan);
+
+    if (validDates.length === 0) {
+        const err = new Error(`Không có ngày nào phù hợp`);
+        err.status = 400;
+        throw err;
+    }
+
+    const createdLessons = [];
+    const errors = [];
+
+    for (const ngayhoc of validDates){
+        try {
+            const mabuoihoc = makeMaBuoiHoc(malop, ngayhoc);
+            const existed = await lessonRepository.findByMaBuoiHoc(mabuoihoc);
+            if (!existed) {
+                const newLesson = await lessonRepository.create(mabuoihoc, malop,ngayhoc, giobatdau, gioketthuc, `Buổi học ngày ${ngayhoc}`);
+                createdLessons.push(newLesson);
+            }
+            else{
+                errors.push(`Buổi học của lớp ${malop} vào ngày ${ngayhoc} đã tồn tại, bỏ qua tạo mới.`);
+            }
+        } catch (error) {
+            errors.push(`Lỗi khi tạo buổi học cho ngày ${ngayhoc}: ${error.message}`);
+        }
+    }
+    return { createdLessons, errors };
+}
+
 const updateLesson = async (mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc) => {
     if (!mabuoihoc || !malop || !ngayhoc || !giobatdau || !gioketthuc || !noidungbuoihoc) {
         throw new Error("Thiếu thông tin để cập nhật buổi học");
@@ -68,5 +131,7 @@ module.exports = {
     getLessonById,
     createLesson,
     updateLesson,
-    deleteLesson
+    deleteLesson,
+    createBulkLessons
+
 }

@@ -10,5 +10,6 @@ dist/
 build/
 .vscode/
 .idea/
+*.http
 
 node_modules

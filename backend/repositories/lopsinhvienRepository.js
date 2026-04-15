@@ -19,6 +19,18 @@ const create = async (malop, masinhvien) => {
     });
 }
 
+const bulkCreate = async (malop, listmasinhvien) => {
+    const lopsinhvienObjects = listmasinhvien.map(masinhvien=> {
+        return{
+            malop: malop,
+            masinhvien: masinhvien
+        };
+    });
+    return await Lopsinhvien.bulkCreate(lopsinhvienObjects, {
+        ignoreDuplicates: true 
+    });
+}
+
 const update = async (malop, masinhvien) => {
     const lopsinhvien = await Lopsinhvien.findOne(
         {
@@ -55,6 +67,7 @@ module.exports = {
     findAll,
     findById,
     create,
+    bulkCreate,
     update,
     deleteLopSinhVien
 }

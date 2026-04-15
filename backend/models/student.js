@@ -9,7 +9,6 @@ module.exports = (sequelize) => {
         primaryKey: true,
         unique: true,
         allowNull: false,
-        autoIncrement: true,
       },
       ten: {
         type: DataTypes.STRING(20),
@@ -21,7 +20,7 @@ module.exports = (sequelize) => {
       },
       ngaysinh: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
       },
       email: {
         type: DataTypes.STRING(50),
@@ -33,7 +32,7 @@ module.exports = (sequelize) => {
       },
       sodienthoai: {
         type: DataTypes.CHAR(10),
-        allowNull: false,
+        allowNull: true,
         unique: true,
         validate: {
           is: /^[0-9]{10}$/,

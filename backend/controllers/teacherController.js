@@ -64,7 +64,7 @@ const deleteTeacherById = async (req,res) => {
             response.message = "Không tìm thấy giảng viên !";
         }
         else{
-            response.message = `Đã xóa thành công ${magiangvien}} !`;
+            response.message = `Đã xóa thành công ${magiangvien} !`;
             response.magiangvien = magiangvien
         }
             
@@ -103,5 +103,6 @@ const updateInfoTeacher = async (req,res) => {
         );
     }
 }
+
 
 module.exports = { getAll, getTeacherById, createTeacher, deleteTeacherById, updateInfoTeacher };
