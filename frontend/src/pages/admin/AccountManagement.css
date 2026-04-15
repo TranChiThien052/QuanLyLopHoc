@@ -381,6 +381,21 @@
   transform: translateY(0);
 }
 
+/* Màu đỏ cho chữ báo lỗi */
+.error-message-text {
+  color: #e74c3c;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+  text-align: left;
+}
+
+/* Viền đỏ cho ô input khi nhập sai */
+.input-error {
+  border: 1px solid #e74c3c !important;
+}
+
+
 /* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
   .admin-header { flex-direction: column; align-items: flex-start; }

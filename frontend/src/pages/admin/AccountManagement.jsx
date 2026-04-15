@@ -63,9 +63,10 @@ const AccountManagement = () => {
       ma: (p.masinhvien || p.magiangvien).toString().trim(),
       ho: p.holot || '',
       ten: p.ten || '',
-      ngaySinh: p.ngaysinh || '',
-      email: p.email || '',        // Phải lấy cả Email
-      sodienthoai: p.sodienthoai || '', // Phải lấy cả SĐT
+      // Cắt lấy 10 ký tự đầu (YYYY-MM-DD) nếu ngày sinh từ DB có kèm giờ giấc
+      ngaySinh: p.ngaysinh ? p.ngaysinh.substring(0, 10) : '', 
+      email: p.email || '',        
+      sodienthoai: p.sodienthoai || '', 
       malop: p.malop || ''
     });
     setErrors({});
@@ -75,57 +76,157 @@ const AccountManagement = () => {
   // 4. XOÁ TRIỆT ĐỂ (DATABASE + FRONTEND SYNC)
   const handleDelete = async (id) => {
     const cleanId = id.toString().trim();
-    if (window.confirm(`Bạn có muốn xoá VĨNH VIỄN hồ sơ và tài khoản của ${cleanId}?`)) {
-      try {
-        // BƯỚC 1: Xoá hồ sơ (Sinh viên hoặc Giảng viên)
-        const profilePath = activeTab === 'sinhvien' ? `/students/${cleanId}` : `/teachers/${cleanId}`;
-        await api.delete(profilePath);
+    if (!window.confirm(`Bạn có chắc muốn xoá vĩnh viễn ${cleanId}?`)) return;
 
-        // BƯỚC 2: Xoá luôn tài khoản đăng nhập
-        await api.delete(`/accounts/${cleanId}`);
-        
-        // BƯỚC 3: Cập nhật giao diện Frontend
-        const updated = allProfiles.filter(p => (p.masinhvien || p.magiangvien).toString().trim() !== cleanId);
-        setAllProfiles(updated);
-        setProfiles(updated);
-        
-        alert("Đã xoá thành công!");
-      } catch (error) {
-        console.error("Lỗi xoá:", error);
-        alert("Lỗi: Có thể bạn đã xoá hồ sơ nhưng tài khoản chưa được xoá, hoặc ngược lại.");
-      }
+    try {
+      // Bước 1: Xoá hồ sơ và tk
+      const profilePath = activeTab === 'sinhvien' ? `/students/${cleanId}` : `/teachers/${cleanId}`;
+      await api.delete(profilePath);
+
+      // Luôn cập nhật giao diện vì hồ sơ đã được xử lý
+      const updated = allProfiles.filter(p => (p.masinhvien || p.magiangvien).toString().trim() !== cleanId);
+      setAllProfiles(updated);
+      setProfiles(updated);
+      
+      alert("Đã xoá thành công!");
+    } catch (error) {
+      console.error("Lỗi xoá:", error);
+      alert("Có lỗi xảy ra khi xoá. Hãy thử load lại trang!");
+      loadProfiles();
     }
   };
 
   // 5. CÁC HÀM XỬ LÝ FORM (ADD / EDIT / DETAIL)
   const validate = (isEdit = false) => {
     let newErrors = {};
-    const cleanMa = formData.ma.trim().toLowerCase();
+    const cleanMa = formData.ma.trim();
+    const cleanHo = formData.ho.trim();
+    const cleanTen = formData.ten.trim();
+    const cleanEmail = formData.email.trim();
+    const cleanSdt = formData.sodienthoai.trim();
+    const cleanLop = formData.malop.trim();
+
+    // 1. Kiểm tra Mã tài khoản (CHAR/STRING 10)
     if (!isEdit) {
-      if (!cleanMa) newErrors.ma = "Trống mã tài khoản";
-      else if (allProfiles.some(p => (p.masinhvien || p.magiangvien || "").toString().trim().toLowerCase() === cleanMa)) {
+      if (!cleanMa) {
+        newErrors.ma = "Mã tài khoản không được để trống";
+      } else if (cleanMa.length > 10) {
+        newErrors.ma = "Mã tài khoản tối đa 10 ký tự";
+      } else if (allProfiles.some(p => (p.masinhvien || p.magiangvien || "").toString().trim().toLowerCase() === cleanMa.toLowerCase())) {
         newErrors.ma = "Mã tài khoản này đã tồn tại!";
       }
     }
-    if (!formData.ho.trim()) newErrors.ho = "Vui lòng nhập họ";
-    if (!formData.ten.trim()) newErrors.ten = "Vui lòng nhập tên";
+
+    // 2. Kiểm tra Họ lót (STRING 30)
+    if (!cleanHo) {
+      newErrors.ho = "Vui lòng nhập họ lót";
+    } else if (cleanHo.length > 30) {
+      newErrors.ho = "Họ lót quá dài (tối đa 30 ký tự)";
+    }
+
+    // 3. Kiểm tra Tên (STRING 20)
+    if (!cleanTen) {
+      newErrors.ten = "Vui lòng nhập tên";
+    } else if (cleanTen.length > 20) {
+      newErrors.ten = "Tên quá dài (tối đa 20 ký tự)";
+    }
+
+    // 4. Kiểm tra Ngày sinh (DATEONLY - allowNull: false)
+    if (!formData.ngaySinh) {
+      newErrors.ngaySinh = "Ngày sinh là bắt buộc";
+    }
+
+    // 5. Kiểm tra Email (STRING 50 + isEmail)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!cleanEmail) {
+      newErrors.email = "Email là bắt buộc";
+    } else if (cleanEmail.length > 50) {
+      newErrors.email = "Email tối đa 50 ký tự";
+    } else if (!emailRegex.test(cleanEmail)) {
+      newErrors.email = "Định dạng email không hợp lệ";
+    }
+
+    // 6. Kiểm tra Số điện thoại (CHAR 10 + Regex /^[0-9]{10}$/)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!cleanSdt) {
+      newErrors.sodienthoai = "Số điện thoại là bắt buộc";
+    } else if (!phoneRegex.test(cleanSdt)) {
+      newErrors.sodienthoai = "SĐT phải có đúng 10 chữ số";
+    }
+
+    // 7. Kiểm tra Mã lớp (CHAR 10 - Chỉ dành cho sinh viên)
+    if (activeTab === 'sinhvien' && cleanLop.length > 10) {
+      newErrors.malop = "Mã lớp tối đa 10 ký tự";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // BE hiện tại chỉ viết logic Import cho Sinh viên nên mình chặn luôn ở FE
+    if (activeTab === 'giangvien') {
+      alert("Tính năng Import Excel hiện chỉ hỗ trợ cho Sinh viên!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('excelFile', file); // 'excelFile' phải khớp 100% với BE
+
+    try {
+      // Gọi đúng API /students/bulk
+      const response = await api.post('/students/bulk', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (response.data.code === 200) {
+        alert(response.data.message); // Ví dụ: "Tạo lớp sinh viên thành công với 10 sinh viên."
+        loadProfiles(); // Tải lại danh sách
+      }
+    } catch (error) {
+      // Hiển thị lỗi chi tiết nếu file thiếu cột hoặc sai định dạng
+      const errorMsg = error.response?.data?.error || "Lỗi khi xử lý file Excel";
+      alert(`Thất bại: ${errorMsg}`);
+    } finally {
+      e.target.value = null; // Reset để có thể chọn lại cùng 1 file
+    }
+  };
+
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    if (!validate(false)) return;
+    if (!validate(false)) return; // Vẫn dùng hàm validate để check form
+
     try {
       const cleanMa = formData.ma.trim();
-      await api.post('/accounts', { mataikhoan: cleanMa, username: cleanMa, password: "123", role: activeTab === 'sinhvien' ? 'student' : 'teacher' });
-      const pData = { ten: formData.ten.trim(), holot: formData.ho, ngaysinh: formData.ngaySinh, email: formData.email, sodienthoai: formData.sodienthoai };
-      if (activeTab === 'sinhvien') await api.post('/students', { masinhvien: cleanMa, ...pData, malop: formData.malop });
-      else await api.post('/teachers', { magiangvien: cleanMa, ...pData });
-      alert("Thêm thành công!");
+      // 1. Chuẩn bị object dữ liệu hồ sơ
+      const pData = { 
+        ten: formData.ten.trim(), 
+        holot: formData.ho.trim(), 
+        ngaysinh: formData.ngaySinh || null, 
+        email: formData.email.trim(), 
+        sodienthoai: formData.sodienthoai.trim() || null 
+      };
+
+      // 2. CHỈ GỌI DUY NHẤT 1 API NÀY (Backend sẽ tự tạo Account cho bạn)
+      if (activeTab === 'sinhvien') {
+        // Gọi BE tạo Sinh viên + Tự tạo Account (mật khẩu mặc định là masinhvien)
+        await api.post('/students', { masinhvien: cleanMa, ...pData, malop: formData.malop.trim() });
+      } else {
+        // Gọi BE tạo Giảng viên + Tự tạo Account (mật khẩu mặc định là magiangvien)
+        await api.post('/teachers', { magiangvien: cleanMa, ...pData });
+      }
+
+      alert("Thêm thành công!"); 
       setShowAddModal(false);
-      loadProfiles();
-    } catch (err) { alert("Lỗi thêm hồ sơ!"); }
+      loadProfiles(); // Tải lại danh sách để hiện người mới
+    } catch (err) {
+      // Nếu lỗi 999 xảy ra, nó sẽ hiện tin nhắn thực tế từ Server
+      const serverMsg = err.response?.data?.message || "Lỗi không xác định";
+      alert(`Thất bại: ${serverMsg}`);
+    }
   };
 
   const handleEditSubmit = async (e) => {
@@ -139,9 +240,8 @@ const AccountManagement = () => {
         holot: formData.ho.trim(),
         ten: formData.ten.trim(),
         ngaysinh: formData.ngaySinh,
-        email: formData.email,
-        sodienthoai: formData.sodienthoai,
-        // Nếu là sinh viên thì gửi thêm mã lớp (tùy vào logic Service của bạn)
+        email: formData.email.trim() || null, // Gửi null nếu trống để BE dễ xử lý
+        sodienthoai: formData.sodienthoai.trim() || null, // Gửi null thay vì chuỗi rỗng
         ...(activeTab === 'sinhvien' && { malop: formData.malop })
       };
 
@@ -217,6 +317,31 @@ const AccountManagement = () => {
           <h2 className="header-title">Quản lý STU</h2>
           <div className="header-controls">
             <input type="text" placeholder="Tìm mã tài khoản..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            {/* CHỈ HIỆN NÚT IMPORT KHI Ở TAB SINH VIÊN */}
+              {activeTab === 'sinhvien' && (
+                <label className="btn-import-excel" style={{
+                  backgroundColor: '#27ae60',
+                  color: 'white',
+                  padding: '8px 18px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  marginRight: '12px',
+                  fontWeight: 'bold',
+                  fontSize: '0.9rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  border: 'none',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                }}>
+                  📁 Nhập Excel
+                  <input 
+                    type="file" 
+                    accept=".xlsx, .xls" 
+                    hidden 
+                    onChange={handleImportExcel} 
+                  />
+                </label>
+              )}
             <button className="btn-add" onClick={() => { setShowAddModal(true); setErrors({}); setFormData({ma:'',ho:'',ten:'',ngaySinh:'',email:'',sodienthoai:'',malop:''}); }}>+ Thêm mới</button>
           </div>
         </div>
@@ -277,23 +402,12 @@ const AccountManagement = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header-centered"><h3>Thêm hồ sơ mới</h3><button className="close-btn-round" onClick={() => setShowAddModal(false)}>&times;</button></div>
             <form onSubmit={handleAddSubmit} className="modal-body-form">
-              <div className="form-group-centered">
-                <label>Mã tài khoản</label>
-                <input type="text" placeholder="Nhập mã tài khoản..." onChange={e => setFormData({...formData, ma: e.target.value})} />
-                {errors.ma && <small className="field-error">{errors.ma}</small>}
-              </div>
+              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" placeholder="Nhập mã tài khoản..." onChange={e => setFormData({...formData, ma: e.target.value})} />{/* Hiển thị câu báo lỗi nếu có */}
+  {errors.ma && <span className="error-message-text">{errors.ma}</span>}</div>
               
               <div className="form-row">
-                <div className="form-group-centered" style={{flex:1}}>
-                  <label>Họ lót</label>
-                  <input type="text" placeholder="Nhập họ..." onChange={e => setFormData({...formData, ho: e.target.value})} />
-                  {errors.ho && <small className="field-error">{errors.ho}</small>}
-                </div>
-                <div className="form-group-centered" style={{flex:1}}>
-                  <label>Tên</label>
-                  <input type="text" placeholder="Tên..." onChange={e => setFormData({...formData, ten: e.target.value})} />
-                  {errors.ten && <small className="field-error">{errors.ten}</small>}
-                </div>
+                <div className="form-group-centered" style={{flex:1}}><label>Họ lót</label><input type="text" placeholder="Nhập họ..." onChange={e => setFormData({...formData, ho: e.target.value})} />{errors.ho && <span className="error-message-text">{errors.ho}</span>}</div>
+                <div className="form-group-centered" style={{flex:1}}><label>Tên</label><input type="text" placeholder="Tên..." onChange={e => setFormData({...formData, ten: e.target.value})} />{errors.ten && <span className="error-message-text">{errors.ten}</span>}</div>
               </div>
 
               <div className="form-row">
@@ -320,16 +434,83 @@ const AccountManagement = () => {
       {showEditModal && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header-centered"><h3>Sửa hồ sơ</h3><button className="close-btn-round" onClick={() => setShowEditModal(false)}>&times;</button></div>
+            <div className="modal-header-centered">
+              <h3>Sửa hồ sơ</h3>
+              <button className="close-btn-round" onClick={() => setShowEditModal(false)}>&times;</button>
+            </div>
+            
             <form onSubmit={handleEditSubmit} className="modal-body-form">
-              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" value={formData.ma} disabled style={{opacity:0.6}} /></div>
-              <div className="form-row">
-                <div className="form-group-centered" style={{flex:1}}><label>Họ lót</label><input type="text" value={formData.ho} onChange={e => setFormData({...formData, ho: e.target.value})} /></div>
-                <div className="form-group-centered" style={{flex:1}}><label>Tên</label><input type="text" value={formData.ten} onChange={e => setFormData({...formData, ten: e.target.value})} /></div>
+              <div className="form-group-centered">
+                <label>Mã tài khoản</label>
+                <input type="text" value={formData.ma} disabled style={{ opacity: 0.6 }} />
               </div>
-              <div className="form-group-centered"><label>Ngày sinh</label><input type="date" value={formData.ngaySinh} onChange={e => setFormData({...formData, ngaySinh: e.target.value})} /></div>
-              {activeTab === 'sinhvien' && <div className="form-group-centered"><label>Lớp</label><input type="text" value={formData.malop} onChange={e => setFormData({...formData, malop: e.target.value})} /></div>}
-              <div className="modal-footer-centered"><button type="button" className="btn-cancel-round" onClick={() => setShowEditModal(false)}>Hủy</button><button type="submit" className="btn-submit-round">Cập nhật</button></div>
+
+              <div className="form-row">
+                <div className="form-group-centered" style={{ flex: 1 }}>
+                  <label>Họ lót</label>
+                  <input type="text" value={formData.ho} onChange={e => setFormData({ ...formData, ho: e.target.value })} />
+                </div>
+                <div className="form-group-centered" style={{ flex: 1 }}>
+                  <label>Tên</label>
+                  <input type="text" value={formData.ten} onChange={e => setFormData({ ...formData, ten: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="form-group-centered">
+                <label>Ngày sinh</label>
+                <input type="date" value={formData.ngaySinh} onChange={e => setFormData({ ...formData, ngaySinh: e.target.value })} />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group-centered" style={{ flex: 1 }}>
+                  <label>Email</label>
+                  <input type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                </div>
+                <div className="form-group-centered" style={{ flex: 1 }}>
+                  <label>SĐT</label>
+                  <input type="text" value={formData.sodienthoai} onChange={e => setFormData({ ...formData, sodienthoai: e.target.value })} />
+                </div>
+              </div>
+
+              {/* Hiển thị Lớp nếu là Sinh viên */}
+              {activeTab === 'sinhvien' && (
+                <div className="form-group-centered">
+                  <label>Lớp</label>
+                  <input type="text" value={formData.malop} onChange={e => setFormData({ ...formData, malop: e.target.value })} />
+                </div>
+              )}
+
+              {/* CHUYỂN NÚT RESET MẬT KHẨU */}
+              <div className="form-group-centered" style={{ marginTop: '10px', borderTop: '1px dashed #ccc', paddingTop: '15px' }}>
+                <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '8px', textAlign: 'center' }}>
+                  Reset về mã mặc định ({formData.ma})
+                </p>
+                <button 
+                  type="button" 
+                  className="btn-reset-pw" 
+                  style={{ 
+                    width: '100%', 
+                    backgroundColor: '#f39c12', 
+                    color: 'white', 
+                    border: 'none', 
+                    padding: '10px', 
+                    borderRadius: '20px', 
+                    fontWeight: 'bold',
+                    cursor: 'pointer' 
+                  }}
+                  onClick={() => handleResetPassword({ 
+                    username: formData.ma, 
+                    role: activeTab === 'sinhvien' ? 'student' : 'teacher' 
+                  })}
+                >
+                  🔄 Reset mật khẩu
+                </button>
+              </div>
+
+              <div className="modal-footer-centered" style={{ marginTop: '20px' }}>
+                <button type="button" className="btn-cancel-round" onClick={() => setShowEditModal(false)}>Hủy</button>
+                <button type="submit" className="btn-submit-round">Cập nhật</button>
+              </div>
             </form>
           </div>
         </div>
@@ -345,18 +526,7 @@ const AccountManagement = () => {
             </div>
             <div className="modal-body-detail">
               <div className="info-row"><strong>Tên đăng nhập:</strong> <span>{selectedAccount.username}</span></div>
-              <div className="info-row"><strong>Vai trò:</strong> <span>{selectedAccount.role === 'sv' ? 'Sinh viên' : 'Giảng viên'}</span></div>
-              
-              {/* Nút Reset mật khẩu mới */}
-              <div className="modal-footer-centered" style={{ marginTop: '20px' }}>
-                <button 
-                  type="button" 
-                  className="btn-reset-pw" 
-                  onClick={() => handleResetPassword(selectedAccount)} // Truyền nguyên object này vào
-                >
-                  🔄 Reset mật khẩu
-                </button>
-              </div>
+              <div className="info-row"><strong>Vai trò:</strong> <span>{selectedAccount.role === 'student' ? 'Sinh viên' : 'Giảng viên'}</span></div>
             </div>
           </div>
         </div>
