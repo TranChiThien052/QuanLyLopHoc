@@ -103,5 +103,29 @@ const updateInfoStudent = async (req,res) => {
         );
     }
 }
+const updateFaceIdStudent = async (req,res) => {
+    try {
+        const masinhvien = req.params.masinhvien
+        const {faceid} = req.body
+        const student = await studentService.updateFaceIdStudent(masinhvien,faceid);
 
-module.exports = { getAll, getStudentById, createStudent, deleteStudentById, updateInfoStudent };
+        let response = {}
+        if(!student) {
+            response.code = 404,
+            response.message = "Không tìm thấy sinh viên !";
+        }
+        else
+            response = student
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            { 
+                code:999,
+                message: error.message 
+            }
+        );
+    }
+}
+
+module.exports = { getAll, getStudentById, createStudent, deleteStudentById, updateInfoStudent, updateFaceIdStudent };

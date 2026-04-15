@@ -58,4 +58,15 @@ const updateInfoStudent = async (masinhvien,ten,holot,ngaysinh,email,sodienthoai
     return await studentRepository.update(masinhvien, ten, holot, ngaysinh, email, sodienthoai);
 }
 
-module.exports = { getAll, getStudentById, createStudent, deleteStudentById, updateInfoStudent};
+const updateFaceIdStudent = async (masinhvien,faceid) => {
+    if(!Array.isArray(faceid) || !faceid)
+        throw new Error("Sai faceId, vui lòng thử lại sau !");
+
+    let student = await studentRepository.updateFaceId(masinhvien,faceid);
+    if(!student)
+        throw new Error("Không tìm thấy sinh viên !")
+
+    return student
+}
+
+module.exports = { getAll, getStudentById, createStudent, deleteStudentById, updateInfoStudent,updateFaceIdStudent};

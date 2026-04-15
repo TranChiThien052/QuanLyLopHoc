@@ -34,5 +34,13 @@ const create = async ( masinhvien,ten,holot,ngaysinh,email,sodienthoai,malop) =>
     return await SinhVien.create({ masinhvien,ten,holot,ngaysinh,email,sodienthoai,malop });
 };
 
+const updateFaceId = async ( masinhvien,faceid) => {
+    const student = await SinhVien.findOne({
+        where: {
+            masinhvien: masinhvien
+        }});
+    if (!student) return null;
+    return await student.update({faceid});
+};
 
-module.exports = { findAll, findByMaSinhVien, create, update, destroy };
+module.exports = { findAll, findByMaSinhVien, create, update, destroy, updateFaceId };
