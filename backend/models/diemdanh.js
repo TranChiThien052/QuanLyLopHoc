@@ -8,7 +8,6 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(25),
         primaryKey: true,
         allowNull: false,
-        autoIncrement: true,
       },
       masinhvien: {
         type: DataTypes.CHAR(10),
