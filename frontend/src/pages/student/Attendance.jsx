@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import * as faceapi from 'face-api.js';
+// Thay đổi dòng cũ thành dòng này:
+import * as faceapi from '@vladmandic/face-api';
 import axios from 'axios';
 import './Attendance.css';
 
