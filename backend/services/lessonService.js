@@ -116,7 +116,7 @@ const createBulkLessons = async (malop, giobatdau, gioketthuc, ngaybatdau, ngayk
             errors.push(`Lỗi khi tạo buổi học cho ngày ${ngayhoc}: ${error.message}`);
         }
     }
-    return { createdLessons, errors };
+    return createdLessons;
 }
 
 const updateLesson = async (mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc) => {
