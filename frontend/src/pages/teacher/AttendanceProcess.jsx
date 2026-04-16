@@ -307,7 +307,13 @@ export default function AttendanceProcess() {
         mabuoihoc: sessionId,
         ngayhoc: passedSession.ngayhoc || ""
     };
-    const qrDataString = encodeURIComponent(JSON.stringify(qrDataObj));
+
+    // T tạm thời khoá lại nha
+    //const qrDataString = encodeURIComponent(JSON.stringify(qrDataObj));
+
+    // Tạo link dẫn thẳng tới trang điểm danh của sinh viên
+    const attendanceURL = `${window.location.origin}/student/attendance/${sessionId}`;
+    const qrDataString = encodeURIComponent(attendanceURL);
 
     const sessionInfo = {
         code: `QR-${sessionId}`,
