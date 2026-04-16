@@ -50,7 +50,7 @@ const deleteStudentById = async (masinhvien) => {
 
     await accountRepository.deleteAccount(masinhvien);
 
-    return studentDelete
+    return studentDelete;
 }
 
 const updateInfoStudent = async (masinhvien,ten,holot,ngaysinh,email,sodienthoai) => {

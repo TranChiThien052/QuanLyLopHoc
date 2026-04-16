@@ -22,6 +22,19 @@ const getLessonById = async (req, res) => {
     }
 };
 
+const getLessonsByMaLop = async (req, res) => {
+    try {
+        const { malop } = req.params;
+        const lessons = await lessonService.getLessonsByMaLop(malop);
+        if (!lessons || lessons.length === 0) {
+            return res.status(404).json({ code: 404, message: "Không tìm thấy buổi học nào cho lớp này!" });
+        }
+        return res.status(200).json(lessons);
+    } catch (error) {
+        return res.status(500).json({ code: 999, message: error.message });
+    }
+};
+
 const createLesson = async (req, res) => {
     try {
         const { malop, giobatdau, gioketthuc, noidungbuoihoc } = req.body;
@@ -72,6 +85,7 @@ const deleteLesson = async (req, res) => {
 module.exports = {
     getAllLessons,
     getLessonById,
+    getLessonsByMaLop,
     createLesson,
     updateLesson,
     deleteLesson,
