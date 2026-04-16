@@ -304,3 +304,36 @@
     font-size: 16px;
   }
 }
+
+/* --- DYNAMIC DATA STYLES --- */
+.schedule-cell {
+  text-align: center !important;
+}
+
+.schedule-item {
+  padding: 4px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.schedule-item:last-child {
+  border-bottom: none;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-state, .error-state {
+  text-align: center;
+  padding: 50px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #666;
+}
+
+.error-state {
+  color: #dc3545;
+}

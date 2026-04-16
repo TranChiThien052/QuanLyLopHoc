@@ -306,4 +306,16 @@
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-.animate-pop { animation: pop 0.3s cubic-bezier(0.17, 0.88, 0.32, 1.28); }
+.center-msg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-grey);
+}
+
+.text-error {
+  color: var(--primary-red);
+}

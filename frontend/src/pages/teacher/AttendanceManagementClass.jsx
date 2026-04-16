@@ -1,20 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './AttendanceManagement.css'; // Reusing the css
-
-const classesData = [
-  { id: "cntt-th10", name: "Lớp CNTT TH10", studentCount: 80, schedule: "Thứ 2, Thứ 4" },
-  { id: "qtkd-kd07", name: "Lớp Quản trị kinh doanh KD07", studentCount: 79, schedule: "Thứ 3, Thứ 5" },
-  { id: "tkdh-06", name: "Lớp Thiết Kế Đồ Họa 06", studentCount: 90, schedule: "Thứ 6" },
-  { id: "mkt-mk01", name: "Lớp Marketing MK01", studentCount: 50, schedule: "Thứ 7" },
-];
+import api from '../../services/api';
+import './AttendanceManagement.css';
 
 export default function AttendanceManagementClass() {
+  const [classes, setClasses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const filteredClasses = classesData.filter((cls) =>
-    cls.name.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/classes');
+        setClasses(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu:", err);
+        setError("Không thể tải dữ liệu lớp học. Vui lòng thử lại sau.");
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    return timeString.substring(0, 5); // "12:35:00" -> "12:35"
+  };
+
+  const filteredClasses = classes.filter((cls) =>
+    (cls.tenlop || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (cls.monhoc || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) return (
+    <div className="mgmt-container">
+      <div className="loading-state">Đang tải danh sách lớp học...</div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="mgmt-container">
+      <div className="error-state">{error}</div>
+    </div>
   );
 
   return (
@@ -39,7 +70,7 @@ export default function AttendanceManagementClass() {
             <tr>
               <th>Mã lớp</th>
               <th>Tên lớp học</th>
-              <th>Số lượng SV</th>
+              <th>Môn học</th>
               <th>Lịch học</th>
               <th>Thao tác</th>
             </tr>
@@ -48,23 +79,25 @@ export default function AttendanceManagementClass() {
             {filteredClasses.length > 0 ? (
               filteredClasses.map((cls, index) => (
                 <tr key={index}>
-                  <td data-label="Mã lớp">{cls.id.toUpperCase()}</td>
-                  <td data-label="Tên lớp">{cls.name}</td>
-                  <td data-label="Số lượng">
-                    <strong>{cls.studentCount}</strong> sinh viên
+                  <td data-label="Mã lớp">{cls.malop}</td>
+                  <td data-label="Tên lớp">{cls.tenlop}</td>
+                  <td data-label="Môn học">{cls.monhoc}</td>
+                  <td data-label="Lịch học" className="schedule-cell">
+                    <div className="schedule-item">
+                      {cls.ngayhoccodinh} - {formatTime(cls.giobatdau)} - {formatTime(cls.gioketthuc)}
+                    </div>
                   </td>
-                  <td data-label="Lịch học">{cls.schedule}</td>
-                  <td data-label="Thao tác" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                  <td data-label="Thao tác" className="actions-cell">
                     <button
                       className="btn-create-code"
                       style={{ backgroundColor: '#28a745' }}
-                      onClick={() => navigate(`/teacher/class-statistics/${cls.id}`)}
+                      onClick={() => navigate(`/teacher/class-statistics/${cls.malop}`)}
                     >
                       Thống kê lớp
                     </button>
                     <button
                       className="btn-create-code"
-                      onClick={() => navigate(`/teacher/attendance/${cls.id}`)}
+                      onClick={() => navigate(`/teacher/attendance/${cls.malop}`)}
                     >
                       Xem buổi học
                     </button>

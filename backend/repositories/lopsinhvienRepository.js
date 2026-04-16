@@ -5,7 +5,7 @@ const findAll = async () => {
 };
 
 const findById = async (malop) => {
-    return await Lopsinhvien.findOne(
+    return await Lopsinhvien.findAll(
         {
             where: { malop : malop }
         }

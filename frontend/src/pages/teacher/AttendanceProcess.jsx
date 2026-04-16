@@ -27,16 +27,48 @@ export default function AttendanceProcess() {
 
     const [students, setStudents] = useState(MOCK_STUDENTS);
 
+    // --- NEW STATES FOR QR ---
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [duration, setDuration] = useState(60); // giây
+    const [timeLeft, setTimeLeft] = useState(0);
+    const [showQRModal, setShowQRModal] = useState(false);
+
     const handleStatusChange = (mssv, newStatus) => {
+        if (showQRModal) return; // Khóa thao tác khi đang hiện QR
         setStudents(prev => prev.map(s =>
             s.mssv === mssv ? { ...s, status: newStatus } : s
         ));
     };
-    // MỚI: Hàm xử lý thay đổi Ghi chú
+
     const handleNoteChange = (mssv, newNote) => {
+        if (showQRModal) return; // Khóa thao tác khi đang hiện QR
         setStudents(prev => prev.map(s =>
             s.mssv === mssv ? { ...s, note: newNote } : s
         ));
+    };
+
+    // Timer logic
+    useEffect(() => {
+        let timer;
+        if (showQRModal && timeLeft > 0) {
+            timer = setInterval(() => {
+                setTimeLeft(prev => prev - 1);
+            }, 1000);
+        } else if (showQRModal && timeLeft === 0) {
+            setShowQRModal(false);
+        }
+        return () => clearInterval(timer);
+    }, [showQRModal, timeLeft]);
+
+    const startQR = () => {
+        setTimeLeft(duration);
+        setShowQRModal(true);
+        setIsGenerating(false);
+    };
+
+    const cancelQR = () => {
+        setShowQRModal(false);
+        setTimeLeft(0);
     };
 
     useEffect(() => {
@@ -48,9 +80,7 @@ export default function AttendanceProcess() {
         sessionId: sessionId,
         className: "CNTT TH10",
         students: 70,
-        // Có mặt = present + late
         present: students.filter(s => s.status === 'present' || s.status === 'late').length,
-        // Vắng = excused + unexcused
         absent: students.filter(s => s.status === 'excused' || s.status === 'unexcused').length,
         time: "7:00 - 12:00"
     };
@@ -65,9 +95,53 @@ export default function AttendanceProcess() {
     const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
 
     return (
-        <div className="process-container">
+        <div className={`process-container ${showQRModal ? 'locked' : ''}`}>
+            {/* MODAL QR CENTERED */}
+            {showQRModal && (
+                <div className="qr-modal-overlay">
+                    <div className="qr-modal-content">
+                        <h2>Mã QR Điểm Danh</h2>
+                        <div className="qr-display">
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${sessionInfo.code}`} alt="QR" />
+                        </div>
+                        <div className="timer-display">
+                            Thời gian còn lại: <strong>{timeLeft}s</strong>
+                        </div>
+                        <button className="btn-cancel-qr" onClick={cancelQR}>Hủy bỏ</button>
+                    </div>
+                </div>
+            )}
+
             <div className="info-header">
                 <div className="header-title">THÔNG TIN BUỔI HỌC</div>
+                
+                {/* NÚT TẠO MÃ QR (Chỉ hiện khi type là face) */}
+                {type === 'face' && !isGenerating && !showQRModal && (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '15px' }}>
+                        <button className="btn-init-qr" onClick={() => setIsGenerating(true)}>
+                            Tạo mã QR cho điểm danh khuôn mặt
+                        </button>
+                    </div>
+                )}
+
+                {/* FORM NHẬP THỜI GIAN */}
+                {isGenerating && (
+                    <div className="qr-setup-box">
+                        <label>Nhập thời gian hiệu lực (giây):</label>
+                        <input 
+                            type="number" 
+                            value={duration} 
+                            onChange={(e) => setDuration(Number(e.target.value))}
+                            min="10"
+                            max="300"
+                        />
+                        <div className="setup-actions">
+                            <button className="btn-confirm-qr" onClick={startQR}>Xác nhận</button>
+                            <button className="btn-cancel-setup" onClick={() => setIsGenerating(false)}>Đóng</button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="info-grid">
                     <div className="info-text">
                         <p>Mã điểm danh: <strong>{sessionInfo.code}</strong></p>
@@ -76,18 +150,11 @@ export default function AttendanceProcess() {
                         <p>Sỉ số: {sessionInfo.students} | Thời gian: {sessionInfo.time}</p>
                     </div>
 
-                    {type === 'face' ? (
-                        <div className="qr-section">
-                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${sessionInfo.code}`} alt="QR" />
-                            <button className="btn-zoom">Phóng To QR</button>
-                        </div>
-                    ) : (
-                        <div className="stats-box">
-                            <div className="stat-item present">Điểm danh: {sessionInfo.present}/{sessionInfo.students}</div>
-                            <div className="stat-item absent">Vắng: {sessionInfo.absent}</div>
-                            <button className="btn-bulk">Điểm danh hàng loạt</button>
-                        </div>
-                    )}
+                    <div className="stats-box">
+                        <div className="stat-item present">Điểm danh: {sessionInfo.present}/{sessionInfo.students}</div>
+                        <div className="stat-item absent">Vắng: {sessionInfo.absent}</div>
+                        <button className="btn-bulk" disabled={showQRModal}>Điểm danh hàng loạt</button>
+                    </div>
                 </div>
             </div>
 
@@ -97,6 +164,7 @@ export default function AttendanceProcess() {
                     placeholder="Nhập mã sinh viên..."
                     value={studentSearch}
                     onChange={(e) => setStudentSearch(e.target.value)}
+                    disabled={showQRModal}
                 />
                 <span className="search-icon">🔍</span>
             </div>
@@ -122,10 +190,10 @@ export default function AttendanceProcess() {
                                     <input
                                         type="text"
                                         className="note-input"
-                                        // Nếu note là '--' thì để trống, ngược lại hiện giá trị note
                                         value={student.note === '--' ? '' : student.note}
                                         placeholder="Thêm ghi chú..."
                                         onChange={(e) => handleNoteChange(student.mssv, e.target.value)}
+                                        disabled={showQRModal}
                                     />
                                 </td>
                                 <td>
@@ -133,6 +201,7 @@ export default function AttendanceProcess() {
                                         className={`status-select ${student.status}`}
                                         value={student.status}
                                         onChange={(e) => handleStatusChange(student.mssv, e.target.value)}
+                                        disabled={showQRModal}
                                     >
                                         <option value="choice">Lựa chọn</option>
                                         <option value="present">Có mặt</option>
@@ -149,16 +218,16 @@ export default function AttendanceProcess() {
 
             {totalPages > 1 && (
                 <div className="mgmt-pagination">
-                    <button className="page-btn-nav" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>‹</button>
+                    <button className="page-btn-nav" disabled={currentPage === 1 || showQRModal} onClick={() => setCurrentPage(prev => prev - 1)}>‹</button>
                     {[...Array(totalPages)].map((_, i) => (
-                        <button key={i + 1} className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
+                        <button key={i + 1} className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`} disabled={showQRModal} onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
                     ))}
-                    <button className="page-btn-nav" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>›</button>
+                    <button className="page-btn-nav" disabled={currentPage === totalPages || showQRModal} onClick={() => setCurrentPage(prev => prev + 1)}>›</button>
                 </div>
             )}
 
             <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                <button className="back-btn" onClick={() => navigate(-1)}>Quay lại</button>
+                <button className="back-btn" disabled={showQRModal} onClick={() => navigate(-1)}>Quay lại</button>
             </div>
         </div>
     );
