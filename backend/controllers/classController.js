@@ -1,6 +1,8 @@
 const classService = require('../services/classService');
 const teacherService = require('../services/teacherService');
 const lopSinhVienService = require('../services/lopsinhvienService');
+const lessonService = require('../services/lessonService');
+const diemDanhService = require('../services/diemDanhService');
 const XLSX = require('xlsx');
 
 const pickValue = (row, keys) => {
@@ -79,19 +81,20 @@ const create = async (req, res) => {
         const TenLop = MonHoc + '_' + teacher.holot + ' ' + teacher.ten;
         const newClass = await classService.create(TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien);
 
-        const danhSachLop = {
-            malop: newClass.MaLop,
-            listmasinhvien: listSinhVien
-        }
+        const createStudentList = await lopSinhVienService.createLopSinhVienBulk(newClass.malop, listSinhVien);
 
-        const createStudentList = await lopSinhVienService.create(danhSachLop);
+        const createdLessons = await lessonService.createBulkLessons(newClass.malop, GioBatDau, GioKetThuc, NgayBatDau, NgayKetThuc, NgayHocCoDinh);
 
-        
+        const LessonCodes = createdLessons.map(lesson => lesson.mabuoihoc);
+
+        const createdDiemDanh = await diemDanhService.initList(listSinhVien, LessonCodes);
 
         const response = {
             class: newClass,
-            studentList: createStudentList
-        }
+            studentList: createStudentList,
+            lessons: createdLessons,
+            diemDanh: createdDiemDanh
+        };
 
         return res.status(201).json(response);
     } catch (error) {

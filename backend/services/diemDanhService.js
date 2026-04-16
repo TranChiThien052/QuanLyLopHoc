@@ -22,6 +22,14 @@ const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat,
     return await diemDanhRepo.create(maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat);
 }
 
+const initList = async (listSinhVien, listBuoiHoc) => {
+    if (!listSinhVien || !Array.isArray(listSinhVien) || listSinhVien.length === 0)
+        throw new Error('Thiếu dữ liệu để tạo điểm danh hàng loạt');
+    if (!listBuoiHoc || !Array.isArray(listBuoiHoc) || listBuoiHoc.length === 0)
+        throw new Error('Thiếu dữ liệu để tạo điểm danh hàng loạt');
+    return await diemDanhRepo.initList(listSinhVien, listBuoiHoc);
+}
+
 const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
     if (!maDiemDanh || !trangThai || !ghiChu || !thoiGianCapNhat || !maNguoiCapNhat)
         throw new Error("Thiếu dữ liệu để cập nhật điểm danh");
@@ -39,6 +47,7 @@ module.exports = {
     findBySinhVienId,
     findByBuoiHocId,
     create,
+    initList,
     update,
     deleteDiemDanh
 }

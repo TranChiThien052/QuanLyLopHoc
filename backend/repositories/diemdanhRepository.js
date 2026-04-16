@@ -33,6 +33,29 @@ const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat,
     });
 };
 
+const initList = async (listSinhVien, listBuoiHoc) => {
+    const createDiemDanh = [];
+    for (const maBuoiHoc of listBuoiHoc) {
+        const diemDanhObjects = listSinhVien.map(maSinhVien => {
+            const maDiemDanh = maSinhVien + "_" + maBuoiHoc;
+            return {
+                madiemdanh: maDiemDanh,
+                masinhvien: maSinhVien,
+                mabuoihoc: maBuoiHoc,
+                trangthai: 'vắng không phép',
+                ghichu: '',
+                thoigiancapnhat: new Date(),
+                manguoicapnhat: 'system'
+            };
+        });
+        const createdDiemDanh = await DiemDanh.bulkCreate(diemDanhObjects, {
+            ignoreDuplicates: true 
+        });
+        createDiemDanh.push(...createdDiemDanh);
+    }
+    return createDiemDanh;
+}
+
 const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
     const diemdanh = await DiemDanh.findOne(
         {
@@ -72,6 +95,7 @@ module.exports = {
     findBySinhVienId,
     findByBuoiHocId,
     create,
+    initList,
     update,
     deleteDiemDanh
 }
