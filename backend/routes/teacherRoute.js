@@ -7,4 +7,5 @@ router.get("/:magiangvien", teacherController.getTeacherById);
 router.post("/", teacherController.createTeacher);
 router.delete("/:magiangvien", teacherController.deleteTeacherById);
 router.put("/:magiangvien", teacherController.updateInfoTeacher);
+router.get("/monhoc/:magiangvien", teacherController.getMonHocCuaGiangVien);
 module.exports = router;

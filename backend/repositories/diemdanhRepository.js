@@ -90,6 +90,28 @@ const deleteDiemDanh = async (maDiemDanh) => {
     return await diemdanh.destroy();
 }
 
+const createBulk = async (listDiemDanh) => {
+    const diemDanhObjects = listDiemDanh.map(diemDanh => {
+        return {
+            madiemdanh: diemDanh.maDiemDanh,
+            masinhvien: diemDanh.maSinhVien,
+            mabuoihoc: diemDanh.maBuoiHoc,
+            trangthai: diemDanh.trangThai,
+            ghichu: diemDanh.ghiChu,
+            thoigiancapnhat: diemDanh.thoiGianCapNhat,
+            manguoicapnhat: diemDanh.maNguoiCapNhat
+        };
+    });
+    return await DiemDanh.bulkCreate(diemDanhObjects, {
+        updateOnDuplicate: [
+            'trangthai', 
+            'ghichu', 
+            'thoigiancapnhat', 
+            'manguoicapnhat'
+        ]
+    });
+}
+
 module.exports = {
     findAll,
     findBySinhVienId,
@@ -97,5 +119,6 @@ module.exports = {
     create,
     initList,
     update,
-    deleteDiemDanh
+    deleteDiemDanh,
+    createBulk
 }

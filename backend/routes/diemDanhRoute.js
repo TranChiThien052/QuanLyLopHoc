@@ -8,5 +8,6 @@ router.get('/buoihoc/:maBuoiHoc', diemDanhController.findByBuoiHocId);
 router.post('/', diemDanhController.create);
 router.put('/:maDiemDanh', diemDanhController.update);
 router.delete('/:maDiemDanh', diemDanhController.deleteDiemDanh);
+router.post('/thu-cong',diemDanhController.diemDanhThuCong);
 
 module.exports = router;

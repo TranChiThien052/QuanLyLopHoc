@@ -1,5 +1,6 @@
 const teacherRepository = require("../repositories/teacherRepository");
 const accountRepository  = require("../repositories/accountRepository");
+const classRepository  = require("../repositories/classRepository");
 const bcrypt = require('bcrypt');
 
 const getAll = async () => {
@@ -61,4 +62,12 @@ const updateInfoTeacher = async (magiangvien,ten,holot,ngaysinh,email,sodienthoa
     return await teacherRepository.update(magiangvien,ten,holot,ngaysinh,email,sodienthoai);
 }
 
-module.exports = { getAll, getTeacherById,  createTeacher, deleteTeacherById, updateInfoTeacher};
+const monHocCuaGiangVien = async (idGiangVien) => {
+    if(!idGiangVien)
+        throw new Error("Chưa truyền mã giảng viên !")
+    const monhoc = await classRepository.findMonHocCuaGiangVien(idGiangVien);
+        
+    return monhoc.length === 0 ? null : monhoc
+}
+
+module.exports = { getAll, getTeacherById,  createTeacher, deleteTeacherById, updateInfoTeacher,monHocCuaGiangVien};

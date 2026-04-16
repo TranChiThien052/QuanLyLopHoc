@@ -104,5 +104,28 @@ const updateInfoTeacher = async (req,res) => {
     }
 }
 
+const getMonHocCuaGiangVien =  async (req, res) => {
+    try {
+        const magiangvien = req.params.magiangvien
+        const monhoc = await teacherService.monHocCuaGiangVien(magiangvien)
 
-module.exports = { getAll, getTeacherById, createTeacher, deleteTeacherById, updateInfoTeacher };
+        let response = {}
+        if(!monhoc) {
+            response.code = 404,
+            response.message = "Không tìm thấy môn học của giảng viên !";
+        }
+        else
+            response = monhoc
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            { 
+                code:999,
+                message: error.message 
+            }
+        );
+    }
+}
+
+module.exports = { getAll, getTeacherById, createTeacher, deleteTeacherById, updateInfoTeacher,getMonHocCuaGiangVien };

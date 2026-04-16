@@ -1,4 +1,5 @@
 const diemDanhRepo = require('../repositories/diemdanhRepository');
+const accoutService = require('./accountService')
 
 const findAll = async () => {
     return await diemDanhRepo.findAll();
@@ -42,6 +43,28 @@ const deleteDiemDanh = async (maDiemDanh) => {
     return await diemDanhRepo.deleteDiemDanh(maDiemDanh);
 }
 
+const diemDanhThuCong = async (maNguoiCapNhat,maBuoiHoc,danhSachDiemDanh) => {
+    if(!maNguoiCapNhat || !maBuoiHoc || !danhSachDiemDanh || danhSachDiemDanh.length === 0)
+        throw new Error("Thiếu dữ liệu điểm danh");
+    const giaoVien = await accoutService.findByUsername(maNguoiCapNhat)
+    if(!giaoVien)
+        throw new Error("Mã người cập nhật không tồn tại trong hệ thống !")
+
+    let listDiemDanh = danhSachDiemDanh.map( item => {
+        const maDiemDanh = `${item.maSinhVien}_${maBuoiHoc}`;
+        return {
+            maDiemDanh: String(maDiemDanh),
+            maSinhVien: item.maSinhVien,
+            maBuoiHoc: maBuoiHoc,
+            trangThai: item.trangThai,
+            ghiChu: item.ghiChu || "",
+            thoiGianCapNhat: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }),
+            maNguoiCapNhat: maNguoiCapNhat
+        }
+    })
+    return await diemDanhRepo.createBulk(listDiemDanh)
+}
+
 module.exports = {
     findAll,
     findBySinhVienId,
@@ -49,5 +72,6 @@ module.exports = {
     create,
     initList,
     update,
-    deleteDiemDanh
+    deleteDiemDanh,
+    diemDanhThuCong
 }
