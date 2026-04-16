@@ -1,35 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import api from '../../services/api';
 import './AttendanceManagement.css';
-
-const sessionsData = [
-  { id: "BH122026", classId: "cntt-th10", className: "Lớp CNTT TH10", studentCount: 70, time: "7:00 - 12:00" },
-  { id: "BH12242", classId: "qtkd-kd07", className: "Lớp Quản trị kinh doanh KD07", studentCount: 79, time: "12:35 - 15:00" },
-  { id: "BH122786", classId: "tkdh-06", className: "Lớp Thiết Kế Đồ Họa 06", studentCount: 90, time: "15:10 - 17:40" },
-  { id: "BH125526", classId: "cntt-th10", className: "Lớp CNTT TH10", studentCount: 80, time: "7:00 - 9:15" },
-  { id: "BH1213226", classId: "tkdh-06", className: "Lớp Thiết Kế Đồ Họa 06", studentCount: 69, time: "7:00 - 12:00" },
-  { id: "BH122029", classId: "mkt-mk01", className: "Lớp Marketing MK01", studentCount: 50, time: "13:00 - 15:00" }, // Dữ liệu giả thêm để test phân trang
-];
 
 export default function AttendanceManagement() {
   const { classId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Số lượng buổi học mỗi trang
+  const [classSessions, setClassSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const itemsPerPage = 5;
 
-  // Mỗi khi tìm kiếm, reset về trang 1
+  // Lọc reset trang
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  const classSessions = sessionsData.filter(s => s.classId === classId);
-  const displayClassName = classSessions.length > 0 ? classSessions[0].className : "Lớp học không xác định";
+  const passedClass = location.state?.cls;
+  const displayClassName = passedClass?.tenlop || `Lớp ${classId}`;
 
-  // 1. Logic lọc danh sách theo từ khóa tìm kiếm
-  const filteredSessions = classSessions.filter((session) =>
-    session.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/lessons/lop/${classId}`);
+        const data = response.data?.data || response.data || [];
+        setClassSessions(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Lỗi tải danh sách buổi học:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (classId) fetchLessons();
+  }, [classId]);
+
+  const filteredSessions = classSessions.filter((session) => {
+    const searchLow = searchTerm.toLowerCase();
+    const ma = (session.mabuiohoc || '').toLowerCase();
+    const ndi = (session.noidungbuoihoc || '').toLowerCase();
+    return ma.includes(searchLow) || ndi.includes(searchLow);
+  });
 
   // 2. Logic phân trang
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -53,6 +67,14 @@ export default function AttendanceManagement() {
           <button className="btn-search">Tìm kiếm</button>
         </div>
       </div>
+
+      {passedClass && (
+        <div style={{ backgroundColor: '#fff', padding: '15px 20px', borderRadius: '12px', marginBottom: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+          <div><strong style={{color: '#6c757d', fontSize: '13px'}}>Tên lớp học</strong> <div style={{fontSize: '16px', fontWeight: 'bold'}}>{passedClass.tenlop}</div></div>
+          <div><strong style={{color: '#6c757d', fontSize: '13px'}}>Mã lớp học</strong> <div style={{fontSize: '16px', fontWeight: 'bold', color: '#1a73e8'}}>{passedClass.malop}</div></div>
+          <div><strong style={{color: '#6c757d', fontSize: '13px'}}>Môn học</strong> <div style={{fontSize: '16px', fontWeight: 'bold'}}>{passedClass.monhoc}</div></div>
+        </div>
+      )}
 
       {/* DATE BANNER */}
       <div className="date-banner" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -81,35 +103,37 @@ export default function AttendanceManagement() {
           <thead>
             <tr>
               <th>Mã buổi học</th>
-              <th>Tên lớp học</th>
-              <th>Số lượng SV</th>
+              <th>Nội dung</th>
+              <th>Ngày học</th>
               <th>Thời gian</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {currentItems.length > 0 ? (
+            {loading ? (
+              <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>Đang tải danh sách buổi học...</td></tr>
+            ) : currentItems.length > 0 ? (
               currentItems.map((session, index) => (
                 <tr key={index}>
-                  <td data-label="Mã buổi">{session.id}</td>
-                  <td data-label="Tên lớp">{session.className}</td>
-                  <td data-label="Số lượng">
-                    <strong>{session.studentCount}</strong> sinh viên
+                  <td data-label="Mã buổi"><strong>{session.mabuoihoc}</strong></td>
+                  <td data-label="Nội dung">{session.noidungbuoihoc || 'N/A'}</td>
+                  <td data-label="Ngày học">{session.ngayhoc ? session.ngayhoc.substring(0, 10) : 'N/A'}</td>
+                  <td data-label="Thời gian">
+                     {session.giobatdau ? session.giobatdau.substring(0, 5) : ''} - {session.gioketthuc ? session.gioketthuc.substring(0, 5) : ''}
                   </td>
-                  <td data-label="Thời gian">{session.time}</td>
                   <td data-label="Thao tác" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                     <button
                       className="btn-create-code"
                       style={{ backgroundColor: '#28a745' }}
-                      onClick={() => navigate(`/teacher/statistics/${session.id}`, { state: { className: session.className } })}
+                      onClick={() => navigate(`/teacher/statistics/${session.mabuoihoc}`, { state: { className: displayClassName } })}
                     >
                       Thống kê buổi
                     </button>
                     <button
                       className="btn-create-code"
-                      onClick={() => navigate(`/teacher/attendance/process/${session.id}?type=face`)}
+                      onClick={() => navigate(`/teacher/attendance/process/${session.mabuoihoc}?type=face`, { state: { session, cls: passedClass, className: displayClassName } })}
                     >
-                      Tạo mã điểm danh
+                      Tạo điểm danh
                     </button>
                   </td>
                 </tr>

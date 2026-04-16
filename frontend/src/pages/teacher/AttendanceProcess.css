@@ -10,10 +10,10 @@
 }
 
 .process-container {
-    max-width: 1090px;
+    max-width: 99%;
     margin: 20px auto;
     font-family: 'Roboto', sans-serif;
-    padding: 0 15px;
+    padding: 0 ;
 }
 
 /* --- TOP INFO --- */
@@ -92,6 +92,55 @@
 .status-select.excused { background: var(--bg-green-light); }    /* Xanh nhạt */
 .status-select.unexcused { background: var(--bg-red-main); }     /* Đỏ */
 .status-select.late { background: var(--bg-yellow-late); }       /* Vàng */
+.status-select.review { background: #FF9800; color: #fff; }      /* Cam Đậm (Đang Xem Xét) */
+
+/* --- DUAL TABLE LAYOUT --- */
+.attendance-tables-wrapper {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.main-table-side {
+    flex: 7;
+    min-width: 0; 
+}
+
+.review-table-side {
+    flex: 3;
+    min-width: 0;
+    background: #fffafa; /* Sắc đỏ / cam nhạt nhẹ cho vùng cảnh báo */
+    border: 2px solid #FF9800;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+.review-title {
+    color: #d9534f;
+    font-size: 18px;
+    margin-bottom: 15px;
+    margin-top: 0;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px dotted #FF9800;
+    padding-bottom: 8px;
+}
+
+.review-table { width: 100%; border-collapse: collapse; }
+.review-table th, .review-table td { padding: 8px; text-align: center; border-bottom: 1px solid #ccc; font-size: 14px; }
+.review-table th { background: #FF9800; color: white; }
+
+.review-actions { display: flex; gap: 8px; justify-content: center; }
+.btn-rv { padding: 6px 12px; font-weight: 700; border: 1px solid #000; border-radius: 4px; cursor: pointer; transition: 0.2s;}
+.btn-rv.approve { background: var(--bg-green-main); color: #000; }
+.btn-rv.reject { background: var(--bg-red-main); color: #000; }
+.btn-rv:hover { transform: translateY(-2px); }
+
+@media (max-width: 1024px) {
+    .attendance-tables-wrapper { flex-direction: column; }
+    .main-table-side, .review-table-side { width: 100%; flex: none; }
+}
 
 /* --- PAGINATION & BACK BTN --- */
 .mgmt-pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
@@ -133,10 +182,13 @@
     font-style: italic;
 }
 
-/* Tùy chỉnh cột Ghi chú rộng ra một chút để không bị tù túng */
-.modern-table td:nth-child(4) {
-    min-width: 280px;
-    padding: 10px 15px;
+/* Tùy chỉnh các cột cho gọn lại */
+.modern-table th:nth-child(3), .modern-table td:nth-child(3) {
+    width: 40px; /* Cột Cập nhật (Thời gian) */
+}
+.modern-table th:nth-child(4), .modern-table td:nth-child(4) {
+    width: 200px; /* Cột Ghi chú */
+    padding: 10px;
 }
 
 /* --- QR GENERATION UI --- */
@@ -290,4 +342,4 @@
 
 .qr-modal-overlay {
     pointer-events: auto; /* Re-enable for modal */
-}
+}
