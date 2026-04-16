@@ -1,4 +1,5 @@
-const {lopsinhvien : Lopsinhvien} = require('../models');
+const {lopsinhvien : Lopsinhvien,sequelize} = require('../models');
+const { QueryTypes } = require('sequelize');
 
 const findAll = async () => {
     return await Lopsinhvien.findAll();
@@ -63,11 +64,30 @@ const deleteLopSinhVien = async (malop, masinhvien) => {
     return await lopsinhvien.destroy();
 }
 
+const findSinhVienCuaLopHoc = async (id) => {
+    const rows = await sequelize.query(
+        `SELECT 
+            lsv.masinhvien
+        FROM 
+            lophoc AS lh
+        INNER JOIN 
+            lop_sinhvien AS lsv ON lh.malop = lsv.malop
+        WHERE 
+            lsv.malop = :maLop`,
+        {
+            replacements: { maLop: id },
+            type: QueryTypes.SELECT
+        }
+    );
+    return rows;
+};
+
 module.exports = {
     findAll,
     findById,
     create,
     bulkCreate,
     update,
-    deleteLopSinhVien
+    deleteLopSinhVien,
+    findSinhVienCuaLopHoc
 }

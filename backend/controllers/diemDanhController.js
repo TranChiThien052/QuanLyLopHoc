@@ -81,11 +81,23 @@ const deleteDiemDanh = async (req, res) => {
     }
 };
 
+const diemDanhThuCong = async (req, res) => {
+    const {maNguoiCapNhat,maBuoiHoc,danhSachDiemDanh} = req.body
+    try{
+        const diemDanh =await diemDanhService.diemDanhThuCong(maNguoiCapNhat,maBuoiHoc,danhSachDiemDanh)
+        return res.status(200).json(diemDanh);
+    }
+    catch(error){
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     findAll,
     findBySinhVienId,
     findByBuoiHocId,
     create,
     update,
-    deleteDiemDanh
+    deleteDiemDanh,
+    diemDanhThuCong
 };
