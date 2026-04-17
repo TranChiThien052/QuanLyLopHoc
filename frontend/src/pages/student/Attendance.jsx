@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import * as faceapi from '@vladmandic/face-api';
 import axios from 'axios';
 import './Attendance.css';
 
 const Attendance = () => {
+
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('sessionId');
+
   const videoRef = useRef();
   const isProcessing = useRef(false);
   
