@@ -231,3 +231,31 @@
   font-weight: 600;
   color: #475569;
 }
+
+.viewport-cam {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: #1e293b; /* Màu tối để biết khung hình đang hoạt động */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.video-qr, .video-face {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Hiệu ứng lật gương cho camera trước */
+.video-face {
+  transform: scaleX(-1);
+}
+
+.placeholder-cam {
+  color: white;
+  text-align: center;
+}
