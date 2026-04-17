@@ -26,7 +26,13 @@ const findByBuoiHocId = async (maBuoiHoc) => {
 const findByClassId = async (malop) => {
     return await DiemDanh.findAll(
         {
-            where: { malop : malop }
+            include: [
+                {
+                    model: Lesson,
+                    where: { malop : malop },
+                    attributes: []
+                }
+            ]
         }
     );
 };
