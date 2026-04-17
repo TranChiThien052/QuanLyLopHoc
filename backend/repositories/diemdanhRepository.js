@@ -1,4 +1,7 @@
 const { diemdanh : DiemDanh } = require("../models");
+const { lesson : Lesson } = require("../models");
+const { SinhVien } = require("../models");
+const { class : Class } = require("../models");
 
 const findAll = async () => {
     return await DiemDanh.findAll();
@@ -18,6 +21,38 @@ const findByBuoiHocId = async (maBuoiHoc) => {
             where: { mabuoihoc : maBuoiHoc }
         }
     );
+};
+
+const findByClassId = async (malop) => {
+    return await DiemDanh.findAll(
+        {
+            where: { malop : malop }
+        }
+    );
+};
+
+const findByClassAndSinhVienId = async (malop, maSinhVien) => {
+    try {
+    const result = await DiemDanh.findAll({
+      include: [
+        {
+          model: Lesson,
+          where: { malop : malop },
+          attributes: []
+        },
+        {
+          model: SinhVien,
+          where: { masinhvien : maSinhVien },
+          attributes: []
+        }
+      ]
+    });
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
@@ -94,6 +129,8 @@ module.exports = {
     findAll,
     findBySinhVienId,
     findByBuoiHocId,
+    findByClassId,
+    findByClassAndSinhVienId,
     create,
     initList,
     update,

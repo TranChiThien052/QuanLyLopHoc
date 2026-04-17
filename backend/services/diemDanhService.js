@@ -16,6 +16,18 @@ const findByBuoiHocId = async (maBuoiHoc) => {
     return await diemDanhRepo.findByBuoiHocId(maBuoiHoc);
 }
 
+const findByClassId = async (malop) => {
+    if (!malop)
+        throw new Error("Thiếu dữ liệu mã lớp học");
+    return await diemDanhRepo.findByClassId(malop);
+}
+
+const findByClassAndSinhVienId = async (malop, maSinhVien) => {
+    if (!malop || !maSinhVien)
+        throw new Error("Thiếu dữ liệu mã lớp học hoặc mã sinh viên");
+    return await diemDanhRepo.findByClassAndSinhVienId(malop, maSinhVien);
+};
+
 const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
     if (!maSinhVien || !maBuoiHoc || !trangThai || !thoiGianCapNhat || !maNguoiCapNhat)
         throw new Error("Thiếu dữ liệu để tạo điểm danh");
@@ -46,6 +58,8 @@ module.exports = {
     findAll,
     findBySinhVienId,
     findByBuoiHocId,
+    findByClassId,
+    findByClassAndSinhVienId,
     create,
     initList,
     update,
