@@ -1,0 +1,107 @@
+.attendance-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  min-height: 80vh; /* Đảm bảo đủ không gian để bự ra */
+}
+
+.attendance-card-modern {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px; /* Tăng độ rộng card để khung camera bự hơn */
+  border-radius: 30px;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+}
+
+.card-top-header {
+  background: #0056b3;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+.brand-name { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+.brand-sub { font-size: 12px; opacity: 0.8; }
+
+.main-camera-frame {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Tăng chiều cao để khung quét bự hơn rõ rệt */
+  background: #000;
+}
+
+/* Responsive: Trên màn hình nhỏ (điện thoại), khung hình sẽ tự điều chỉnh */
+@media (max-width: 480px) {
+  .main-camera-frame { height: 350px; }
+  .attendance-card-modern { border-radius: 20px; }
+}
+
+.main-camera-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Phủ kín khung bự */
+  transform: scaleX(-1);
+}
+
+.scanning-laser-v2 {
+  position: absolute;
+  top: 10%;
+  width: 100%;
+  height: 4px;
+  background: #22c55e;
+  box-shadow: 0 0 20px #22c55e;
+  animation: laserPulse 2.5s infinite ease-in-out;
+  z-index: 5;
+}
+
+@keyframes laserPulse {
+  0%, 100% { top: 15%; opacity: 0.5; }
+  50% { top: 85%; opacity: 1; }
+}
+
+.full-result {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  z-index: 10;
+}
+.full-result.success { color: #4ade80; }
+.full-result.error { color: #f87171; }
+
+.status-message-bar {
+  padding: 18px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  background: #f8fafc;
+  min-height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.status-message-bar.success { background: #ecfdf5; color: #065f46; }
+.status-message-bar.error { background: #fef2f2; color: #991b1b; }
+.status-message-bar.scanning { background: #fffbeb; color: #92400e; }
+
+.card-bottom-info {
+  padding: 15px 25px;
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #64748b;
+}
+.info-row b { color: #1e293b; }
