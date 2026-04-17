@@ -97,7 +97,7 @@ export default function AttendanceManagementClass() {
                     </button>
                     <button
                       className="btn-create-code"
-                      onClick={() => navigate(`/teacher/attendance/${cls.malop}`)}
+                      onClick={() => navigate(`/teacher/attendance/${cls.malop}`, { state: { cls } })}
                     >
                       Xem buổi học
                     </button>

@@ -181,7 +181,6 @@
 .card-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
 .badge { background: #f1f5f9; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; }
 
-/* --- POPUP (MODAL) THÊM LỚP --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -189,12 +188,14 @@
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 10000;
-  padding: 15px;
+  padding: 30px 15px;
+  overflow-y: auto;
 }
 
 .modal-content {
+  box-sizing: border-box;
   background: white;
   width: 100%;
   max-width: 550px;
@@ -202,6 +203,7 @@
   padding: 30px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
   position: relative;
+  margin: auto;
 }
 
 .modal-header {
@@ -224,6 +226,29 @@
 .input-group label { display: block; font-size: 13px; font-weight: 800; color: var(--dark-navy); margin-bottom: 8px; }
 .input-group input { width: 100%; padding: 12px 15px; border: 2px solid #edf2f7; border-radius: 12px; outline: none; transition: 0.3s; }
 .input-group input:focus { border-color: var(--primary-cyan); }
+
+.input-group select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #edf2f7;
+  border-radius: 12px;
+  outline: none;
+  transition: 0.3s;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--dark-navy);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2331a7bf' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 14px;
+}
+.input-group select:focus {
+  border-color: var(--primary-cyan);
+  box-shadow: 0 0 0 4px rgba(49, 167, 191, 0.15);
+}
 
 /* KHU VỰC NHẬP SINH VIÊN */
 .student-input-section {
@@ -301,7 +326,10 @@
   .header-actions { width: 100%; }
   .search-wrapper { flex: 1; width: auto; }
   .modal-form .form-grid { grid-template-columns: 1fr; }
-  .modal-content { padding: 20px; border-radius: 0; min-height: 100vh; display: flex; flex-direction: column; }
+  .modal-content { 
+    padding: 20px; 
+    border-radius: 20px !important; 
+  }
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -318,4 +346,4 @@
 
 .text-error {
   color: var(--primary-red);
-}
+}
