@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import * as faceapi from '@vladmandic/face-api';
+import jsQR from 'jsqr'; // Đảm bảo đã chạy: npm install jsqr
 import axios from 'axios';
 import './Attendance.css';
 
 const Attendance = () => {
   const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('sessionId'); // Lấy mã buổi học từ URL
+  const sessionId = searchParams.get('sessionId'); // Lấy ID từ ?sessionId=...
 
   const videoRef = useRef(null);
+  const canvasRef = useRef(document.createElement('canvas')); 
+  const isProcessing = useRef(false);
   
   const [step, setStep] = useState('idle'); 
   const [isCamOpen, setIsCamOpen] = useState(false);
@@ -16,9 +19,8 @@ const Attendance = () => {
   const [msg, setMsg] = useState('Đang khởi tạo hệ thống...');
   const [student, setStudent] = useState(null);
   const [sessionInfo, setSessionInfo] = useState(null);
-  const isProcessing = useRef(false);
 
-  // 1. Khởi tạo AI và lấy thông tin người dùng
+  // 1. Khởi tạo AI và lấy thông tin User
   useEffect(() => {
     const init = async () => {
       try {
@@ -29,6 +31,7 @@ const Attendance = () => {
         ]);
         const savedUser = JSON.parse(localStorage.getItem('user'));
         if (savedUser?.id) setStudent({ masinhvien: savedUser.id });
+        setMsg('Sẵn sàng. Hãy mở Camera sau để quét mã QR giảng viên!');
       } catch (e) {
         setMsg('Lỗi: Không thể tải mô hình AI!');
       }
@@ -37,21 +40,20 @@ const Attendance = () => {
   }, []);
 
   /**
-   * 2. Hàm xác thực Buổi học (Fix lỗi N/A)
+   * 2. Xác thực Buổi học (Fix lỗi N/A)
    */
   const handleVerifyQR = useCallback(async (mabuoihoc) => {
-    if (!mabuoihoc || !student?.masinhvien) return;
+    if (!mabuoihoc || !student?.masinhvien || isProcessing.current) return;
+    isProcessing.current = true;
     setStep('verifying');
-    setMsg('Đang xác thực thông tin buổi học...');
+    setMsg('Đã nhận mã! Đang kiểm tra danh sách lớp...');
 
     try {
-      // Gọi API kiểm tra danh sách điểm danh
       const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`);
       const attendanceData = resAt.data?.data || resAt.data || [];
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
 
       if (record) {
-        // Lấy thông tin lớp và môn học để hiển thị
         const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/${mabuoihoc}`);
         const resClass = await axios.get(`${process.env.REACT_APP_API_URL}/class/${resLesson.data.malop}`);
 
@@ -61,59 +63,44 @@ const Attendance = () => {
           madiemdanh: record.madiemdanh
         });
 
-        setIsCamOpen(false); // Đóng cam QR nếu đang mở
+        setIsCamOpen(false); // Reset cam để chuyển bước
         setShowModal(true);
         setStep('face_id'); 
       } else {
         setStep('idle');
-        setMsg('Bạn không có tên trong danh sách buổi học này!');
+        setMsg('Bạn không có tên trong buổi học này!');
       }
     } catch (err) {
       setStep('idle');
       setMsg('Lỗi: Buổi học không hợp lệ!');
+    } finally {
+      isProcessing.current = false;
     }
   }, [student]);
 
-  // Tự động chạy xác thực khi vào từ link QR
-  useEffect(() => {
-    if (sessionId && student?.masinhvien && step === 'idle') {
-      handleVerifyQR(sessionId);
-    }
-  }, [sessionId, student, step, handleVerifyQR]);
-
   /**
-   * 3. Quản lý vòng đời Camera (Fix lỗi Ref null và ESLint dòng 54)
+   * 3. Giải mã QR từ Camera
    */
-  useEffect(() => {
-    let currentStream = null;
+  const scanQRCode = useCallback(() => {
+    if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-    const startCamera = async () => {
-      // Chỉ thực hiện khi isCamOpen = true và phần tử video đã xuất hiện trong DOM
-      if (isCamOpen && videoRef.current) {
-        try {
-          const mode = step === 'face_id' ? "user" : "environment";
-          currentStream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } } 
-          });
-          
-          if (videoRef.current) {
-            videoRef.current.srcObject = currentStream;
-          }
-        } catch (err) {
-          setMsg('Lỗi: Không thể mở Camera. Hãy kiểm tra quyền và HTTPS!');
-        }
+      if (code) {
+        // Trích xuất ID từ link quét được
+        const params = new URLSearchParams(code.data.split('?')[1]);
+        const sid = params.get('sessionId') || code.data;
+        handleVerifyQR(sid);
       }
-    };
-
-    startCamera();
-
-    // Dọn dẹp: Tắt camera khi Component bị hủy hoặc trạng thái thay đổi
-    return () => {
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [isCamOpen, step]);
+    }
+  }, [handleVerifyQR]);
 
   /**
    * 4. Nhận diện khuôn mặt
@@ -121,7 +108,7 @@ const Attendance = () => {
   const handleFaceID = useCallback(async () => {
     if (isProcessing.current) return;
     isProcessing.current = true;
-    setMsg('Đang nhận diện (Quét 5 lần)...');
+    setMsg('Đang nhận diện mặt (5 lần)...');
 
     try {
       for (let i = 1; i <= 5; i++) {
@@ -129,34 +116,59 @@ const Attendance = () => {
         await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
         await new Promise(r => setTimeout(r, 200));
       }
-
       await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${sessionInfo.madiemdanh}`, {
         trangThai: 'Có mặt',
         maNguoiCapNhat: student.masinhvien
       });
-
       setStep('success');
       setMsg('ĐIỂM DANH THÀNH CÔNG! ✅');
     } catch (err) {
-      setMsg('Nhận diện thất bại! Thử lại sau 3s...');
+      setMsg('Thất bại! Thử lại sau 3s...');
       setTimeout(() => { isProcessing.current = false; }, 3000);
     }
   }, [student, sessionInfo]);
 
-  // Vòng lặp nhận diện AI
+  /**
+   * 5. Vòng đời Camera & Loop
+   */
+  useEffect(() => {
+    let stream = null;
+    const startCam = async () => {
+      if (isCamOpen && videoRef.current) {
+        try {
+          const mode = step === 'face_id' ? "user" : "environment";
+          stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: mode, width: { ideal: 1280 } } 
+          });
+          if (videoRef.current) videoRef.current.srcObject = stream;
+        } catch (e) { setMsg('Lỗi: Hãy cấp quyền Camera và dùng HTTPS!'); }
+      }
+    };
+    startCam();
+    return () => stream?.getTracks().forEach(t => t.stop());
+  }, [isCamOpen, step]);
+
   useEffect(() => {
     let timer;
-    if (isCamOpen && step === 'face_id' && !isProcessing.current && videoRef.current) {
-      timer = setInterval(async () => {
-        const det = await faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions());
-        if (det) {
-          clearInterval(timer);
-          handleFaceID();
+    if (isCamOpen && videoRef.current) {
+      timer = setInterval(() => {
+        if (step === 'scanning_qr') scanQRCode();
+        else if (step === 'face_id' && !isProcessing.current) {
+          faceapi.detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions()).then(det => {
+            if (det) { clearInterval(timer); handleFaceID(); }
+          });
         }
-      }, 500);
+      }, step === 'scanning_qr' ? 300 : 500);
     }
     return () => clearInterval(timer);
-  }, [isCamOpen, step, handleFaceID]);
+  }, [isCamOpen, step, scanQRCode, handleFaceID]);
+
+  // Tự động chạy nếu link đã có sessionId sẵn
+  useEffect(() => {
+    if (sessionId && student?.masinhvien && step === 'idle') {
+      handleVerifyQR(sessionId);
+    }
+  }, [sessionId, student, step, handleVerifyQR]);
 
   return (
     <div className="attendance-responsive-wrapper">
@@ -165,23 +177,22 @@ const Attendance = () => {
           <h2>STU SYSTEM</h2>
           <p>Hệ thống điểm danh sinh viên</p>
         </div>
-
         <div className="viewport-cam">
-          {/* Luôn kiểm tra điều kiện hiển thị */}
           {isCamOpen && !showModal ? (
-            <video ref={videoRef} autoPlay muted playsInline className="video-qr" />
+            <div className="scanner-container">
+              <video ref={videoRef} autoPlay muted playsInline className="video-stream" />
+              <div className="qr-overlay-frame"></div>
+            </div>
           ) : (
             <div className="placeholder-cam">
               <span className="icon">{step === 'verifying' ? '⏳' : '📷'}</span>
             </div>
           )}
         </div>
-
         <div className={`status-text ${step}`}>{msg}</div>
-
         <div className="footer-action">
           {step === 'idle' && !sessionId && (
-            <button className="btn-start" onClick={() => setIsCamOpen(true)}>MỞ CAMERA QUÉT QR</button>
+            <button className="btn-start" onClick={() => { setIsCamOpen(true); setStep('scanning_qr'); }}>MỞ CAMERA QUÉT QR</button>
           )}
         </div>
       </div>
@@ -191,7 +202,7 @@ const Attendance = () => {
           <div className="modal-container-custom">
             <div className="modal-top">
               <h3>XÁC THỰC SINH VIÊN</h3>
-              <button className="btn-close" onClick={() => { setShowModal(false); setIsCamOpen(false); }}>&times;</button>
+              <button className="btn-close" onClick={() => { setShowModal(false); setIsCamOpen(false); setStep('idle'); }}>&times;</button>
             </div>
             <div className="modal-inner">
               <div className="info-box-session">
@@ -200,10 +211,7 @@ const Attendance = () => {
                 <p>Lớp: <strong>{sessionInfo?.tenlop || 'Đang tải...'}</strong></p>
               </div>
               <div className="face-viewport">
-                {/* Sử dụng isCamOpen để điều khiển video trong Modal */}
-                {step === 'face_id' && (
-                  <video ref={videoRef} autoPlay muted playsInline className="video-face" />
-                )}
+                {step === 'face_id' && <video ref={videoRef} autoPlay muted playsInline className="video-stream mirror" />}
                 <div className="laser-line"></div>
                 {step === 'success' && <div className="success-tag">ĐÃ ĐIỂM DANH ✅</div>}
               </div>
