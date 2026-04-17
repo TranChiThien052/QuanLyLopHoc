@@ -1,4 +1,6 @@
-const { class : Class } = require('../models');
+const { class : Class, sequelize } = require('../models');
+const { QueryTypes } = require('sequelize');
+const lopsinhvienRepositories = require("./lopsinhvienRepository")
 
 const findAll = async () => {
     return await Class.findAll();
@@ -61,10 +63,53 @@ const deleteClass = async (MaLop) => {
     return await lop.destroy();
 }
 
+const findMonHocCuaSinhVien = async (id) => {
+    const rows = await sequelize.query(
+        `SELECT 
+            lh.malop, 
+            lh.monhoc
+        FROM 
+            lophoc AS lh
+        INNER JOIN 
+            lop_sinhvien AS lsv ON lh.malop = lsv.malop
+        WHERE 
+            lsv.masinhvien = :maSinhVien`,
+        {
+            replacements: { maSinhVien: id },
+            type: QueryTypes.SELECT
+        }
+    );
+    return rows;
+};
+
+const findMonHocCuaGiangVien = async (id) => {
+    const monhoc = await Class.findAll(
+        {
+            where: { magiangvien : id }
+        }
+    );
+
+    let promiseArray = monhoc.map( async item => {
+        let soLuong = await lopsinhvienRepositories.findSinhVienCuaLopHoc(item.malop)
+
+        return {
+            maLop: item.malop,
+            tenLop: item.tenlop,
+            tenMonHoc: item.monhoc,
+            soLuongSinhVien: soLuong.length
+        }
+    })
+    const response = await Promise.all(promiseArray);
+    
+    return response
+};
+
 module.exports = {
     findAll,
     findById,
     create,
     update,
-    deleteClass
+    deleteClass,
+    findMonHocCuaSinhVien,
+    findMonHocCuaGiangVien
 }

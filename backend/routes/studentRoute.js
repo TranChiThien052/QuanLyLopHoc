@@ -33,4 +33,5 @@ router.post("/bulk", (req, res, next) => {
 router.delete("/:masinhvien", studentController.deleteStudentById);
 router.put("/:masinhvien", studentController.updateInfoStudent);
 router.put('/update-faceid/:masinhvien',studentController.updateFaceIdStudent);
+router.get('/monhoc/:masinhvien',studentController.getMonHocCuaSinhVien);
 module.exports = router;

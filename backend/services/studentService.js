@@ -1,5 +1,6 @@
 const studentRepository = require("../repositories/studentRepository");
 const accountRepository  = require("../repositories/accountRepository");
+const classRepository = require("../repositories/classRepository");
 const bcrypt = require('bcrypt');
 
 const getAll = async () => {
@@ -76,4 +77,12 @@ const updateFaceIdStudent = async (masinhvien,faceid) => {
     return student
 }
 
-module.exports = { getAll, getStudentById, createStudent, createBulk, deleteStudentById, updateInfoStudent,updateFaceIdStudent};
+const monHocCuaSinhVien = async (idSinhVien) => {
+    if(!idSinhVien)
+        throw new Error("Chưa truyền mã sinh viên !")
+    const monhoc = await classRepository.findMonHocCuaSinhVien(idSinhVien);
+        
+    return monhoc.length === 0 ? null : monhoc
+}
+
+module.exports = { getAll, getStudentById, createStudent, createBulk, deleteStudentById, updateInfoStudent,updateFaceIdStudent,monHocCuaSinhVien};
