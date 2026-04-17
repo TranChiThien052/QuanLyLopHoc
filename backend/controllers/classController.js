@@ -44,6 +44,8 @@ const findById = async (req, res) => {
 
 const create = async (req, res) => {
     try {
+        let excelFileExisted = false;
+        let response;
         const listSinhVien = [];
         if (req.file) {
             const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
@@ -69,6 +71,8 @@ const create = async (req, res) => {
                 }
                 listSinhVien.push(MaSinhVien);
             }
+
+            excelFileExisted = true;
         }
 
         const { MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien } = req.body;
@@ -81,21 +85,27 @@ const create = async (req, res) => {
         const TenLop = MonHoc + '_' + teacher.holot + ' ' + teacher.ten;
         const newClass = await classService.create(TenLop, MonHoc, NgayBatDau, NgayKetThuc, NgayHocCoDinh, GioBatDau, GioKetThuc, MaGiangVien);
 
-        const createStudentList = await lopSinhVienService.createLopSinhVienBulk(newClass.malop, listSinhVien);
-
         const createdLessons = await lessonService.createBulkLessons(newClass.malop, GioBatDau, GioKetThuc, NgayBatDau, NgayKetThuc, NgayHocCoDinh);
+        
+        if(excelFileExisted) {
+            const createStudentList = await lopSinhVienService.createLopSinhVienBulk(newClass.malop, listSinhVien);
 
-        const LessonCodes = createdLessons.map(lesson => lesson.mabuoihoc);
+            const LessonCodes = createdLessons.map(lesson => lesson.mabuoihoc);
 
-        const createdDiemDanh = await diemDanhService.initList(listSinhVien, LessonCodes);
+            const createdDiemDanh = await diemDanhService.initList(listSinhVien, LessonCodes);
 
-        const response = {
-            class: newClass,
-            studentList: createStudentList,
-            lessons: createdLessons,
-            diemDanh: createdDiemDanh
-        };
-
+            response = {
+                class: newClass,
+                studentList: createStudentList,
+                lessons: createdLessons,
+                diemDanh: createdDiemDanh
+            };
+        } else {
+            response = {
+                class: newClass,
+                lessons: createdLessons
+            };
+        }
         return res.status(201).json(response);
     } catch (error) {
         res.status(500).json({ error: error.message });
