@@ -219,7 +219,6 @@ const AccountManagement = () => {
             </thead>
             <tbody>
               {currentItems.map((p) => (
-                // Đã xóa onClick và class row-clickable để không còn Popup
                 <tr key={(p.masinhvien || p.magiangvien).toString().trim()}>
                   <td className="text-id">{(p.masinhvien || p.magiangvien).toString().trim()}</td>
                   <td className="text-bold">{p.holot} {p.ten}</td>
