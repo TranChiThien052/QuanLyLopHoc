@@ -57,7 +57,7 @@ export default function AttendanceProcess() {
                             return st;
                         }
                     });
-                    
+
                     baseStudents = await Promise.all(detailedPromises);
                 } catch (err) {
                     console.error("Lỗi lấy danh sách sinh viên lớp:", err);
@@ -68,7 +68,7 @@ export default function AttendanceProcess() {
             const response = await api.get(`/diemDanh/buoiHoc/${sessionId}`);
             const diemdanhData = response.data?.data || response.data || [];
             const ddArray = Array.isArray(diemdanhData) ? diemdanhData : [];
-            
+
             // Bước 3: Gộp (Merge)
             const roster = baseStudents.length > 0 ? baseStudents : ddArray;
 
@@ -85,14 +85,14 @@ export default function AttendanceProcess() {
                     } else if (ddRecord.thoigiancapnhat.includes(' ')) {
                         parsedTime = ddRecord.thoigiancapnhat.split(' ')[1].substring(0, 5);
                     } else {
-                        parsedTime = ddRecord.thoigiancapnhat.substring(0, 5); 
+                        parsedTime = ddRecord.thoigiancapnhat.substring(0, 5);
                     }
                 }
 
                 return {
                     mssv: svId || '--',
                     tenSV: tenXacDinh,
-                    maLop: maLop || '--', 
+                    maLop: maLop || '--',
                     updateTime: parsedTime,
                     note: ddRecord?.ghichu || '--',
                     status: ddRecord?.trangthai || 'Lựa chọn', // Tiếng việt mặc định
@@ -119,7 +119,7 @@ export default function AttendanceProcess() {
             const ddArray = Array.isArray(data) ? data : [];
             // Lọc đúng buổi học hiện tại
             const ddRecord = ddArray.find(d => String(d.mabuoihoc) === String(sessionId));
-            
+
             if (ddRecord) {
                 let parsedTime = '--';
                 if (ddRecord.thoigiancapnhat) {
@@ -129,11 +129,11 @@ export default function AttendanceProcess() {
                     } else if (ddRecord.thoigiancapnhat.includes(' ')) {
                         parsedTime = ddRecord.thoigiancapnhat.split(' ')[1].substring(0, 5);
                     } else {
-                        parsedTime = ddRecord.thoigiancapnhat.substring(0, 5); 
+                        parsedTime = ddRecord.thoigiancapnhat.substring(0, 5);
                     }
                 }
 
-                setStudents(prev => prev.map(s => 
+                setStudents(prev => prev.map(s =>
                     s.mssv === mssv ? {
                         ...s,
                         updateTime: parsedTime,
@@ -149,8 +149,8 @@ export default function AttendanceProcess() {
     };
 
     const handleStatusChange = async (mssv, newStatus) => {
-        if (showQRModal) return; 
-        
+        if (showQRModal) return;
+
         // Optimistic UI update
         setStudents(prev => prev.map(s =>
             s.mssv === mssv ? { ...s, status: newStatus } : s
@@ -160,7 +160,7 @@ export default function AttendanceProcess() {
         if (!student) return;
 
         const maNguoiCapNhat = user?.id || user?.username || 'admin';
-        
+
         try {
             if (student.madiemdanh) {
                 // Đã có mã -> Nhấn PUT Cập Nhật
@@ -192,7 +192,7 @@ export default function AttendanceProcess() {
 
     // Chỉ cập nhật value ở Input (Giữ mượt UI)
     const handleNoteChange = (mssv, newNote) => {
-        if (showQRModal) return; 
+        if (showQRModal) return;
         setStudents(prev => prev.map(s =>
             s.mssv === mssv ? { ...s, note: newNote } : s
         ));
@@ -200,12 +200,12 @@ export default function AttendanceProcess() {
 
     // Khi người dùng bấm click ra ngoài Input (Mất Focus) -> Lưu Note xuống BE
     const handleNoteBlur = async (mssv, finalNote) => {
-        if (showQRModal) return; 
+        if (showQRModal) return;
         const student = students.find(s => s.mssv === mssv);
         if (!student) return;
-        
+
         const maNguoiCapNhat = user?.id || user?.username || 'admin';
-        
+
         try {
             if (student.madiemdanh) {
                 await api.put(`/diemDanh/${student.madiemdanh}`, {
@@ -216,7 +216,7 @@ export default function AttendanceProcess() {
                     ghiChu: finalNote || ' ',
                     maNguoiCapNhat: maNguoiCapNhat
                 });
-                await fetchSingleStudentAttendance(mssv); 
+                await fetchSingleStudentAttendance(mssv);
             } else {
                 await api.post(`/diemDanh/`, {
                     maSinhVien: mssv,
@@ -244,7 +244,7 @@ export default function AttendanceProcess() {
         }
 
         // Cập nhật Giao diện ngay lập tức thành Vắng (Optimistic UI)
-        setStudents(prev => prev.map(s => 
+        setStudents(prev => prev.map(s =>
             (s.status === 'Lựa chọn' || s.status === 'choice') ? { ...s, status: 'Vắng không phép' } : s
         ));
 
@@ -303,10 +303,10 @@ export default function AttendanceProcess() {
     }, [studentSearch]);
 
     // Dữ liệu tạo QR (Chuỗi JSON chứa Mã Buổi Học và Ngày Học)
-    const qrDataObj = {
-        mabuoihoc: sessionId,
-        ngayhoc: passedSession.ngayhoc || ""
-    };
+    // const qrDataObj = {
+    //     mabuoihoc: sessionId,
+    //     ngayhoc: passedSession.ngayhoc || ""
+    // };
 
     // T tạm thời khoá lại nha
     //const qrDataString = encodeURIComponent(JSON.stringify(qrDataObj));
@@ -329,8 +329,8 @@ export default function AttendanceProcess() {
         const mssvStr = s?.mssv || '';
         const tenSVStr = s?.tenSV || '';
         const searchStr = studentSearch || '';
-        return mssvStr.toLowerCase().includes(searchStr.toLowerCase()) || 
-               tenSVStr.toLowerCase().includes(searchStr.toLowerCase());
+        return mssvStr.toLowerCase().includes(searchStr.toLowerCase()) ||
+            tenSVStr.toLowerCase().includes(searchStr.toLowerCase());
     });
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -361,7 +361,7 @@ export default function AttendanceProcess() {
 
             <div className="info-header">
                 <div className="header-title">THÔNG TIN BUỔI HỌC</div>
-                
+
                 {/* NÚT TẠO MÃ QR (Chỉ hiện khi type là face) */}
                 {type === 'face' && !isGenerating && !showQRModal && (
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '15px' }}>
@@ -375,9 +375,9 @@ export default function AttendanceProcess() {
                 {isGenerating && (
                     <div className="qr-setup-box">
                         <label>Nhập thời gian hiệu lực (giây):</label>
-                        <input 
-                            type="number" 
-                            value={duration} 
+                        <input
+                            type="number"
+                            value={duration}
                             onChange={(e) => setDuration(Number(e.target.value))}
                             min="10"
                             max="300"
@@ -449,13 +449,12 @@ export default function AttendanceProcess() {
                                         </td>
                                         <td>
                                             <select
-                                                className={`status-select ${
-                                                    student.status === 'Có mặt' ? 'present' : 
-                                                    student.status === 'Vắng có phép' ? 'excused' : 
-                                                    student.status === 'Vắng không phép' ? 'unexcused' : 
-                                                    student.status === 'Đang xem xét' ? 'review' : 
-                                                    student.status === 'Đi trễ' ? 'late' : 'choice'
-                                                }`}
+                                                className={`status-select ${student.status === 'Có mặt' ? 'present' :
+                                                        student.status === 'Vắng có phép' ? 'excused' :
+                                                            student.status === 'Vắng không phép' ? 'unexcused' :
+                                                                student.status === 'Đang xem xét' ? 'review' :
+                                                                    student.status === 'Đi trễ' ? 'late' : 'choice'
+                                                    }`}
                                                 value={student.status}
                                                 onChange={(e) => handleStatusChange(student.mssv, e.target.value)}
                                                 disabled={showQRModal || student.status === 'Đang xem xét'}
@@ -488,14 +487,14 @@ export default function AttendanceProcess() {
                                 if (endPage - startPage < 4) {
                                     startPage = Math.max(1, endPage - 4);
                                 }
-                                
+
                                 const pages = [];
                                 for (let i = startPage; i <= endPage; i++) {
                                     pages.push(
-                                        <button 
-                                            key={i} 
-                                            className={`page-btn ${currentPage === i ? 'active' : ''}`} 
-                                            disabled={showQRModal} 
+                                        <button
+                                            key={i}
+                                            className={`page-btn ${currentPage === i ? 'active' : ''}`}
+                                            disabled={showQRModal}
                                             onClick={() => setCurrentPage(i)}
                                         >
                                             {i}
@@ -524,18 +523,18 @@ export default function AttendanceProcess() {
                             {reviewStudents.length > 0 ? (
                                 reviewStudents.map(student => (
                                     <tr key={student.mssv}>
-                                        <td style={{fontWeight: 700}}>{student.mssv}</td>
+                                        <td style={{ fontWeight: 700 }}>{student.mssv}</td>
                                         <td>{student.tenSV}</td>
                                         <td>
                                             <div className="review-actions">
-                                                <button 
-                                                    className="btn-rv approve" 
+                                                <button
+                                                    className="btn-rv approve"
                                                     onClick={() => handleStatusChange(student.mssv, 'Có mặt')}
                                                     disabled={showQRModal}
                                                 >Có mặt
                                                 </button>
-                                                <button 
-                                                    className="btn-rv reject" 
+                                                <button
+                                                    className="btn-rv reject"
                                                     onClick={() => handleStatusChange(student.mssv, 'Vắng không phép')}
                                                     disabled={showQRModal}
                                                 >Vắng
