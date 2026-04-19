@@ -35,6 +35,32 @@ const findByBuoiHocId = async (req, res) => {
     }
 };
 
+const findByClassId = async (req, res) => {
+    const { malop } = req.params;
+    try {
+        const diemDanh = await diemDanhService.findByClassId(malop);
+        if (!diemDanh) {
+            return res.status(404).json({ error: 'Điểm danh không tồn tại' });
+        }
+        res.json(diemDanh);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const findByClassAndSinhVienId = async (req, res) => {
+    const { malop, maSinhVien } = req.params;
+    try {
+        const diemDanh = await diemDanhService.findByClassAndSinhVienId(malop, maSinhVien);
+        if (!diemDanh) {
+            return res.status(404).json({ error: 'Điểm danh không tồn tại' });
+        }
+        res.json(diemDanh);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const create = async (req, res) => {
     const { maSinhVien, maBuoiHoc, trangThai, ghiChu, maNguoiCapNhat } = req.body;
     const thoiGianCapNhat = new Date();
@@ -81,11 +107,25 @@ const deleteDiemDanh = async (req, res) => {
     }
 };
 
+const diemDanhThuCong = async (req, res) => {
+    const {maNguoiCapNhat,maBuoiHoc,danhSachDiemDanh} = req.body
+    try{
+        const diemDanh =await diemDanhService.diemDanhThuCong(maNguoiCapNhat,maBuoiHoc,danhSachDiemDanh)
+        return res.status(200).json(diemDanh);
+    }
+    catch(error){
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     findAll,
     findBySinhVienId,
     findByBuoiHocId,
+    findByClassId,
+    findByClassAndSinhVienId,
     create,
     update,
-    deleteDiemDanh
+    deleteDiemDanh,
+    diemDanhThuCong
 };

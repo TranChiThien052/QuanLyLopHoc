@@ -198,4 +198,28 @@ const updateFaceIdStudent = async (req,res) => {
     }
 }
 
-module.exports = { getAll, getStudentById, createStudent, createBulkStudents, deleteStudentById, updateInfoStudent, updateFaceIdStudent };
+const getMonHocCuaSinhVien =  async (req, res) => {
+    try {
+        const masinhvien = req.params.masinhvien
+        const monhoc = await studentService.monHocCuaSinhVien(masinhvien)
+
+        let response = {}
+        if(!monhoc) {
+            response.code = 404,
+            response.message = "Không tìm thấy sinh viên !";
+        }
+        else
+            response = monhoc
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            { 
+                code:999,
+                message: error.message 
+            }
+        );
+    }
+}
+
+module.exports = { getAll, getStudentById, createStudent, createBulkStudents, deleteStudentById, updateInfoStudent, updateFaceIdStudent,getMonHocCuaSinhVien };
