@@ -17,6 +17,7 @@ const Attendance = () => {
   const [isCamOpen, setIsCamOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [msg, setMsg] = useState('Đang khởi tạo hệ thống...');
+  const [errorLine, setErrorLine] = useState('');
   const [student, setStudent] = useState(null);
   const [sessionInfo, setSessionInfo] = useState(null);
 
@@ -31,8 +32,10 @@ const Attendance = () => {
         ]);
         const savedUser = JSON.parse(localStorage.getItem('user'));
         if (savedUser?.id) setStudent({ masinhvien: savedUser.id });
+        setErrorLine('');
         setMsg('Sẵn sàng. Hãy mở Camera sau để quét mã QR giảng viên!');
       } catch (e) {
+        setErrorLine(`Lỗi khởi tạo: ${e?.message || 'Không xác định'}`);
         setMsg('Lỗi: Không thể tải mô hình AI!');
       }
     };
@@ -47,6 +50,7 @@ const Attendance = () => {
     isProcessing.current = true;
     setStep('verifying');
     setMsg('Đã nhận mã! Đang kiểm tra danh sách lớp...');
+    setErrorLine('');
 
     try {
       const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`);
@@ -73,6 +77,7 @@ const Attendance = () => {
       }
     } catch (err) {
       setStep('idle');
+      setErrorLine(`Dữ liệu lỗi QR: ${err?.response?.data?.message || err?.message || String(err)}`);
       setMsg('Lỗi: Buổi học không hợp lệ!' + err.message);
     } finally {
       isProcessing.current = false;
@@ -191,6 +196,7 @@ const Attendance = () => {
           )}
         </div>
         <div className={`status-text ${step}`}>{msg}</div>
+        {errorLine && <div className="status-text error">{errorLine}</div>}
         <div className="footer-action">
           {step === 'idle' && !sessionId && (
             <button className="btn-start" onClick={() => { setIsCamOpen(true); setStep('scanning_qr'); }}>MỞ CAMERA QUÉT QR</button>
