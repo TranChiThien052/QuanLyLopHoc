@@ -56,7 +56,6 @@ const Attendance = () => {
       const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`);
       const attendanceData = resAt.data?.data || resAt.data || [];
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
-      setMsg(attendanceData + " - " + record);
 
       if (record) {
         const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/${mabuoihoc}`);
@@ -78,7 +77,7 @@ const Attendance = () => {
     } catch (err) {
       setStep('idle');
       setErrorLine(`Dữ liệu lỗi QR: ${err?.response?.data?.message || err?.message || String(err)}`);
-      setMsg('Lỗi: Buổi học không hợp lệ!' + err.message);
+      setMsg(err);
     } finally {
       isProcessing.current = false;
     }
