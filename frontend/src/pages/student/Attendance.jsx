@@ -52,6 +52,7 @@ const Attendance = () => {
       const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`);
       const attendanceData = resAt.data?.data || resAt.data || [];
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
+      setMsg(attendanceData + " - " + record);
 
       if (record) {
         const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/${mabuoihoc}`);
@@ -97,7 +98,6 @@ const Attendance = () => {
         // Trích xuất ID từ link quét được
         const params = new URLSearchParams(code.data.split('?')[1]);
         const sid = params.get('sessionId') || code.data;
-        console.log(params, sid);
         handleVerifyQR(sid);
       }
     }
