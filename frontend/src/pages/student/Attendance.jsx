@@ -195,8 +195,7 @@ const Attendance = () => {
             </div>
           )}
         </div>
-        <div className={`status-text ${step}`}>{msg}</div>
-        {errorLine && <div className="status-text error">{errorLine}</div>}
+        <div className={`status-text ${step}`}>{msg}{errorLine}</div>
         <div className="footer-action">
           {step === 'idle' && !sessionId && (
             <button className="btn-start" onClick={() => { setIsCamOpen(true); setStep('scanning_qr'); }}>MỞ CAMERA QUÉT QR</button>
