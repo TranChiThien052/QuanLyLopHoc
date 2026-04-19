@@ -97,6 +97,7 @@ const Attendance = () => {
         // Trích xuất ID từ link quét được
         const params = new URLSearchParams(code.data.split('?')[1]);
         const sid = params.get('sessionId') || code.data;
+        console.log(params, sid);
         handleVerifyQR(sid);
       }
     }
