@@ -73,7 +73,7 @@ const Attendance = () => {
       }
     } catch (err) {
       setStep('idle');
-      setMsg('Lỗi: Buổi học không hợp lệ!' + (err.response?.data?.message ? ` (${err.response.data.message})` : ''));
+      setMsg('Lỗi: Buổi học không hợp lệ!' + err.message);
     } finally {
       isProcessing.current = false;
     }
