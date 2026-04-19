@@ -54,8 +54,8 @@ const Attendance = () => {
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
 
       if (record) {
-        const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/${mabuoihoc}`);
-        const resClass = await axios.get(`${process.env.REACT_APP_API_URL}/class/${resLesson.data.malop}`);
+        const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lessons/${mabuoihoc}`);
+        const resClass = await axios.get(`${process.env.REACT_APP_API_URL}/classes/${resLesson.data.malop}`);
 
         setSessionInfo({
           tenlop: resClass.data.tenlop,
@@ -72,7 +72,7 @@ const Attendance = () => {
       }
     } catch (err) {
       setStep('idle');
-      setMsg('Lỗi: Buổi học không hợp lệ!');
+      setMsg(err);
     } finally {
       isProcessing.current = false;
     }
