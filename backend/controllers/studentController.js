@@ -37,6 +37,30 @@ const getAll = async (req, res) => {
     }
 };
 
+const getInfoStudentById = async (req, res) => {
+    try {
+        const masinhvien = req.user.id
+        const student = await studentService.getStudentById(masinhvien);
+        let response = {}
+
+        if(!student) {
+            response.code = 404,
+            response.message = "Không tìm thấy sinh viên !";
+        }
+        else
+            response = student
+        
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            { 
+                code:999,
+                message: error.message 
+            }
+        );
+    }
+};
+
 const getStudentById = async (req, res) => {
     try {
         const masinhvien = req.params.masinhvien
@@ -151,7 +175,7 @@ const deleteStudentById = async (req,res) => {
 
 const updateInfoStudent = async (req,res) => {
     try {
-        const masinhvien = req.params.masinhvien
+        const masinhvien = req.user.id
         const {ten,holot,ngaysinh,email,sodienthoai} = req.body
         const student = await studentService.updateInfoStudent(masinhvien,ten,holot,ngaysinh,email,sodienthoai);
 
@@ -175,7 +199,7 @@ const updateInfoStudent = async (req,res) => {
 }
 const updateFaceIdStudent = async (req,res) => {
     try {
-        const masinhvien = req.params.masinhvien
+        const masinhvien = req.user.id
         const {faceid} = req.body
         const student = await studentService.updateFaceIdStudent(masinhvien,faceid);
 
@@ -200,7 +224,7 @@ const updateFaceIdStudent = async (req,res) => {
 
 const getMonHocCuaSinhVien =  async (req, res) => {
     try {
-        const masinhvien = req.params.masinhvien
+        const masinhvien = req.user.id
         const monhoc = await studentService.monHocCuaSinhVien(masinhvien)
 
         let response = {}
@@ -222,4 +246,14 @@ const getMonHocCuaSinhVien =  async (req, res) => {
     }
 }
 
-module.exports = { getAll, getStudentById, createStudent, createBulkStudents, deleteStudentById, updateInfoStudent, updateFaceIdStudent,getMonHocCuaSinhVien };
+module.exports = { 
+    getAll, 
+    getStudentById, 
+    createStudent, 
+    createBulkStudents, 
+    deleteStudentById, 
+    updateInfoStudent, 
+    updateFaceIdStudent,
+    getMonHocCuaSinhVien,
+    getInfoStudentById
+};

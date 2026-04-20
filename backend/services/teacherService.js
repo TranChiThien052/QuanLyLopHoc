@@ -65,9 +65,8 @@ const updateInfoTeacher = async (magiangvien,ten,holot,ngaysinh,email,sodienthoa
 const monHocCuaGiangVien = async (idGiangVien) => {
     if(!idGiangVien)
         throw new Error("Chưa truyền mã giảng viên !")
-    const monhoc = await classRepository.findMonHocCuaGiangVien(idGiangVien);
         
-    return monhoc.length === 0 ? null : monhoc
+    return await classRepository.findMonHocCuaGiangVien(idGiangVien);
 }
 
 module.exports = { getAll, getTeacherById,  createTeacher, deleteTeacherById, updateInfoTeacher,monHocCuaGiangVien};

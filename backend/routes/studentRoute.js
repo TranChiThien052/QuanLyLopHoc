@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require('multer');
 const studentController = require("../controllers/studentController");
+const authenController = require('../controllers/authController');
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -19,8 +20,9 @@ const upload = multer({
     }
 });
 
-router.get("/", studentController.getAll);
-router.get("/:masinhvien", studentController.getStudentById);
+router.get("/",authenController.authenticate,authenController.authorize(['admin']),studentController.getAll);
+router.get("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.getStudentById);
+router.get("/infoStudent",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
 router.post("/", studentController.createStudent);
 router.post("/bulk", (req, res, next) => {
 	upload.single('excelFile')(req, res, (err) => {
@@ -30,8 +32,8 @@ router.post("/bulk", (req, res, next) => {
 		next();
 	});
 }, studentController.createBulkStudents);
-router.delete("/:masinhvien", studentController.deleteStudentById);
-router.put("/:masinhvien", studentController.updateInfoStudent);
-router.put('/update-faceid/:masinhvien',studentController.updateFaceIdStudent);
-router.get('/monhoc/:masinhvien',studentController.getMonHocCuaSinhVien);
+router.delete("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.deleteStudentById);
+router.put("/", authenController.authenticate,authenController.authorize(['student']),studentController.updateInfoStudent);
+router.put('/update-faceid/:masinhvien',authenController.authenticate,authenController.authorize(['student']),studentController.updateFaceIdStudent);
+router.get('/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 module.exports = router;
