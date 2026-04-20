@@ -22,7 +22,7 @@ const upload = multer({
 
 router.get("/",authenController.authenticate,authenController.authorize(['admin']),studentController.getAll);
 router.get("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.getStudentById);
-router.get("/infoStudent",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
+router.get("/info/student",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
 router.post("/", studentController.createStudent);
 router.post("/bulk", authenController.authenticate, authenController.authorize(['admin']), (req, res, next) => {
 	upload.single('excelFile')(req, res, (err) => {
