@@ -13,6 +13,14 @@ const findById = async (malop) => {
     );
 }
 
+const findByMaSinhVien = async (masinhvien) => {
+    return await Lopsinhvien.findAll(
+        {
+            where: { masinhvien: masinhvien }
+        }
+    );
+};
+
 const create = async (malop, masinhvien) => {
     return await Lopsinhvien.create({
         malop,
@@ -85,6 +93,7 @@ const findSinhVienCuaLopHoc = async (id) => {
 module.exports = {
     findAll,
     findById,
+    findByMaSinhVien,
     create,
     bulkCreate,
     update,

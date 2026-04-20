@@ -62,7 +62,7 @@ const findByClassAndSinhVienId = async (req, res) => {
 };
 
 const create = async (req, res) => {
-    const { maSinhVien, maBuoiHoc, trangThai, ghiChu, maNguoiCapNhat } = req.body;
+    const { maSinhVien, maBuoiHoc, trangThai, ghiChu, maNguoiCapNhat, GPS } = req.body;
     const thoiGianCapNhat = new Date();
     try {
         const newDiemDanh = await diemDanhService.create(
@@ -71,7 +71,8 @@ const create = async (req, res) => {
             trangThai,
             ghiChu,
             thoiGianCapNhat,
-            maNguoiCapNhat
+            maNguoiCapNhat,
+            GPS
         );
         res.status(201).json(newDiemDanh);
     } catch (error) {
@@ -81,7 +82,7 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const { maDiemDanh } = req.params;
-    const { trangThai, ghiChu, maNguoiCapNhat } = req.body;
+    const { trangThai, ghiChu, maNguoiCapNhat, GPS } = req.body;
     const thoiGianCapNhat = new Date();
     try {
         const updatedDiemDanh = await diemDanhService.update(
@@ -89,7 +90,8 @@ const update = async (req, res) => {
             trangThai,
             ghiChu,
             thoiGianCapNhat,
-            maNguoiCapNhat
+            maNguoiCapNhat,
+            GPS
         );
         res.json(updatedDiemDanh);
     } catch (error) {

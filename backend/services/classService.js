@@ -28,10 +28,17 @@ const deleteClass = async (MaLop) => {
     return await classRepo.deleteClass(MaLop);
 }
 
+const findMonHocCuaGiangVien = async (id) => {
+    if (!id)
+        throw new Error("Thiếu dữ liệu mã giảng viên");
+    return await classRepo.findMonHocCuaGiangVien(id);
+};
+
 module.exports = {
     findAll,
     findById,
     create,
     update,
-    deleteClass
+    deleteClass,
+    findMonHocCuaGiangVien
 }

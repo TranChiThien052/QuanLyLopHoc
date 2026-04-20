@@ -37,6 +37,29 @@ const getLopSinhVienById = async (req, res) => {
     }
 };
 
+const getLopSinhVienByMaSinhVien = async (req, res) => {
+    try {
+        const masinhvien = req.params.masinhvien
+        const lopsinhvien = await lopsinhvienService.getLopSinhVienByMaSinhVien(masinhvien);
+        let response = {}
+            if(!lopsinhvien) {
+                response.code = 404,
+                response.message = "Không tìm thấy lớp sinh viên !";
+            }
+            else{
+                response = lopsinhvien
+            }
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            {
+                code: 999,
+                message: error.message
+            }
+        );
+    }
+};
+
 const createLopSinhVien = async (req, res) => {
     try {
         const {malop, masinhvien} = req.body
@@ -108,6 +131,7 @@ const deleteLopSinhVien = async (req, res) => {
 module.exports = {
     getAllLopSinhVien,
     getLopSinhVienById,
+    getLopSinhVienByMaSinhVien,
     createLopSinhVien,
     createLopSinhVienBulk,
     updateLopSinhVien,

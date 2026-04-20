@@ -29,6 +29,10 @@ module.exports = (sequelize) => {
       manguoicapnhat: {
         type: DataTypes.STRING(10),
       },
+      gps: {
+        type: DataTypes.TEXT,
+        allowNull: true
+      }
     },
     {
       tableName: "diemdanh",

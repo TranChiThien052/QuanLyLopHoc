@@ -8,5 +8,5 @@ router.get("/info",authenController.authenticate,authenController.authorize(['ad
 router.post("/",authenController.authenticate,authenController.authorize(['admin','teacher']), teacherController.createTeacher);
 router.delete("/:magiangvien",authenController.authenticate,authenController.authorize('admin'), teacherController.deleteTeacherById);
 router.put("/",authenController.authenticate,authenController.authorize(['teacher']), teacherController.updateInfoTeacher);
-router.get("/monhoc",authenController.authenticate,authenController.authorize(['teacher']), teacherController.getMonHocCuaGiangVien);
+router.get("/ds/monhoc",authenController.authenticate,authenController.authorize(['teacher']), teacherController.getMonHocCuaGiangVien);
 module.exports = router;
