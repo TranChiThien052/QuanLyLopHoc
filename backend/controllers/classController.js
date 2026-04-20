@@ -142,10 +142,21 @@ const deleteClass = async (req, res) => {
     }
 };
 
+const findMonHocCuaGiangVien = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const monHocs = await classService.findMonHocCuaGiangVien(id);
+        res.json(monHocs);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     findAll,
     findById,
     create,
     update,
-    deleteClass
+    deleteClass,
+    findMonHocCuaGiangVien
 };
