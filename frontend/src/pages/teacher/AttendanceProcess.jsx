@@ -312,9 +312,11 @@ export default function AttendanceProcess() {
     //const qrDataString = encodeURIComponent(JSON.stringify(qrDataObj));
 
     // Tạo link dẫn thẳng tới trang điểm danh của sinh viên
-    const attendanceURL = `${window.location.origin}/student/attendance/${sessionId}`;
+    //const attendanceURL = `${window.location.origin}/student/attendance/${sessionId}`;
+    const attendanceURL = `${window.location.origin}/student/attendance?sessionId=${sessionId}`;
     const qrDataString = encodeURIComponent(attendanceURL);
 
+    
     const sessionInfo = {
         code: `QR-${sessionId}`,
         sessionId: sessionId,
