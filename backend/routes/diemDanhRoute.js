@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const diemDanhController = require('../controllers/diemDanhController');
+const authenController = require('../controllers/authController');
 const { route } = require('./classRoute');
 
 router.get('/', diemDanhController.findAll);
@@ -11,6 +12,6 @@ router.get('/classAndSinhVien/:malop/:maSinhVien', diemDanhController.findByClas
 router.post('/', diemDanhController.create);
 router.put('/:maDiemDanh', diemDanhController.update);
 router.delete('/:maDiemDanh', diemDanhController.deleteDiemDanh);
-router.post('/thu-cong',diemDanhController.diemDanhThuCong);
+router.post('/thu-cong',authenController.authenticate,authenController.authorize(['teacher']),diemDanhController.diemDanhThuCong);
 
 module.exports = router;
