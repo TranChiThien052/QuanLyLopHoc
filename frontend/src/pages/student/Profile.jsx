@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./StudentProfile.css";
 
 export default function StudentProfile() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     ma: "",
     holot: "",
@@ -162,6 +164,13 @@ export default function StudentProfile() {
           <div className="form-actions">
             <button className="btn-save-profile" onClick={handleUpdate}>
               Cập nhật thông tin
+            </button>
+
+            <button 
+              className="btn-face-id-link" 
+              onClick={() => navigate('/student/register-face')}
+            >
+              🔄 Cập nhật FaceID
             </button>
           </div>
 
