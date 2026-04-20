@@ -20,7 +20,7 @@ const findByBuoiHocId = async (maBuoiHoc) => {
     );
 };
 
-const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
+const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS) => {
     const maDiemDanh = maSinhVien + "_" + maBuoiHoc;
     return await DiemDanh.create({
         madiemdanh: maDiemDanh,
@@ -29,7 +29,8 @@ const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat,
         trangthai: trangThai,
         ghichu: ghiChu,
         thoigiancapnhat: thoiGianCapNhat,
-        manguoicapnhat: maNguoiCapNhat
+        manguoicapnhat: maNguoiCapNhat,
+        GPS: GPS,
     });
 };
 
@@ -45,7 +46,8 @@ const initList = async (listSinhVien, listBuoiHoc) => {
                 trangthai: 'vắng không phép',
                 ghichu: '',
                 thoigiancapnhat: new Date(),
-                manguoicapnhat: 'system'
+                manguoicapnhat: 'system',
+                GPS: null
             };
         });
         const createdDiemDanh = await DiemDanh.bulkCreate(diemDanhObjects, {
@@ -56,7 +58,7 @@ const initList = async (listSinhVien, listBuoiHoc) => {
     return createDiemDanh;
 }
 
-const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
+const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS) => {
     const diemdanh = await DiemDanh.findOne(
         {
             where: 
@@ -72,6 +74,7 @@ const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCap
     diemdanh.ghichu = ghiChu;
     diemdanh.thoigiancapnhat = thoiGianCapNhat;
     diemdanh.manguoicapnhat = maNguoiCapNhat;
+    diemdanh.GPS = GPS;
     return await diemdanh.save();
 }
 
