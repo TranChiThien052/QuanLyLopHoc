@@ -49,7 +49,6 @@ const getInfoStudentById = async (req, res) => {
         }
         else
             response = student
-        
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(

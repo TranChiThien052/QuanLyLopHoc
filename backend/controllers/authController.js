@@ -33,7 +33,8 @@ const authenticate = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
-        next(); 
+        console.log("Decoded user from token:", decoded);
+        next();
     } catch (error) {
         res.status(401).json({ error: "Token không hợp lệ hoặc đã hết hạn"});
     }
@@ -44,12 +45,13 @@ const authenticate = (req, res, next) => {
 const authorize = (allowedRoles) => {
     return (req, res, next) => {
         const user = req.user;
-
+        console.log("User role:", user);
+        console.log(user.role);
         if (!user || !user.role) 
             return res.status(403).json({ message: "Không tìm thấy quyền hạn người dùng." });
-        
-        const isAllowed = allowedRoles.includes(user.role);
-
+        console.log("Allowed roles:", allowedRoles);
+        const isAllowed = allowedRoles.includes(user.role.trim());
+        console.log(isAllowed);
         if (isAllowed) 
             next(); 
         else 
