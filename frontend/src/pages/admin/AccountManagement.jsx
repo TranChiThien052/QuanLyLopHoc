@@ -26,7 +26,9 @@ const AccountManagement = () => {
   const loadProfiles = useCallback(async () => {
     try {
       const path = activeTab === 'sinhvien' ? '/students' : '/teachers';
-      const response = await api.get(path);
+      const response = await api.get(path, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
       setAllProfiles(response.data);
       setProfiles(response.data);
     } catch (error) {
@@ -128,7 +130,12 @@ const AccountManagement = () => {
     data.append('excelFile', file);
     try {
       // Gọi đúng Route /students/bulk
-      const response = await api.post('/students/bulk', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const response = await api.post('/students/bulk', data, { 
+        headers: {
+          'Content-Type': 'multipart/form-data' ,
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        } 
+      });
       if (response.data.code === 200) {
         alert(response.data.message);
         loadProfiles();
@@ -144,9 +151,21 @@ const AccountManagement = () => {
     try {
       const pData = { ten: formData.ten, holot: formData.ho, ngaysinh: formData.ngaySinh, email: formData.email, sodienthoai: formData.sodienthoai };
       if (activeTab === 'sinhvien') {
-        await api.post('/students', { masinhvien: formData.ma, ...pData, malop: formData.malop });
+        await api.post('/students', 
+          { masinhvien: formData.ma, ...pData, malop: formData.malop }, 
+          { headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
       } else {
-        await api.post('/teachers', { magiangvien: formData.ma, ...pData });
+        await api.post('/teachers', 
+          { magiangvien: formData.ma, ...pData }, 
+          { headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
       }
       alert("Thêm thành công!"); 
       setShowAddModal(false);

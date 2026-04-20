@@ -24,7 +24,7 @@ router.get("/",authenController.authenticate,authenController.authorize(['admin'
 router.get("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.getStudentById);
 router.get("/infoStudent",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
 router.post("/", studentController.createStudent);
-router.post("/bulk", (req, res, next) => {
+router.post("/bulk", authenController.authenticate, authenController.authorize(['admin']), (req, res, next) => {
 	upload.single('excelFile')(req, res, (err) => {
 		if (err) {
 			return res.status(400).json({ error: err.message });
