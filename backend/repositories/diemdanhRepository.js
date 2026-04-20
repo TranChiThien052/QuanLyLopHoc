@@ -71,7 +71,7 @@ const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat,
         ghichu: ghiChu,
         thoigiancapnhat: thoiGianCapNhat,
         manguoicapnhat: maNguoiCapNhat,
-        GPS: GPS,
+        gps: GPS,
     });
 };
 
@@ -88,7 +88,7 @@ const initList = async (listSinhVien, listBuoiHoc) => {
                 ghichu: '',
                 thoigiancapnhat: new Date(),
                 manguoicapnhat: 'system',
-                GPS: null
+                gps: null
             };
         });
         const createdDiemDanh = await DiemDanh.bulkCreate(diemDanhObjects, {
@@ -115,7 +115,7 @@ const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCap
     diemdanh.ghichu = ghiChu;
     diemdanh.thoigiancapnhat = thoiGianCapNhat;
     diemdanh.manguoicapnhat = maNguoiCapNhat;
-    diemdanh.GPS = GPS;
+    diemdanh.gps = GPS;
     return await diemdanh.save();
 }
 
@@ -144,7 +144,7 @@ const createBulk = async (listDiemDanh) => {
             ghichu: diemDanh.ghiChu,
             thoigiancapnhat: diemDanh.thoiGianCapNhat,
             manguoicapnhat: diemDanh.maNguoiCapNhat,
-            GPS: diemDanh.GPS
+            gps: diemDanh.gps
         };
     });
     return await DiemDanh.bulkCreate(diemDanhObjects, {
@@ -152,7 +152,8 @@ const createBulk = async (listDiemDanh) => {
             'trangthai', 
             'ghichu', 
             'thoigiancapnhat', 
-            'manguoicapnhat'
+            'manguoicapnhat',
+            'gps'
         ]
     });
 }
