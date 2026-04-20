@@ -31,6 +31,8 @@ app.get("/", (req, res) => {
   res.send("Xin chào từ Node.js!");
 });
 
-app.listen(3001, () => {
-  console.log("Server chạy tại http://localhost:3000");
-});
+// app.listen(3001, () => {
+//   console.log("Server chạy tại http://localhost:3000");
+// });
+
+module.exports = app
