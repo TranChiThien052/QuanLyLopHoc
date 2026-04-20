@@ -23,6 +23,44 @@ const findByBuoiHocId = async (maBuoiHoc) => {
     );
 };
 
+const findByClassId = async (malop) => {
+    return await DiemDanh.findAll(
+        {
+            include: [
+                {
+                    model: Lesson,
+                    where: { malop : malop },
+                    attributes: []
+                }
+            ]
+        }
+    );
+};
+
+const findByClassAndSinhVienId = async (malop, maSinhVien) => {
+    try {
+    const result = await DiemDanh.findAll({
+      include: [
+        {
+          model: Lesson,
+          where: { malop : malop },
+          attributes: []
+        },
+        {
+          model: SinhVien,
+          where: { masinhvien : maSinhVien },
+          attributes: []
+        }
+      ]
+    });
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS) => {
     const maDiemDanh = maSinhVien + "_" + maBuoiHoc;
     return await DiemDanh.create({
@@ -105,7 +143,8 @@ const createBulk = async (listDiemDanh) => {
             trangthai: diemDanh.trangThai,
             ghichu: diemDanh.ghiChu,
             thoigiancapnhat: diemDanh.thoiGianCapNhat,
-            manguoicapnhat: diemDanh.maNguoiCapNhat
+            manguoicapnhat: diemDanh.maNguoiCapNhat,
+            GPS: diemDanh.GPS
         };
     });
     return await DiemDanh.bulkCreate(diemDanhObjects, {
