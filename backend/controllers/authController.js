@@ -45,13 +45,9 @@ const authenticate = (req, res, next) => {
 const authorize = (allowedRoles) => {
     return (req, res, next) => {
         const user = req.user;
-        console.log("User role:", user);
-        console.log(user.role);
         if (!user || !user.role) 
             return res.status(403).json({ message: "Không tìm thấy quyền hạn người dùng." });
-        console.log("Allowed roles:", allowedRoles);
         const isAllowed = allowedRoles.includes(user.role.trim());
-        console.log(isAllowed);
         if (isAllowed) 
             next(); 
         else 

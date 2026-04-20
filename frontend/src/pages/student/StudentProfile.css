@@ -105,11 +105,33 @@
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
+  margin-right: 30px;
 }
 
 .btn-save-profile:hover {
   background: #e68a00;
   transform: translateY(-2px);
+}
+
+.btn-face-id-link {
+  background: #31A7BF; /* Màu xanh thương hiệu STU */
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-face-id-link:hover {
+  background: #26879b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(49, 167, 191, 0.3);
 }
 
 .student-profile-loading {

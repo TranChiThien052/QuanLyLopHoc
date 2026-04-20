@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./StudentProfile.css";
 
 export default function StudentProfile() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     ma: "",
     holot: "",
@@ -19,18 +21,18 @@ export default function StudentProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-      
+
       const studentId = user.masinhvien || user.username || user.id;
       try {
         const response = await api.get('/students/infoStudent', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         const profiles = response.data || [];
-        const myProfile = profiles.find(p => p.masinhvien === studentId);
-        
+        const myProfile = Array.isArray(profiles) ? profiles.find(p => p.masinhvien === studentId) : profiles;
+
         if (myProfile) {
           setFormData({
-            ma: studentId,
+            ma: myProfile.masinhvien || "",
             holot: myProfile.holot || "",
             ten: myProfile.ten || "",
             malop: myProfile.malop || "",
@@ -67,8 +69,10 @@ export default function StudentProfile() {
         sodienthoai: formData.sodienthoai,
         malop: formData.malop
       };
-      
-      await api.put(`/students/${formData.ma}`, payload);
+
+      await api.put(`/students/`, payload, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
       alert("Cập nhật thông tin sinh viên thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật sinh viên:", error);
@@ -84,7 +88,7 @@ export default function StudentProfile() {
 
       <div className="profile-content central-layout">
         <div className="profile-form-box">
-          
+
           <div className="form-row">
             <label>Mã sinh viên</label>
             <input type="text" name="ma" value={formData.ma} disabled className="readonly-input" />
@@ -93,22 +97,22 @@ export default function StudentProfile() {
           <div className="form-row-multi">
             <div className="form-group flex-2">
               <label>Họ lót</label>
-              <input 
-                type="text" 
-                name="holot" 
-                value={formData.holot} 
-                onChange={handleChange} 
+              <input
+                type="text"
+                name="holot"
+                value={formData.holot}
+                onChange={handleChange}
                 placeholder="Nhập họ lót"
               />
             </div>
 
             <div className="form-group flex-1">
               <label>Tên</label>
-              <input 
-                type="text" 
-                name="ten" 
-                value={formData.ten} 
-                onChange={handleChange} 
+              <input
+                type="text"
+                name="ten"
+                value={formData.ten}
+                onChange={handleChange}
                 placeholder="Nhập tên"
               />
             </div>
@@ -116,43 +120,43 @@ export default function StudentProfile() {
 
           <div className="form-row">
             <label>Tên lớp</label>
-            <input 
-              type="text" 
-              name="malop" 
-              value={formData.malop} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="malop"
+              value={formData.malop}
+              onChange={handleChange}
               placeholder="Nhập mã lớp"
             />
           </div>
 
           <div className="form-row">
             <label>Ngày sinh</label>
-            <input 
-              type="date" 
-              name="ngaysinh" 
-              value={formData.ngaysinh} 
-              onChange={handleChange} 
+            <input
+              type="date"
+              name="ngaysinh"
+              value={formData.ngaysinh}
+              onChange={handleChange}
             />
           </div>
 
           <div className="form-row">
             <label>Email</label>
-            <input 
-              type="email" 
-              name="email" 
-              value={formData.email} 
-              onChange={handleChange} 
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Nhập email"
             />
           </div>
 
           <div className="form-row">
             <label>Số điện thoại</label>
-            <input 
-              type="text" 
-              name="sodienthoai" 
-              value={formData.sodienthoai} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="sodienthoai"
+              value={formData.sodienthoai}
+              onChange={handleChange}
               placeholder="Nhập số điện thoại"
             />
           </div>
@@ -160,6 +164,13 @@ export default function StudentProfile() {
           <div className="form-actions">
             <button className="btn-save-profile" onClick={handleUpdate}>
               Cập nhật thông tin
+            </button>
+
+            <button 
+              className="btn-face-id-link" 
+              onClick={() => navigate('/student/register-face')}
+            >
+              🔄 Cập nhật FaceID
             </button>
           </div>
 
