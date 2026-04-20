@@ -1,4 +1,4 @@
-const { class : Class } = require('../models');
+const { class : Class, SinhVien } = require('../models');
 
 const findAll = async () => {
     return await Class.findAll();
@@ -61,10 +61,39 @@ const deleteClass = async (MaLop) => {
     return await lop.destroy();
 }
 
+const findMonHocCuaSinhVien = async (id) => {
+    const sinhVien = await SinhVien.findOne({
+        where: { masinhvien: id },
+        attributes: [], // Không lấy các trường của SinhVien 
+        include: [{
+            model: Class,
+            attributes: ['malop', 'monhoc','ngayhoccodinh','ngaybatdau','ngayketthuc','giobatdau','gioketthuc'],
+            through: {
+                attributes: [] // Loại bỏ các trường trung gian của bảng lop_sinhvien khỏi kết quả
+            }
+        }]
+    });
+    console.log(sinhVien)
+
+    return sinhVien ? sinhVien.LopHocs : [];
+};
+
+const findMonHocCuaGiangVien = async (id) => {
+    const monhoc = await Class.findAll(
+        {
+            where: { magiangvien : id }
+        }
+    );
+
+    return monhoc
+};
+
 module.exports = {
     findAll,
     findById,
     create,
     update,
-    deleteClass
+    deleteClass,
+    findMonHocCuaSinhVien,
+    findMonHocCuaGiangVien
 }

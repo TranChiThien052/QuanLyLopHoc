@@ -16,7 +16,7 @@ const getAll = async (req, res) => {
 
 const getTeacherById = async (req, res) => {
     try {
-        const magiangvien = req.params.magiangvien
+        const magiangvien = req.user.id
         const teacher = await teacherService.getTeacherById(magiangvien);
         let response = {}
 
@@ -81,7 +81,7 @@ const deleteTeacherById = async (req,res) => {
 
 const updateInfoTeacher = async (req,res) => {
     try {
-        const magiangvien = req.params.magiangvien
+        const magiangvien = req.user.id
         const {ten,holot,ngaysinh,email,sodienthoai} = req.body
         const teacher = await teacherService.updateInfoTeacher(magiangvien,ten,holot,ngaysinh,email,sodienthoai);
 
@@ -95,6 +95,31 @@ const updateInfoTeacher = async (req,res) => {
 
         res.status(200).json(response);
     } catch (error) {
+        console.log(error)
+        res.status(500).json(
+            { 
+                code:999,
+                message: error.message
+            }
+        );
+    }
+}
+
+const getMonHocCuaGiangVien =  async (req, res) => {
+    try {
+        const magiangvien = req.user.id
+        const monhoc = await teacherService.monHocCuaGiangVien(magiangvien)
+
+        let response = {}
+        if(!monhoc) {
+            response.code = 404,
+            response.message = "Không tìm thấy môn học của giảng viên !";
+        }
+        else
+            response = monhoc
+
+        res.status(200).json(response);
+    } catch (error) {
         res.status(500).json(
             { 
                 code:999,
@@ -104,5 +129,4 @@ const updateInfoTeacher = async (req,res) => {
     }
 }
 
-
-module.exports = { getAll, getTeacherById, createTeacher, deleteTeacherById, updateInfoTeacher };
+module.exports = { getAll, getTeacherById, createTeacher, deleteTeacherById, updateInfoTeacher,getMonHocCuaGiangVien };
