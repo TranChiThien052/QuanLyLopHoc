@@ -21,9 +21,10 @@ export default function StudentProfile() {
       if (!user) return;
       
       const studentId = user.masinhvien || user.username || user.id;
-      
       try {
-        const response = await api.get('/students');
+        const response = await api.get('/students/infoStudent', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
         const profiles = response.data || [];
         const myProfile = profiles.find(p => p.masinhvien === studentId);
         
