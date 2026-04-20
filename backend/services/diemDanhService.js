@@ -32,7 +32,7 @@ const findByClassAndSinhVienId = async (malop, maSinhVien) => {
 const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
     if (!maSinhVien || !maBuoiHoc || !trangThai || !thoiGianCapNhat || !maNguoiCapNhat)
         throw new Error("Thiếu dữ liệu để tạo điểm danh");
-    return await diemDanhRepo.create(maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat);
+    return await diemDanhRepo.create(maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, null);
 }
 
 const initList = async (listSinhVien, listBuoiHoc) => {
@@ -71,7 +71,8 @@ const diemDanhThuCong = async (maNguoiCapNhat,maBuoiHoc,danhSachDiemDanh) => {
             trangThai: item.trangThai,
             ghiChu: item.ghiChu || "",
             thoiGianCapNhat: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }),
-            maNguoiCapNhat: maNguoiCapNhat
+            maNguoiCapNhat: maNguoiCapNhat,
+            GPS: null
         }
     })
     return await diemDanhRepo.createBulk(listDiemDanh)
