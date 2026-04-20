@@ -1,4 +1,7 @@
 const { diemdanh : DiemDanh } = require("../models");
+const { lesson : Lesson } = require("../models");
+const { SinhVien } = require("../models");
+const { class : Class } = require("../models");
 
 const findAll = async () => {
     return await DiemDanh.findAll();
@@ -93,12 +96,37 @@ const deleteDiemDanh = async (maDiemDanh) => {
     return await diemdanh.destroy();
 }
 
+const createBulk = async (listDiemDanh) => {
+    const diemDanhObjects = listDiemDanh.map(diemDanh => {
+        return {
+            madiemdanh: diemDanh.maDiemDanh,
+            masinhvien: diemDanh.maSinhVien,
+            mabuoihoc: diemDanh.maBuoiHoc,
+            trangthai: diemDanh.trangThai,
+            ghichu: diemDanh.ghiChu,
+            thoigiancapnhat: diemDanh.thoiGianCapNhat,
+            manguoicapnhat: diemDanh.maNguoiCapNhat
+        };
+    });
+    return await DiemDanh.bulkCreate(diemDanhObjects, {
+        updateOnDuplicate: [
+            'trangthai', 
+            'ghichu', 
+            'thoigiancapnhat', 
+            'manguoicapnhat'
+        ]
+    });
+}
+
 module.exports = {
     findAll,
     findBySinhVienId,
     findByBuoiHocId,
+    findByClassId,
+    findByClassAndSinhVienId,
     create,
     initList,
     update,
-    deleteDiemDanh
+    deleteDiemDanh,
+    createBulk
 }
