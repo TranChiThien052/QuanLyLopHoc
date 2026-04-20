@@ -21,7 +21,7 @@ const upload = multer({
 });
 
 router.get("/",authenController.authenticate,authenController.authorize(['admin']),studentController.getAll);
-router.get("/infoStudent",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
+router.get("/info/student",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
 router.get('/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 router.get("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.getStudentById);
 router.post("/", studentController.createStudent);
