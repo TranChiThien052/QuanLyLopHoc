@@ -11,5 +11,6 @@ build/
 .vscode/
 .idea/
 *.http
+/fileTest
 
 node_modules
