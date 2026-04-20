@@ -42,13 +42,19 @@ const Attendance = () => {
     setMsg('Đã nhận mã! Đang kiểm tra danh sách lớp...');
 
     try {
-      const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`);
+      const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
       const attendanceData = resAt.data?.data || resAt.data || [];
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
 
       if (record) {
-        const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lessons/${mabuoihoc}`);
-        const resClass = await axios.get(`${process.env.REACT_APP_API_URL}/classes/${resLesson.data.malop}`);
+        const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lessons/${mabuoihoc}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        const resClass = await axios.get(`${process.env.REACT_APP_API_URL}/classes/${resLesson.data.malop}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
 
         // Khi đã có record, chuyển sang trang xác thực khuôn mặt với camera trước.
         navigate('/student/attendance/resLesson', {

@@ -157,7 +157,8 @@ const ClassManagement = () => {
         
         await api.post('/classes', payload, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         });
       }
@@ -238,7 +239,11 @@ const ClassManagement = () => {
             }
 
             if (listmasinhvien.length > 0) {
-              await api.post(`/lopsinhvien/bulk`, { malop: selectedClass.malop, listmasinhvien });
+              await api.post(`/lopsinhvien/bulk`, { malop: selectedClass.malop, listmasinhvien }, {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+              });
               fetchClassStudents();
             } else {
               alert("Không tìm thấy mã sinh viên ở cột đầu tiên của file Excel!");
@@ -366,7 +371,7 @@ const ClassManagement = () => {
                       <td>{c.tenlop}</td>
                       <td>{c.monhoc}</td>
                       <td className="text-cyan font-bold">
-                        {c.ngayhoccodinh} ({formatTime(c.giobatdau)} - {formatTime(c.gioketthuc)})
+                       Thứ {c.ngayhoccodinh} ({formatTime(c.giobatdau)} - {formatTime(c.gioketthuc)})
                       </td>
                       <td style={{ fontSize: '12px' }}>
                         {c.ngaybatdau} đến {c.ngayketthuc}
@@ -532,7 +537,7 @@ const ClassManagement = () => {
                     <option value="">Chọn ngày học</option>
                     <option value="Hai">Thứ 2</option>
                     <option value="Ba">Thứ 3</option>
-                    <option value="Bốn">Thứ 4</option>
+                    <option value="Tư">Thứ 4</option>
                     <option value="Năm">Thứ 5</option>
                     <option value="Sáu">Thứ 6</option>
                     <option value="Bảy">Thứ 7</option>
