@@ -14,7 +14,10 @@ export default function AttendanceManagementClass() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/classes');
+        const user = JSON.parse(localStorage.getItem("user"));
+        const response = await api.get(`/classes/giangvien/${user.id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
         setClasses(response.data);
         setLoading(false);
       } catch (err) {
