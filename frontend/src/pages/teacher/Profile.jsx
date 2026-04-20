@@ -64,7 +64,11 @@ export default function TeacherProfile() {
         sodienthoai: formData.sodienthoai
       };
       
-      await api.put(`/teachers/${formData.ma}`, payload);
+      await api.put(`/teachers/${formData.ma}`, payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       alert("Cập nhật thông tin giảng viên thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật giảng viên:", error);
