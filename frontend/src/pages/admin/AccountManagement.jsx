@@ -5,8 +5,8 @@ import './AccountManagement.css';
 const api = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 
 const AccountManagement = () => {
-  const [allProfiles, setAllProfiles] = useState([]); 
-  const [profiles, setProfiles] = useState([]);         
+  const [allProfiles, setAllProfiles] = useState([]);
+  const [profiles, setProfiles] = useState([]);
   const [activeTab, setActiveTab] = useState('sinhvien');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,9 +14,9 @@ const AccountManagement = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  
+
   // Đã xóa selectedAccount và setSelectedAccount để hết lỗi ESLint
-  
+
   const [formData, setFormData] = useState({
     ma: '', ho: '', ten: '', ngaySinh: '', email: '', sodienthoai: '', malop: ''
   });
@@ -65,9 +65,9 @@ const AccountManagement = () => {
       ma: (p.masinhvien || p.magiangvien).toString().trim(),
       ho: p.holot || '',
       ten: p.ten || '',
-      ngaySinh: p.ngaysinh ? p.ngaysinh.substring(0, 10) : '', 
-      email: p.email || '',        
-      sodienthoai: p.sodienthoai || '', 
+      ngaySinh: p.ngaysinh ? p.ngaysinh.substring(0, 10) : '',
+      email: p.email || '',
+      sodienthoai: p.sodienthoai || '',
       malop: p.malop || ''
     });
     setErrors({});
@@ -130,11 +130,11 @@ const AccountManagement = () => {
     data.append('excelFile', file);
     try {
       // Gọi đúng Route /students/bulk
-      const response = await api.post('/students/bulk', data, { 
+      const response = await api.post('/students/bulk', data, {
         headers: {
-          'Content-Type': 'multipart/form-data' ,
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`
-        } 
+        }
       });
       if (response.data.code === 200) {
         alert(response.data.message);
@@ -151,23 +151,25 @@ const AccountManagement = () => {
     try {
       const pData = { ten: formData.ten, holot: formData.ho, ngaysinh: formData.ngaySinh, email: formData.email, sodienthoai: formData.sodienthoai };
       if (activeTab === 'sinhvien') {
-        await api.post('/students', 
-          { masinhvien: formData.ma, ...pData, malop: formData.malop }, 
-          { headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+        await api.post('/students',
+          { masinhvien: formData.ma, ...pData, malop: formData.malop },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
             }
           }
         );
       } else {
-        await api.post('/teachers', 
-          { magiangvien: formData.ma, ...pData }, 
-          { headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+        await api.post('/teachers',
+          { magiangvien: formData.ma, ...pData },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
             }
           }
         );
       }
-      alert("Thêm thành công!"); 
+      alert("Thêm thành công!");
       setShowAddModal(false);
       loadProfiles();
     } catch (err) { alert("Lỗi khi thêm hồ sơ mới!"); }
@@ -210,13 +212,13 @@ const AccountManagement = () => {
           <h2 className="header-title">Quản lý STU</h2>
           <div className="header-controls">
             <input type="text" placeholder="Tìm mã tài khoản..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-              {activeTab === 'sinhvien' && (
-                <label className="btn-import-excel-label">
-                  📁 Nhập Excel
-                  <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
-                </label>
-              )}
-            <button className="btn-add" onClick={() => { setShowAddModal(true); setFormData({ma:'',ho:'',ten:'',ngaySinh:'',email:'',sodienthoai:'',malop:''}); }}>+ Thêm mới</button>
+            {activeTab === 'sinhvien' && (
+              <label className="btn-import-excel-label">
+                📁 Nhập Excel
+                <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
+              </label>
+            )}
+            <button className="btn-add" onClick={() => { setShowAddModal(true); setFormData({ ma: '', ho: '', ten: '', ngaySinh: '', email: '', sodienthoai: '', malop: '' }); }}>+ Thêm mới</button>
           </div>
         </div>
 
@@ -232,7 +234,7 @@ const AccountManagement = () => {
                 <th>Mã tài khoản</th>
                 <th>Họ và tên</th>
                 <th className="hide-mobile">Ngày sinh</th>
-                <th>{activeTab === 'sinhvien' ? 'Lớp' : 'Email'}</th> 
+                <th>{activeTab === 'sinhvien' ? 'Lớp' : 'Email'}</th>
                 <th style={{ textAlign: 'center' }}>Thao tác</th>
               </tr>
             </thead>
@@ -272,17 +274,17 @@ const AccountManagement = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header-centered"><h3>Thêm hồ sơ mới</h3><button className="close-btn-round" onClick={() => setShowAddModal(false)}>&times;</button></div>
             <form onSubmit={handleAddSubmit} className="modal-body-form">
-              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" placeholder="Nhập mã..." onChange={e => setFormData({...formData, ma: e.target.value})} />{errors.ma && <span className="error-message-text">{errors.ma}</span>}</div>
+              <div className="form-group-centered"><label>Mã tài khoản</label><input type="text" placeholder="Nhập mã..." onChange={e => setFormData({ ...formData, ma: e.target.value })} />{errors.ma && <span className="error-message-text">{errors.ma}</span>}</div>
               <div className="form-row">
-                <div className="form-group-centered" style={{flex:1}}><label>Họ lót</label><input type="text" onChange={e => setFormData({...formData, ho: e.target.value})} />{errors.ho && <span className="error-message-text">{errors.ho}</span>}</div>
-                <div className="form-group-centered" style={{flex:1}}><label>Tên</label><input type="text" onChange={e => setFormData({...formData, ten: e.target.value})} />{errors.ten && <span className="error-message-text">{errors.ten}</span>}</div>
+                <div className="form-group-centered" style={{ flex: 1 }}><label>Họ lót</label><input type="text" onChange={e => setFormData({ ...formData, ho: e.target.value })} />{errors.ho && <span className="error-message-text">{errors.ho}</span>}</div>
+                <div className="form-group-centered" style={{ flex: 1 }}><label>Tên</label><input type="text" onChange={e => setFormData({ ...formData, ten: e.target.value })} />{errors.ten && <span className="error-message-text">{errors.ten}</span>}</div>
               </div>
               <div className="form-row">
-                <div className="form-group-centered" style={{flex:1}}><label>Ngày sinh</label><input type="date" onChange={e => setFormData({...formData, ngaySinh: e.target.value})} /></div>
-                <div className="form-group-centered" style={{flex:1}}><label>SĐT</label><input type="text" onChange={e => setFormData({...formData, sodienthoai: e.target.value})} /></div>
+                <div className="form-group-centered" style={{ flex: 1 }}><label>Ngày sinh</label><input type="date" onChange={e => setFormData({ ...formData, ngaySinh: e.target.value })} /></div>
+                <div className="form-group-centered" style={{ flex: 1 }}><label>SĐT</label><input type="text" onChange={e => setFormData({ ...formData, sodienthoai: e.target.value })} /></div>
               </div>
-              <div className="form-group-centered"><label>Email</label><input type="email" onChange={e => setFormData({...formData, email: e.target.value})} /></div>
-              {activeTab === 'sinhvien' && (<div className="form-group-centered"><label>Mã lớp</label><input type="text" onChange={e => setFormData({...formData, malop: e.target.value})} /></div>)}
+              <div className="form-group-centered"><label>Email</label><input type="email" onChange={e => setFormData({ ...formData, email: e.target.value })} /></div>
+              {activeTab === 'sinhvien' && (<div className="form-group-centered"><label>Mã lớp</label><input type="text" onChange={e => setFormData({ ...formData, malop: e.target.value })} /></div>)}
               <div className="modal-footer-centered"><button type="button" className="btn-cancel-round" onClick={() => setShowAddModal(false)}>Hủy</button><button type="submit" className="btn-submit-round">Lưu hồ sơ</button></div>
             </form>
           </div>

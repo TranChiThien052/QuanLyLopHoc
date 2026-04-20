@@ -61,6 +61,8 @@ const ResLesson = () => {
       await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
         trangThai: 'Có mặt',
         maNguoiCapNhat: masinhvien
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
       setStep('success');
