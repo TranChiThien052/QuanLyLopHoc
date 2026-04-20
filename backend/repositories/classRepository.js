@@ -86,6 +86,22 @@ const findMonHocCuaGiangVien = async (id) => {
     return monhoc
 };
 
+const findMonHocCuaSinhVien = async (id) => {
+    const sinhVien = await SinhVien.findOne({
+        where: { masinhvien: id },
+        attributes: [], // Không lấy các trường của SinhVien 
+        include: [{
+            model: Class,
+            attributes: ['malop', 'monhoc','ngayhoccodinh','ngaybatdau','ngayketthuc','giobatdau','gioketthuc'],
+            through: {
+                attributes: [] // Loại bỏ các trường trung gian của bảng lop_sinhvien khỏi kết quả
+            }
+        }]
+    });
+
+    return sinhVien ? sinhVien.LopHocs : [];
+};
+
 module.exports = {
     findAll,
     findById,
@@ -93,5 +109,6 @@ module.exports = {
     create,
     update,
     deleteClass,
-    findMonHocCuaGiangVien
+    findMonHocCuaGiangVien,
+    findMonHocCuaSinhVien
 }
