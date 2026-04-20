@@ -31,5 +31,6 @@ router.post('/', (req, res, next) => {
 }, classController.create);
 router.put('/:MaLop', classController.update);
 router.delete('/:MaLop', classController.deleteClass);
+router.get('/giangvien/:id', classController.findMonHocCuaGiangVien);
 
 module.exports = router;

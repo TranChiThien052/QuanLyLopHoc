@@ -29,7 +29,7 @@ module.exports = (sequelize) => {
       manguoicapnhat: {
         type: DataTypes.STRING(10),
       },
-      GPS: {
+      gps: {
         type: DataTypes.TEXT,
         allowNull: true
       }
