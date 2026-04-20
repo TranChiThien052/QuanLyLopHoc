@@ -11,6 +11,15 @@ const getLopSinhVienById = async (malop) => {
     return await lopsinhvienRepository.findById(malop);
 }
 
+const getLopSinhVienByMaSinhVien = async (masinhvien) => {
+    if (!masinhvien) {
+        throw new Error("Thiếu mã sinh viên");
+    }
+    return await lopsinhvienRepository.findByMaSinhVien(masinhvien);
+    
+};
+
+
 const createLopSinhVien = async(malop, masinhvien) => {
     if (!malop || !masinhvien) {
         throw new Error("Thiếu thông tin để tạo lớp sinh viên");
@@ -45,6 +54,7 @@ const deleteLopSinhVien = async (malop, masinhvien) => {
 module.exports = {
     getAllLopSinhVien,
     getLopSinhVienById,
+    getLopSinhVienByMaSinhVien,
     createLopSinhVien,
     updateLopSinhVien,
     createLopSinhVienBulk,
