@@ -21,7 +21,7 @@ const upload = multer({
 });
 
 router.get("/",authenController.authenticate,authenController.authorize(['admin']),studentController.getAll);
-router.get("/infoStudent",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
+router.get("/info/student",authenController.authenticate,authenController.authorize(['student']),studentController.getInfoStudentById);
 router.get('/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 router.get("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.getStudentById);
 router.post("/", studentController.createStudent);
@@ -36,4 +36,5 @@ router.post("/bulk", authenController.authenticate, authenController.authorize([
 router.delete("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.deleteStudentById);
 router.put("/", authenController.authenticate,authenController.authorize(['student']),studentController.updateInfoStudent);
 router.put('/update-faceid/:masinhvien',authenController.authenticate,authenController.authorize(['student']),studentController.updateFaceIdStudent);
+router.get('/ds/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 module.exports = router;
