@@ -1,4 +1,6 @@
 const lessonRepository = require('../repositories/lessonRepository');
+const lopsinhvienService = require('./lopsinhvienService');
+const diemDanhService = require('./diemDanhService');
 
 const toDDMMYYYY = (ngayhoc) => {
     const [yyyy, mm, dd] = String(ngayhoc).split("-");
@@ -53,7 +55,24 @@ const createLesson = async (malop, giobatdau, gioketthuc, noidungbuoihoc) => {
         err.status = 409; // controller có thể dùng err.status
         throw err;
     }
-    return await lessonRepository.create(mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
+    
+    const newLesson = await lessonRepository.create(mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
+    
+    try {
+        const danhSachSinhVien = await lopsinhvienService.getLopSinhVienById(malop);
+        if (danhSachSinhVien && danhSachSinhVien.length > 0) {
+            const listMaSinhVien = danhSachSinhVien.map(item => item.masinhvien);
+            await diemDanhService.initList(listMaSinhVien, [newLesson.mabuoihoc]);
+            console.log(`Đã khởi tạo điểm danh thành công cho ${listMaSinhVien.length} sinh viên của buổi học ${newLesson.mabuoihoc}`);
+        } else {
+            console.log(`Lớp ${malop} chưa có sinh viên nào, không tạo điểm danh.`);
+        }
+        
+    } catch (error) {
+        console.error("Lỗi khi khởi tạo điểm danh cho buổi học mới:", error);
+        
+    }
+    return newLesson;
 }
 
 const dayMap = {
