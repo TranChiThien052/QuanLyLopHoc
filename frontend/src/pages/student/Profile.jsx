@@ -24,7 +24,7 @@ export default function StudentProfile() {
 
       const studentId = user.masinhvien || user.username || user.id;
       try {
-        const response = await api.get('/students/infoStudent', {
+        const response = await api.get('/students/info/student', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         const profiles = response.data || [];
