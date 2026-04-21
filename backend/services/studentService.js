@@ -62,7 +62,7 @@ const updateInfoStudent = async (masinhvien,ten,holot,ngaysinh,email,sodienthoai
     if(ten.indexOf(" ") !== -1)
         throw new Error("Mã và tên không chứa khoảng trắng !");
 
-    if(!holot || !ten || !email || !sodienthoai || !ngaysinh)
+    if(!holot || !ten || !email)
         throw new Error("Thiếu thông tin đầu vào !")
     return await studentRepository.update(masinhvien, ten, holot, ngaysinh, email, sodienthoai);
 }
