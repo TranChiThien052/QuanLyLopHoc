@@ -22,7 +22,7 @@ export default function TeacherProfile() {
       const teacherId = user.magiangvien || user.username || user.id;
       
       try {
-        const response = await api.get('/teachers/info', {
+        const response = await api.get('/teachers/info/teacher', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         const profiles = response.data || [];
