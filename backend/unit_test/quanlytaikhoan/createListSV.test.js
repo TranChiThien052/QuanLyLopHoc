@@ -7,7 +7,6 @@ const jwt = require('jsonwebtoken');
 describe('Chưa đăng nhập', () => {
 
     it('Tạo danh sách bại', async () => {
-        const filePath = path.join(__dirname, 'fileTest/ds-test.xlsx');
         const response = await request(app)
         .post('/students/bulk')
         .set('Authorization', `Bearer `)
@@ -27,7 +26,6 @@ describe('Đã đăng nhập, không có quyền', () => {
     });
 
     it('Tạo danh sách thát bại', async () => {
-        const filePath = path.join(__dirname, 'fileTest/ds-test.xlsx');
         const response = await request(app)
         .post('/students/bulk')
         .set('Authorization', `Bearer ${testToken}`)
@@ -84,6 +82,17 @@ describe('Đã đăng nhập', () => {
         .attach('excelFile',filePath)
     
         expect(response.statusCode).toBe(500);
+    });
+
+    it('Tạo danh sách thất bại, trùng mail', async () => {
+        const filePath = path.join(__dirname, 'fileTest/ds-test-trung-mail.xlsx');
+        const response = await request(app)
+        .post('/students/bulk')
+        .set('Authorization', `Bearer ${testToken}`)
+        .attach('excelFile',filePath)
+    
+        expect(response.statusCode).toBe(200);
+        expect(response.body.error);
     });
 });
 

@@ -46,7 +46,6 @@ BuoiHoc.belongsTo(LopHoc, { foreignKey: "malop" });
 // --- Quan hệ cho DiemDanh ---
 DiemDanh.belongsTo(SinhVien, { foreignKey: "masinhvien" });
 DiemDanh.belongsTo(BuoiHoc, { foreignKey: "mabuoihoc" });
-
 // 3. Xuất các đối tượng để dùng ở Controller
 module.exports = {
   sequelize,

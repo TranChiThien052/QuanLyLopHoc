@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const classController = require('../controllers/classController');
+const authController = require('../controllers/authController')
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -21,7 +22,7 @@ const upload = multer({
 
 router.get('/', classController.findAll);
 router.get('/:id', classController.findById);
-router.post('/', (req, res, next) => {
+router.post('/',authController.authenticate,authController.authorize(['teacher']), (req, res, next) => {
 	upload.single('excelFile')(req, res, (err) => {
 		if (err) {
 			return res.status(400).json({ error: err.message });

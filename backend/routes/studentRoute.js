@@ -34,6 +34,6 @@ router.post("/bulk", authenController.authenticate, authenController.authorize([
 }, studentController.createBulkStudents);
 router.delete("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.deleteStudentById);
 router.put("/", authenController.authenticate,authenController.authorize(['student']),studentController.updateInfoStudent);
-router.put('/update-faceid/:masinhvien',authenController.authenticate,authenController.authorize(['student']),studentController.updateFaceIdStudent);
+router.put('/update-faceid',authenController.authenticate,authenController.authorize(['student']),studentController.updateFaceIdStudent);
 router.get('/ds/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 module.exports = router;
