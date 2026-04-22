@@ -1,154 +1,241 @@
-:root {
-  --header-bg: #99e3fc;
-  --subject-bg: #9bcbec;
-  --table-header-bg: #84e598;
-  --border-color: #000000;
+.attendance-detail-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.attendance-container {
-  max-width: 1090px;
-  margin: auto;
-  border: 2px solid var(--border-color);
-  font-family: 'Inter', 'Roboto', sans-serif;
-  background-color: white;
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
 }
 
-/* HEADER SECTION */
-.header-top {
-  background-color: var(--header-bg);
-  padding: 20px;
-  text-align: center;
-  border-bottom: 1px solid var(--border-color);
+.back-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.header-top h1 {
+.back-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.detail-header h1 {
+  font-size: 2rem;
+  color: #0f172a;
+  font-weight: 800;
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
 }
 
-.header-subject {
-  background-color: var(--subject-bg);
-  padding: 15px;
-  text-align: center;
-  border-bottom: 1px solid var(--border-color);
+.table-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
-.header-subject h2 {
-  margin: 0;
-  font-size: 24px;
-}
-
-/* TABLE STYLES */
-.table-responsive {
-  overflow-x: auto;
-}
-
-.attendance-table {
+.modern-table {
   width: 100%;
   border-collapse: collapse;
+  text-align: left;
 }
 
-.attendance-table th {
-  background-color: var(--table-header-bg);
-  padding: 15px;
+.modern-table th {
+  background: #f1f5f9;
+  padding: 1.2rem 1.5rem;
   font-weight: 700;
-  font-size: 18px;
-  border-bottom: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color); /* Kẻ sọc dọc như Figma */
+  color: #475569;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.attendance-table td {
-  padding: 15px;
-  text-align: center;
-  font-size: 16px;
-  border-bottom: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color);
+.modern-table td {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
 }
 
-.attendance-table th:last-child, 
-.attendance-table td:last-child {
-  border-right: none;
+.modern-table tr:last-child td {
+  border-bottom: none;
 }
 
-.bold-date {
-  font-weight: 900;
+.buoi-hoc-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* STATUS BADGES */
-.status-badge.present {
-  color: #000;
-  background-color: #62FF00; /* Màu xanh lá sáng trong Figma */
-  padding: 5px 10px;
-  border-radius: 4px;
-  display: inline-block;
+.id-tag {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.85rem;
 }
 
-.status-badge.absent {
-  color: #fb0505;
-  font-weight: bold;
+.updater-tag {
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* PAGINATION */
-.pagination {
+.status-badge-new {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-badge-new.present {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge-new.absent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.ghichu-text {
+  color: #64748b;
+  font-style: italic;
+  font-size: 0.95rem;
+  display: block;
+  min-width: 150px;
+}
+
+.column-ghichu {
+  width: 30%;
+}
+
+/* Pagination */
+.modern-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  gap: 10px;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
-.page-node {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
+.page-control {
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
   background: white;
+  color: #475569;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.2s;
 }
 
-.page-node.active {
-  background-color: #fb0505;
-  color: white;
+.page-control:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
-/* --- RESPONSIVE CHO ĐIỆN THOẠI --- */
+.page-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* No data state */
+.no-data {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.no-data-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.no-data p {
+  color: #64748b;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* Loading state */
+.attendance-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+/* Responsive Mobile */
 @media (max-width: 768px) {
-  .attendance-container {
-    border: none;
+  .attendance-detail-container {
+    padding: 1rem;
   }
 
-  .attendance-table thead {
-    display: none; /* Ẩn tiêu đề bảng trên mobile */
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
-  .attendance-table tr {
+  .detail-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .modern-table thead {
+    display: none;
+  }
+
+  .modern-table tr {
     display: block;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: #f9f9f9;
+    margin-bottom: 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
   }
 
-  .attendance-table td {
+  .modern-table td {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
-    border-right: none;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f1f5f9;
     text-align: right;
-    padding: 10px 15px;
   }
 
-  .attendance-table td::before {
-    content: attr(data-label);
-    font-weight: bold;
-    float: left;
-    color: #555;
-  }
-
-  .attendance-table td:last-child {
+  .modern-table td:last-child {
     border-bottom: none;
+  }
+
+  .modern-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-transform: uppercase;
   }
 }
