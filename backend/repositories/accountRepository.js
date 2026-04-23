@@ -1,4 +1,4 @@
-const { account : Account, sequelize } = require('../models');
+const { account : Account, sequelize, account } = require('../models');
 
 const findAll = async () => {
     return await Account.findAll();
@@ -82,6 +82,15 @@ const deleteAccount = async (username) => {
     return await account.destroy();
 };
 
+// trả về số dòng xóa, k bắt lỗi
+const xoaSinhVienKhoiLopHoc = async (masinhvien) => {
+    return await Account.destroy({
+        where: {
+            username: masinhvien
+        }
+    });
+}
+
 module.exports = {
     findAll,
     findAllSinhVien,
@@ -90,5 +99,6 @@ module.exports = {
     create,
     createBulk,
     update,
-    deleteAccount
+    deleteAccount,
+    xoaSinhVienKhoiLopHoc
 }

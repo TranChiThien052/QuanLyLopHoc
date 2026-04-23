@@ -1,6 +1,8 @@
 const studentRepository = require("../repositories/studentRepository");
 const accountRepository  = require("../repositories/accountRepository");
 const classRepository = require("../repositories/classRepository");
+const lopsinhvienRepository = require("../repositories/lopsinhvienRepository");
+
 
 const bcrypt = require('bcrypt');
 
@@ -45,12 +47,12 @@ const createBulk = async (listSinhVien) => {
 const deleteStudentById = async (masinhvien) => {
     if(!masinhvien)
         throw new Error("Vui lòng truyền mã !");
+    await lopsinhvienRepository.xoaSinhVienKhoiLopHoc(masinhvien);
+    await accountRepository.xoaSinhVienKhoiLopHoc(masinhvien);
     let studentDelete = await studentRepository.destroy(masinhvien);
 
     if(!studentDelete)
         throw new Error("Không tìm thấy sinh viên !")
-
-    await accountRepository.deleteAccount(masinhvien);
 
     return studentDelete;
 }

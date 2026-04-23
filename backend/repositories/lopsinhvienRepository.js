@@ -1,5 +1,5 @@
 const {lopsinhvien : Lopsinhvien,sequelize} = require('../models');
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, where } = require('sequelize');
 
 const findAll = async () => {
     return await Lopsinhvien.findAll();
@@ -72,6 +72,15 @@ const deleteLopSinhVien = async (malop, masinhvien) => {
     return await lopsinhvien.destroy();
 }
 
+// trả về số dòng xóa, k bắt lỗi
+const xoaSinhVienKhoiLopHoc = async (masinhvien) => {
+    return await Lopsinhvien.destroy({
+        where: {
+            masinhvien: masinhvien
+        }
+    });
+}
+
 const findSinhVienCuaLopHoc = async (id) => {
     const rows = await sequelize.query(
         `SELECT 
@@ -98,5 +107,6 @@ module.exports = {
     bulkCreate,
     update,
     deleteLopSinhVien,
-    findSinhVienCuaLopHoc
+    findSinhVienCuaLopHoc,
+    xoaSinhVienKhoiLopHoc
 }
