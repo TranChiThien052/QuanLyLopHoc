@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as faceapi from '@vladmandic/face-api';
 import axios from 'axios';
 import './Attendance.css';
@@ -9,6 +9,7 @@ const ResLesson = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const isProcessing = useRef(false);
+  // const {mabuoihoc} = useParams();
 
   const [step, setStep] = useState('loading');
   const [msg, setMsg] = useState('Đang tải mô hình nhận diện...');
@@ -17,6 +18,7 @@ const ResLesson = () => {
   const madiemdanh = state?.madiemdanh;
   const monhoc = state?.monhoc;
   const tenlop = state?.tenlop;
+  console.log('State received in ResLesson:', state);
 
   useEffect(() => {
     const init = async () => {
