@@ -19,7 +19,7 @@ const ResLesson = () => {
   const [madiemdanh, setMaDiemDanh] = useState(state?.madiemdanh || null);
   const [monhoc, setMonHoc] = useState(state?.monhoc || null);
   const [tenlop, setTenLop] = useState(state?.tenlop || null);
-
+  const [faceId, setFaceId] = useState(state?.faceid || null);
   console.log('State received in ResLesson:', state);
   console.log('URL params - mabuoihoc:', mabuoihoc);
 
@@ -43,48 +43,50 @@ const ResLesson = () => {
           }
         );
 
-        console.log('Current student info:', studentInfo.data);
+        console.log('Current student faceID:', studentInfo.faceid);
+
+        setFaceId(studentInfo.faceid);
+
+        // Fetch all attendance records for this lesson
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/diemDanh/buoihoc/${mabuoihoc}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }
+        );
+
+        const attendanceRecords = response.data;
         
-        // // Fetch all attendance records for this lesson
-        // const response = await axios.get(
-        //   `${process.env.REACT_APP_API_URL}/diemDanh/buoihoc/${mabuoihoc}`,
-        //   {
-        //     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        //   }
-        // );
+        // Find the record for current student
+        const currentStudentRecord = attendanceRecords.find(
+          record => record.masinhvien === currentUserId
+        );
 
-        // const attendanceRecords = response.data;
-        
-        // // Find the record for current student
-        // const currentStudentRecord = attendanceRecords.find(
-        //   record => record.masinhvien === currentUserId
-        // );
+        if (!currentStudentRecord) {
+          setStep('error');
+          setMsg('Không tìm thấy thông tin sinh viên cho buổi học này.');
+          return;
+        }
 
-        // if (!currentStudentRecord) {
-        //   setStep('error');
-        //   setMsg('Không tìm thấy thông tin sinh viên cho buổi học này.');
-        //   return;
-        // }
+        // Set attendance info
+        setMaDiemDanh(currentStudentRecord.madiemdanh);
+        setMaSinhVien(currentStudentRecord.masinhvien);
 
-        // // Set attendance info
-        // setMaDiemDanh(currentStudentRecord.madiemdanh);
-        // setMaSinhVien(currentStudentRecord.masinhvien);
+        // Fetch full student details
+        const studentResponse = await axios.get(
+          `${process.env.REACT_APP_API_URL}/student/${currentStudentRecord.masinhvien}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }
+        );
 
-        // // Fetch full student details
-        // const studentResponse = await axios.get(
-        //   `${process.env.REACT_APP_API_URL}/student/${currentStudentRecord.masinhvien}`,
-        //   {
-        //     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        //   }
-        // );
+        if (studentResponse.data) {
+          const student = studentResponse.data;
+          setMonHoc(student.monhoc || 'Đang tải...'); // Adjust field name as needed
+          setTenLop(student.tenlop || 'Đang tải...'); // Adjust field name as needed
+        }
 
-        // if (studentResponse.data) {
-        //   const student = studentResponse.data;
-        //   setMonHoc(student.monhoc || 'Đang tải...'); // Adjust field name as needed
-        //   setTenLop(student.tenlop || 'Đang tải...'); // Adjust field name as needed
-        // }
-
-        // setMsg('Thông tin buổi học đã tải xong!');
+        setMsg('Thông tin buổi học đã tải xong!');
       } catch (error) {
         console.error('Error fetching attendance data:', error);
         setStep('error');
@@ -126,20 +128,46 @@ const ResLesson = () => {
     setMsg('Đang nhận diện mặt (5 lần)...');
 
     try {
+      let descriptors = [];
       for (let i = 1; i <= 5; i += 1) {
         setMsg(`Quét mặt: ${i}/5...`);
-        await faceapi
+        const detection = await faceapi
           .detectSingleFace(videoRef.current, new faceapi.TinyFaceDetectorOptions())
-          .withFaceLandmarks();
+          .withFaceLandmarks()
+          .withFaceDescriptor(); // cần thêm bước này để có descriptor
+
+        if (detection) {
+          descriptors.push(Array.from(detection.descriptor));
+        }
         await new Promise((resolve) => setTimeout(resolve, 220));
       }
 
-      await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
-        trangThai: 'Có mặt',
-        maNguoiCapNhat: masinhvien
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      if (descriptors.length === 0) {
+        throw new Error('Không thu được descriptor khuôn mặt');
+      }
+
+      const descriptorLength = descriptors[0].length;
+      const averageDescriptor = Array.from({ length: descriptorLength }, (_, idx) => {
+        const sum = descriptors.reduce((acc, descriptor) => acc + descriptor[idx], 0);
+        return sum / descriptors.length;
       });
+
+      console.log('Average descriptor:', averageDescriptor);
+
+      const distance = faceapi.euclideanDistance(averageDescriptor, faceId);
+
+      console.log('Distance to stored faceID:', distance);
+
+      if (distance > 0.6) {
+        throw new Error('Khuôn mặt không khớp');
+      }
+
+      // await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
+      //   trangThai: 'Có mặt',
+      //   maNguoiCapNhat: masinhvien
+      // }, {
+      //   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      // });
 
       setStep('success');
       setMsg('ĐIỂM DANH THÀNH CÔNG! ✅');
@@ -148,7 +176,7 @@ const ResLesson = () => {
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
     }
-  }, [madiemdanh, masinhvien]);
+  }, [madiemdanh, masinhvien, faceId]);
 
   // Luôn mở camera trước để ưu tiên thiết bị điện thoại.
   useEffect(() => {
