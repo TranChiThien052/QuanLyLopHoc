@@ -27,6 +27,14 @@ const ResLesson = () => {
   useEffect(() => {
     const fetchStudentAttendanceData = async () => {
       if (!mabuoihoc || masinhvien) {
+        const studentInfo = await axios.get(
+          `${process.env.REACT_APP_API_URL}/students/info/student`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }
+        );
+
+        setFaceId(studentInfo.data.faceid);
         return; // Already have data from state or no URL param
       }
 
@@ -36,16 +44,6 @@ const ResLesson = () => {
         // Get current user info from localStorage or token
         const currentUserId = localStorage.getItem('user');
 
-        const studentInfo = await axios.get(
-          `${process.env.REACT_APP_API_URL}/students/info/student`,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          }
-        );
-
-        console.log('Current student faceID:', studentInfo.data);
-
-        setFaceId(studentInfo.data.faceid);
 
         // Fetch all attendance records for this lesson
         const response = await axios.get(
