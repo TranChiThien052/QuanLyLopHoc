@@ -43,9 +43,10 @@ function AppRoutes() {
             <Route path="profile" element={<Profile />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="register-face" element={<FaceRegistration />} />
-            <Route path="attendance/resLesson" element={<ResLesson />} />
+            {/* <Route path="attendance/resLesson" element={<ResLesson />} /> */}
             <Route path="attendance-history" element={<AttendanceHistory />} />
             <Route path="attendance/:subjectId" element={<AttendanceDetail />} />
+            <Route path="/student/attendance/lesson/:mabuoihoc" element={<ResLesson/>}/>
           </Route>
         </Route>
 

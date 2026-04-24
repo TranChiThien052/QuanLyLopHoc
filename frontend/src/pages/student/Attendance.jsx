@@ -57,7 +57,7 @@ const Attendance = () => {
         });
 
         // Khi đã có record, chuyển sang trang xác thực khuôn mặt với camera trước.
-        navigate('/student/attendance/resLesson', {
+        navigate(`/student/attendance/lesson/${mabuoihoc}`, {
           state: {
             mabuoihoc,
             masinhvien: student.masinhvien,

@@ -158,6 +158,15 @@ const createBulk = async (listDiemDanh) => {
     });
 }
 
+// trả về số dòng xóa, k bắt lỗi
+const xoaSinhVienKhoiLopHoc = async (masinhvien) => {
+    return await DiemDanh.destroy({
+        where: {
+            masinhvien: masinhvien
+        }
+    });
+}
+
 module.exports = {
     findAll,
     findBySinhVienId,
@@ -168,5 +177,6 @@ module.exports = {
     initList,
     update,
     deleteDiemDanh,
-    createBulk
+    createBulk,
+    xoaSinhVienKhoiLopHoc
 }
