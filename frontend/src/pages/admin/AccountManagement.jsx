@@ -74,21 +74,24 @@ const AccountManagement = () => {
     setShowEditModal(true);
   };
 
-  // 4. Xóa hồ sơ (Đã khớp với Route Backend)
+  // 4. Xóa hồ sơ
   const handleDelete = async (id) => {
     const cleanId = id.toString().trim();
-    if (!window.confirm(`Bạn có chắc muốn xoá vĩnh viễn ${cleanId}?`)) return;
+    if (!window.confirm(`Bạn có chắc muốn xoá vĩnh viễn tài khoản ${cleanId}?`)) return;
 
     try {
+      // Xác định đường dẫn dựa trên Tab hiện tại
       const profilePath = activeTab === 'sinhvien' ? `/students/${cleanId}` : `/teachers/${cleanId}`;
-      await api.delete(profilePath);
+      
+      await api.delete(profilePath, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
 
-      const updated = allProfiles.filter(p => (p.masinhvien || p.magiangvien).toString().trim() !== cleanId);
-      setAllProfiles(updated);
-      setProfiles(updated);
       alert("Đã xoá thành công!");
+      loadProfiles();
     } catch (error) {
-      alert("Có lỗi xảy ra khi xoá. Vui lòng kiểm tra kết nối host!");
+      console.error("Lỗi xóa:", error);
+      alert("Lỗi 401/403: Không thể xóa. Hãy kiểm tra lại quyền Admin!");
     }
   };
 
@@ -100,7 +103,6 @@ const AccountManagement = () => {
     const cleanTen = formData.ten.trim();
     const cleanEmail = formData.email.trim();
     const cleanSdt = formData.sodienthoai.trim();
-    // Đã xóa cleanLop không dùng ở đây để hết lỗi ESLint
 
     if (!isEdit) {
       if (!cleanMa) newErrors.ma = "Mã tài khoản không được trống";
@@ -111,13 +113,14 @@ const AccountManagement = () => {
 
     if (!cleanHo) newErrors.ho = "Vui lòng nhập họ lót";
     if (!cleanTen) newErrors.ten = "Vui lòng nhập tên";
-    if (!formData.ngaySinh) newErrors.ngaySinh = "Ngày sinh là bắt buộc";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!cleanEmail || !emailRegex.test(cleanEmail)) newErrors.email = "Email không hợp lệ";
 
     const phoneRegex = /^[0-9]{10}$/;
-    if (!cleanSdt || !phoneRegex.test(cleanSdt)) newErrors.sodienthoai = "SĐT phải đủ 10 chữ số";
+    if (cleanSdt && !phoneRegex.test(cleanSdt)) {
+      newErrors.sodienthoai = "SĐT nếu nhập phải đủ 10 chữ số";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -149,7 +152,14 @@ const AccountManagement = () => {
     e.preventDefault();
     if (!validate(false)) return;
     try {
-      const pData = { ten: formData.ten, holot: formData.ho, ngaysinh: formData.ngaySinh, email: formData.email, sodienthoai: formData.sodienthoai };
+      const pData = { 
+        ten: formData.ten, 
+        holot: formData.ho, 
+        ngaysinh: formData.ngaySinh || null, 
+        email: formData.email, 
+        sodienthoai: formData.sodienthoai || null
+      };
+
       if (activeTab === 'sinhvien') {
         await api.post('/students',
           { masinhvien: formData.ma, ...pData, malop: formData.malop },
@@ -175,31 +185,39 @@ const AccountManagement = () => {
     } catch (err) { alert("Lỗi khi thêm hồ sơ mới!"); }
   };
 
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const cleanId = formData.ma.trim();
-      const path = activeTab === 'sinhvien' 
-        ? `/students/update/${cleanId}` 
-        : `/teachers/update/${cleanId}`;
 
+const handleEditSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const cleanId = formData.ma.trim();
+    const path = activeTab === 'sinhvien' 
+      ? `/students/update/${cleanId}` 
+      : `/teachers`; 
+
+    // ĐIỀU CHỈNH DỮ LIỆU GỬI ĐI
       const updateData = { 
+        // Dòng này cực quan trọng để code BE của ông chạy được:
+        magiangvien: cleanId, 
+        
         holot: formData.ho, 
         ten: formData.ten, 
-        ngaysinh: formData.ngaySinh, 
+        ngaysinh: formData.ngaySinh || null, 
         email: formData.email, 
-        sodienthoai: formData.sodienthoai, 
-        ...(activeTab === 'sinhvien' && { malop: formData.malop }) 
+        sodienthoai: formData.sodienthoai || null,
+        ...(activeTab === 'sinhvien' && { malop: formData.malop })
       };
 
       await api.put(path, updateData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
-      alert("Cập nhật thông tin thành công!");
+      alert(`Cập nhật thông tin ${activeTab === 'sinhvien' ? 'sinh viên' : 'giảng viên'} thành công!`);
       setShowEditModal(false);
       loadProfiles();
-    } catch (error) { alert("Lỗi cập nhật dữ liệu!"); }
+    } catch (error) {
+      console.error("Lỗi cập nhật:", error);
+      alert("Cập nhật thất bại. Hãy kiểm tra Console để xem lỗi cụ thể!");
+    }
   };
 
   const handleResetPassword = async (username) => {
@@ -212,6 +230,17 @@ const AccountManagement = () => {
         });
         alert("Reset thành công!");
       } catch (e) { alert("Lỗi Backend khi reset mật khẩu!"); }
+    }
+  };
+
+  // AccountManagement.jsx
+
+  const handleResetFaceID = () => {
+    const id = formData.ma;
+    // Hiện confirm để tránh bấm nhầm
+    if (window.confirm(`Bạn có muốn chuẩn bị Reset FaceID cho sinh viên ${id} không?`)) {
+      console.log("Sẵn sàng Reset FaceID cho mã:", id);
+      alert("Nút đã sẵn sàng!");
     }
   };
 
@@ -304,7 +333,7 @@ const AccountManagement = () => {
         </div>
       )}
 
-      {/* MODAL SỬA (TÍCH HỢP RESET MẬT KHẨU) */}
+      {/* MODAL SỬA */}
       {showEditModal && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -324,6 +353,19 @@ const AccountManagement = () => {
               <div className="reset-pw-section">
                 <button type="button" className="btn-reset-pw-simple" onClick={() => handleResetPassword(formData.ma)}>🔄 Reset mật khẩu về mặc định</button>
               </div>
+              <button type="button" className="btn-reset-faceid" onClick={handleResetFaceID}
+                style={{ 
+                  backgroundColor: '#f39c12', // Màu cam nổi bật
+                  color: 'white', 
+                  marginLeft: '10px',
+                  padding: '10px 15px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}>
+                  🔄 Reset FaceID
+                </button>
               <div className="modal-footer-centered"><button type="button" className="btn-cancel-round" onClick={() => setShowEditModal(false)}>Hủy</button><button type="submit" className="btn-submit-round">Cập nhật</button></div>
             </form>
           </div>
