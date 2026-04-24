@@ -151,7 +151,7 @@ const ResLesson = () => {
         const sum = descriptors.reduce((acc, descriptor) => acc + descriptor[idx], 0);
         return sum / descriptors.length;
       });
-
+      console.log("Student's average descriptor:", faceId);
       console.log('Average descriptor:', averageDescriptor);
 
       const distance = faceapi.euclideanDistance(averageDescriptor, faceId);
@@ -172,6 +172,7 @@ const ResLesson = () => {
       setStep('success');
       setMsg('ĐIỂM DANH THÀNH CÔNG! ✅');
     } catch (error) {
+      console.log(error);
       setStep('error');
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
