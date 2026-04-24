@@ -34,6 +34,7 @@ const ClassManagement = () => {
   const [studentFile, setStudentFile] = useState(null);
   const [studentCode, setStudentCode] = useState('');
   const [classStudentFile, setClassStudentFile] = useState(null);
+  const [teacherName, setTeacherName] = useState("");
 
   const isMobile = window.innerWidth < 768;
   const itemsPerPage = isMobile ? 3 : 5;
@@ -41,7 +42,7 @@ const ClassManagement = () => {
   const fetchClasses = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get('/classes');
+      const response = await api.get(`/classes/giangvien/${user.id}`);
       const data = response.data;
       setClasses(Array.isArray(data) ? data : (data?.data && Array.isArray(data.data) ? data.data : []));
       setLoading(false);
@@ -100,6 +101,26 @@ const ClassManagement = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedClass, searchTerm]);
+
+  useEffect(() => {
+    const fetchTeacherName = async () => {
+      if (!user) return;
+      const teacherId = user.magiangvien || user.username || user.id;
+      try {
+        const response = await api.get('/teachers/info/teacher', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        const profiles = response.data || [];
+        const myProfile = Array.isArray(profiles) ? profiles.find(p => p.magiangvien === teacherId) : profiles;
+        if (myProfile) {
+          setTeacherName(`${myProfile.holot} ${myProfile.ten}`);
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải tên giảng viên:", err);
+      }
+    };
+    fetchTeacherName();
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -332,7 +353,7 @@ const ClassManagement = () => {
             <div className="class-header">
               <div className="header-text">
                 <h2 className="title-modern">Quản lý lớp học</h2>
-                <p className="subtitle">Giảng viên: <span><strong>Bùi Nhật Bằng</strong></span></p>
+                <p className="subtitle">Giảng viên: <span><strong>{teacherName || user?.username || user?.id}</strong></span></p>
               </div>
               <div className="header-actions">
                 <div className="search-wrapper">
