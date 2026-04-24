@@ -4,6 +4,39 @@ import * as faceapi from '@vladmandic/face-api';
 import axios from 'axios';
 import './Attendance.css';
 
+// Hàm tính khoảng cách giữa 2 tọa độ lat/lon ra mét (Công thức Haversine)
+const getDistanceInMeters = (lat1, lon1, lat2, lon2) => {
+  const R = 6371e3; // Bán kính trái đất (mét)
+  const toRad = angle => (angle * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; 
+};
+
+// Hàm lấy vị trí hiện tại dưới dạng Promise để dùng chung với async/await
+const getCurrentLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Trình duyệt hoặc thiết bị không hỗ trợ định vị GPS.'));
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        });
+      },
+      (error) => reject(error),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+};
+
 const ResLesson = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -118,6 +151,10 @@ const ResLesson = () => {
 
     try {
       let descriptors = [];
+      let trangThaiDiemDanh = 'Có mặt';
+      let ghiChu = '';
+      let gpsString = '';
+
       const studentInfo = await axios.get(
         `${process.env.REACT_APP_API_URL}/students/info/student`,
         {
@@ -154,9 +191,63 @@ const ResLesson = () => {
 
       console.log('Distance to stored faceID:', distance);
 
-      if (distance > 0.6) {
-        throw new Error('Khuôn mặt không khớp');
+      if (distance > 0.4) {
+        const studentLocation = await getCurrentLocation();
+        gpsString = `${studentLocation.lat},${studentLocation.lon}`;
+        trangThaiDiemDanh = 'Xem xét';
+        ghiChu = 'Khuôn mặt không khớp';
       }
+      else{
+      // ---- BẮT ĐẦU XỬ LÝ GPS ----
+      setMsg('Đang lấy vị trí hiện tại (GPS)...');
+      
+      
+      // Thay bằng tọa độ thực tế nơi diễn ra buổi học 
+      // (VD: Đây là toạ độ tham khảo lấy theo Google Maps)
+      const TARGET_LAT = 10.738028962835843; //Vĩ độ trường
+      const TARGET_LON = 106.67793576132826; //Kinh độ trường
+
+      // const TARGET_LAT = 10.747572888673872; //Vĩ độ STU
+      // const TARGET_LON = 106.68251246342655; //Kinh độ STU 10.747572888673872, 106.68251246342655
+      
+      try {
+        const studentLocation = await getCurrentLocation();
+        
+        // Tính khoảng cách
+        const distanceToClass = getDistanceInMeters(
+          studentLocation.lat, studentLocation.lon, 
+          TARGET_LAT, TARGET_LON
+        );
+        
+        console.log(`Khoảng cách đo được: ${distanceToClass.toFixed(2)} mét`);
+        
+        // Nếu cách xa hơn 50m => đưa vào trạng thái cần xem xét
+        if (distanceToClass > 50) {
+          trangThaiDiemDanh = 'Xem xét';
+          ghiChu = 'Sinh viên nằm ngoài vùng điểm danh';
+        }
+        
+        // Format chuỗi GPS truyền lên Backend (Lat,Lon) nếu BE cần thiết lưu lịch sử vị trí
+        gpsString = studentLocation.lat + ',' + studentLocation.lon;
+        console.log('Vị trí GPS của sinh viên:', gpsString);
+        
+      } catch (geoError) {
+        console.error('Lỗi khi lấy GPS:', geoError);
+        // Tùy theo logic dự án: nếu sinh viên không mở quyền truy cập GPS thì tự động đánh dấu "Xem xét"
+        trangThaiDiemDanh = 'Xem xét'; 
+      }
+    }
+      // ---- GỌI API CẬP NHẬT TRẠNG THÁI ----
+      setMsg('Đang gửi dữ liệu lên máy chủ...');
+      
+      await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
+        trangThai: trangThaiDiemDanh,
+        maNguoiCapNhat: masinhvien,
+        ghiChu: ghiChu,
+        GPS: gpsString // Truyền thêm GPS string lên DB
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
 
       // await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
       //   trangThai: 'Có mặt',
@@ -166,7 +257,7 @@ const ResLesson = () => {
       // });
 
       setStep('success');
-      setMsg('ĐIỂM DANH THÀNH CÔNG! ✅');
+      setMsg(`ĐIỂM DANH THÀNH CÔNG! ✅ (Trạng thái: ${trangThaiDiemDanh})`);
     } catch (error) {
       console.log(error);
       setStep('error');

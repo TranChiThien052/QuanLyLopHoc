@@ -82,16 +82,22 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const { maDiemDanh } = req.params;
-    const { trangThai, ghiChu, maNguoiCapNhat, GPS } = req.body;
+    console.log("===> PAYLOAD RECEIVED:", req.body); // Check payload
+    // Hỗ trợ nhận cả gps (chữ thường) lẫn GPS (chữ hoa)
+    const receivedGPS = req.body.gps !== undefined ? req.body.gps : req.body.GPS;
+    const finalGPS = receivedGPS ? String(receivedGPS) : null;
+    console.log("===> FINAL GPS EXTRACTED:", finalGPS); // Check derived value
+
+    const { trangThai, ghiChu, maNguoiCapNhat } = req.body;
     const thoiGianCapNhat = new Date();
     try {
         const updatedDiemDanh = await diemDanhService.update(
             maDiemDanh,
             trangThai,
-            ghiChu,
+            ghiChu || null,
             thoiGianCapNhat,
             maNguoiCapNhat,
-            GPS
+            finalGPS
         );
         res.json(updatedDiemDanh);
     } catch (error) {
