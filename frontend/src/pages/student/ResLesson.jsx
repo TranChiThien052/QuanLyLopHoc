@@ -37,13 +37,13 @@ const ResLesson = () => {
         const currentUserId = localStorage.getItem('user');
 
         const studentInfo = await axios.get(
-          `${process.env.REACT_APP_API_URL}/students/info/student}`,
+          `${process.env.REACT_APP_API_URL}/students/info/student`,
           {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           }
         );
 
-        console.log('Current student faceID:', studentInfo.data.faceid);
+        console.log('Current student faceID:', studentInfo.data);
 
         setFaceId(studentInfo.data.faceid);
 
