@@ -1,4 +1,5 @@
 const teacherService = require("../services/teacherService");
+const classService = require("../services/classService");
 
 const getAll = async (req, res) => {
     try {
@@ -84,7 +85,7 @@ const updateInfoTeacher = async (req,res) => {
         const magiangvien = (req.user.role === 'teacher') ? req.user.id : req.body.magiangvien
         const {ten,holot,ngaysinh,email,sodienthoai} = req.body
         const teacher = await teacherService.updateInfoTeacher(magiangvien,ten,holot,ngaysinh,email,sodienthoai);
-
+        const classes = await classService.updateClassNameByGiangVienName(magiangvien, holot + " " + ten);
         let response = {}
         if(!teacher) {
             response.code = 404,

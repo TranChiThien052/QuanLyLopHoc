@@ -82,7 +82,7 @@ const FaceRegistration = () => {
       const faceDescriptorArray = Array.from(detection.descriptor);
       const studentId = user?.masinhvien || user?.id;
 
-      await api.put(`/students/update-faceid/${studentId}`, 
+      await api.put(`${process.env.REACT_APP_API_URL}/students/update-faceid`, 
         { faceid: faceDescriptorArray },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -90,6 +90,7 @@ const FaceRegistration = () => {
       setMsg('✅ THÀNH CÔNG!');
       setTimeout(() => navigate('/student/profile'), 2000);
     } catch (error) {
+      console.log(error);
       setMsg('❌ Lỗi lưu dữ liệu!');
       setIsProcessing(false);
     }

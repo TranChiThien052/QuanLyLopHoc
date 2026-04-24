@@ -28,6 +28,15 @@ const deleteClass = async (MaLop) => {
     return await classRepo.deleteClass(MaLop);
 }
 
+const updateClassNameByGiangVienName = async (MaGiangVien, TenGiangVien) => {
+    if (!MaGiangVien || !TenGiangVien)
+        throw new Error("Thiếu dữ liệu mã giảng viên hoặc tên giảng viên");
+    const classes = await classRepo.findMonHocCuaGiangVien(MaGiangVien);
+    if (!classes || classes.length === 0)
+        return {result : "Không tìm thấy lớp học nào của giảng viên này"};
+    return await classRepo.updateClassNameByGiangVienName(TenGiangVien, classes);
+};
+
 const findMonHocCuaGiangVien = async (id) => {
     if (!id)
         throw new Error("Thiếu dữ liệu mã giảng viên");
@@ -40,5 +49,6 @@ module.exports = {
     create,
     update,
     deleteClass,
-    findMonHocCuaGiangVien
+    findMonHocCuaGiangVien,
+    updateClassNameByGiangVienName
 }
