@@ -111,12 +111,16 @@ const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCap
     if (!diemdanh) {
         throw new Error("Điểm danh không tồn tại");
     }
-    diemdanh.trangthai = trangThai;
-    diemdanh.ghichu = ghiChu;
-    diemdanh.thoigiancapnhat = thoiGianCapNhat;
-    diemdanh.manguoicapnhat = maNguoiCapNhat;
-    diemdanh.gps = GPS;
-    return await diemdanh.save();
+    
+    console.log("===> Repo is applying GPS:", GPS); // LOG TESTING
+
+    return await diemdanh.update({
+        trangthai: trangThai,
+        ghichu: ghiChu,
+        thoigiancapnhat: thoiGianCapNhat,
+        manguoicapnhat: maNguoiCapNhat,
+        gps: GPS
+    });
 }
 
 const deleteDiemDanh = async (maDiemDanh) => {

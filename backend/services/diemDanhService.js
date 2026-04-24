@@ -43,10 +43,10 @@ const initList = async (listSinhVien, listBuoiHoc) => {
     return await diemDanhRepo.initList(listSinhVien, listBuoiHoc);
 }
 
-const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat) => {
-    if (!maDiemDanh || !trangThai || !ghiChu || !thoiGianCapNhat || !maNguoiCapNhat)
+const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS) => {
+    if (!maDiemDanh || !trangThai || !thoiGianCapNhat || !maNguoiCapNhat)
         throw new Error("Thiếu dữ liệu để cập nhật điểm danh");
-    return await diemDanhRepo.update(maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat);
+    return await diemDanhRepo.update(maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS);
 }
 
 const deleteDiemDanh = async (maDiemDanh) => {
