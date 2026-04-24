@@ -353,19 +353,25 @@ const handleEditSubmit = async (e) => {
               <div className="reset-pw-section">
                 <button type="button" className="btn-reset-pw-simple" onClick={() => handleResetPassword(formData.ma)}>🔄 Reset mật khẩu về mặc định</button>
               </div>
-              <button type="button" className="btn-reset-faceid" onClick={handleResetFaceID}
-                style={{ 
-                  backgroundColor: '#f39c12', // Màu cam nổi bật
-                  color: 'white', 
-                  marginLeft: '10px',
-                  padding: '10px 15px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}>
+              {activeTab === 'sinhvien' && (
+                <button 
+                  type="button" 
+                  className="btn-reset-faceid" 
+                  onClick={handleResetFaceID}
+                  style={{ 
+                    backgroundColor: '#f39c12', // Màu cam nổi bật
+                    color: 'white', 
+                    marginLeft: '10px',
+                    padding: '10px 15px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
                   🔄 Reset FaceID
                 </button>
+              )}
               <div className="modal-footer-centered"><button type="button" className="btn-cancel-round" onClick={() => setShowEditModal(false)}>Hủy</button><button type="submit" className="btn-submit-round">Cập nhật</button></div>
             </form>
           </div>
