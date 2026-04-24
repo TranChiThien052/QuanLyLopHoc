@@ -74,7 +74,7 @@ describe('Đã đăng nhập', () => {
         expect(response.statusCode).toBe(400);
     });
 
-    it('Tạo danh sách thất bại, định dạng dữ liệu không đúng', async () => {
+    it('Tạo danh sách thất bại, email mã không đúng định dạng dữ liệu', async () => {
         const filePath = path.join(__dirname, 'fileTest/ds-test-sai-dinh-dang.xlsx');
         const response = await request(app)
         .post('/students/bulk')
