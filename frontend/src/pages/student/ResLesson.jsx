@@ -33,8 +33,9 @@ const ResLesson = () => {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           }
         );
-
+        console.log('Fetched student info from API:', studentInfo.data);
         setFaceId(studentInfo.data.faceid);
+        
         return; // Already have data from state or no URL param
       }
 
