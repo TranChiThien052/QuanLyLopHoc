@@ -84,7 +84,7 @@ const ResLesson = () => {
     };
 
     fetchStudentAttendanceData();
-  }, [mabuoihoc, masinhvien, faceId]);
+  }, [mabuoihoc, masinhvien]);
 
   useEffect(() => {
     const init = async () => {
@@ -173,7 +173,7 @@ const ResLesson = () => {
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
     }
-  }, [madiemdanh, masinhvien, faceId]);
+  }, [madiemdanh, masinhvien]);
 
   // Luôn mở camera trước để ưu tiên thiết bị điện thoại.
   useEffect(() => {
