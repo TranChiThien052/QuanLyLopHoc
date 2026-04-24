@@ -95,7 +95,7 @@ const ResLesson = () => {
     };
 
     fetchStudentAttendanceData();
-  }, [mabuoihoc, masinhvien]);
+  }, [mabuoihoc, masinhvien, faceId]);
 
   useEffect(() => {
     const init = async () => {
