@@ -223,7 +223,7 @@ const ResLesson = () => {
         
         // Nếu cách xa hơn 50m => đưa vào trạng thái cần xem xét
         if (distanceToClass > 50) {
-          trangThaiDiemDanh = 'Xem xét';
+          trangThaiDiemDanh = 'Đang xem xét';
           ghiChu = 'Sinh viên nằm ngoài vùng điểm danh';
         }
         
@@ -234,10 +234,8 @@ const ResLesson = () => {
       } catch (geoError) {
         console.error('Lỗi khi lấy GPS:', geoError);
         // Tùy theo logic dự án: nếu sinh viên không mở quyền truy cập GPS thì tự động đánh dấu "Xem xét"
-        trangThaiDiemDanh = 'Xem xét'; 
+        trangThaiDiemDanh = 'Đang xem xét'; 
       }
-    }
-      // ---- GỌI API CẬP NHẬT TRẠNG THÁI ----
       setMsg('Đang gửi dữ liệu lên máy chủ...');
       
       await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
@@ -248,6 +246,11 @@ const ResLesson = () => {
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
+      setStep('success');
+      setMsg(`ĐIỂM DANH THÀNH CÔNG! ✅ (Trạng thái: ${trangThaiDiemDanh})`);
+    }
+      // ---- GỌI API CẬP NHẬT TRẠNG THÁI ----
+      
 
       // await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
       //   trangThai: 'Có mặt',
@@ -256,8 +259,7 @@ const ResLesson = () => {
       //   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       // });
 
-      setStep('success');
-      setMsg(`ĐIỂM DANH THÀNH CÔNG! ✅ (Trạng thái: ${trangThaiDiemDanh})`);
+      
     } catch (error) {
       console.log(error);
       setStep('error');
