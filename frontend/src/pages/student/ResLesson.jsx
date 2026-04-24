@@ -19,7 +19,6 @@ const ResLesson = () => {
   const [madiemdanh, setMaDiemDanh] = useState(state?.madiemdanh || null);
   const [monhoc, setMonHoc] = useState(state?.monhoc || null);
   const [tenlop, setTenLop] = useState(state?.tenlop || null);
-  const [faceId, setFaceId] = useState(state?.faceid || null);
   console.log('State received in ResLesson:', state);
   console.log('URL params - mabuoihoc:', mabuoihoc);
 
@@ -27,15 +26,6 @@ const ResLesson = () => {
   useEffect(() => {
     const fetchStudentAttendanceData = async () => {
       if (!mabuoihoc || masinhvien) {
-        const studentInfo = await axios.get(
-          `${process.env.REACT_APP_API_URL}/students/info/student`,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          }
-        );
-        console.log('Fetched student info from API:', studentInfo.data);
-        setFaceId(studentInfo.data.faceid);
-        
         return; // Already have data from state or no URL param
       }
 
@@ -128,6 +118,13 @@ const ResLesson = () => {
 
     try {
       let descriptors = [];
+      const studentInfo = await axios.get(
+        `${process.env.REACT_APP_API_URL}/students/info/student`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        }
+      );
+      console.log('Fetched student info from API:', studentInfo.data);
       for (let i = 1; i <= 5; i += 1) {
         setMsg(`Quét mặt: ${i}/5...`);
         const detection = await faceapi
@@ -150,10 +147,10 @@ const ResLesson = () => {
         const sum = descriptors.reduce((acc, descriptor) => acc + descriptor[idx], 0);
         return sum / descriptors.length;
       });
-      console.log("Student's average descriptor:", faceId);
+      console.log("Student's average descriptor:", studentInfo.data.faceid);
       console.log('Average descriptor:', averageDescriptor);
 
-      const distance = faceapi.euclideanDistance(averageDescriptor, faceId);
+      const distance = faceapi.euclideanDistance(averageDescriptor, studentInfo.data.faceid);
 
       console.log('Distance to stored faceID:', distance);
 
