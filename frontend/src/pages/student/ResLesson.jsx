@@ -7,24 +7,98 @@ import './Attendance.css';
 const ResLesson = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { mabuoihoc } = useParams();
   const videoRef = useRef(null);
   const isProcessing = useRef(false);
-  // const {mabuoihoc} = useParams();
 
   const [step, setStep] = useState('loading');
   const [msg, setMsg] = useState('Đang tải mô hình nhận diện...');
 
-  const masinhvien = state?.masinhvien;
-  const madiemdanh = state?.madiemdanh;
-  const monhoc = state?.monhoc;
-  const tenlop = state?.tenlop;
+  // Data from state (passed from QR scan) or from URL params
+  const [masinhvien, setMaSinhVien] = useState(state?.masinhvien || null);
+  const [madiemdanh, setMaDiemDanh] = useState(state?.madiemdanh || null);
+  const [monhoc, setMonHoc] = useState(state?.monhoc || null);
+  const [tenlop, setTenLop] = useState(state?.tenlop || null);
+
   console.log('State received in ResLesson:', state);
+  console.log('URL params - mabuoihoc:', mabuoihoc);
+
+  // Fetch student attendance data if navigating via URL
+  useEffect(() => {
+    const fetchStudentAttendanceData = async () => {
+      if (!mabuoihoc || masinhvien) {
+        return; // Already have data from state or no URL param
+      }
+
+      try {
+        setMsg('Đang tải thông tin buổi học...');
+        
+        // Get current user info from localStorage or token
+        const currentUserId = localStorage.getItem('user');
+
+        const studentInfo = await axios.get(
+          `${process.env.REACT_APP_API_URL}/students/info/student}`,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }
+        );
+
+        console.log('Current student info:', studentInfo.data);
+        
+        // // Fetch all attendance records for this lesson
+        // const response = await axios.get(
+        //   `${process.env.REACT_APP_API_URL}/diemDanh/buoihoc/${mabuoihoc}`,
+        //   {
+        //     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        //   }
+        // );
+
+        // const attendanceRecords = response.data;
+        
+        // // Find the record for current student
+        // const currentStudentRecord = attendanceRecords.find(
+        //   record => record.masinhvien === currentUserId
+        // );
+
+        // if (!currentStudentRecord) {
+        //   setStep('error');
+        //   setMsg('Không tìm thấy thông tin sinh viên cho buổi học này.');
+        //   return;
+        // }
+
+        // // Set attendance info
+        // setMaDiemDanh(currentStudentRecord.madiemdanh);
+        // setMaSinhVien(currentStudentRecord.masinhvien);
+
+        // // Fetch full student details
+        // const studentResponse = await axios.get(
+        //   `${process.env.REACT_APP_API_URL}/student/${currentStudentRecord.masinhvien}`,
+        //   {
+        //     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        //   }
+        // );
+
+        // if (studentResponse.data) {
+        //   const student = studentResponse.data;
+        //   setMonHoc(student.monhoc || 'Đang tải...'); // Adjust field name as needed
+        //   setTenLop(student.tenlop || 'Đang tải...'); // Adjust field name as needed
+        // }
+
+        // setMsg('Thông tin buổi học đã tải xong!');
+      } catch (error) {
+        console.error('Error fetching attendance data:', error);
+        setStep('error');
+        setMsg('Lỗi khi tải thông tin. Vui lòng thử lại.');
+      }
+    };
+
+    fetchStudentAttendanceData();
+  }, [mabuoihoc, masinhvien]);
 
   useEffect(() => {
     const init = async () => {
       if (!masinhvien || !madiemdanh) {
-        setStep('error');
-        setMsg('Thiếu dữ liệu buổi học. Vui lòng quét QR lại.');
+        // Wait a bit to allow data fetch to complete
         return;
       }
 
