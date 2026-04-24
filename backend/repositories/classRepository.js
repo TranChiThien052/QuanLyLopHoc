@@ -102,6 +102,14 @@ const findMonHocCuaSinhVien = async (id) => {
     return sinhVien ? sinhVien.LopHocs : [];
 };
 
+const updateClassNameByGiangVienName = async (TenGiangVien, classes) => {
+    const updatedClasses = await Promise.all(classes.map(async (lop) => {
+        lop.tenlop = `${lop.monhoc} - ${TenGiangVien}`;
+        return await lop.save();
+    }));
+    return updatedClasses;
+};
+
 module.exports = {
     findAll,
     findById,
@@ -110,5 +118,6 @@ module.exports = {
     update,
     deleteClass,
     findMonHocCuaGiangVien,
-    findMonHocCuaSinhVien
+    findMonHocCuaSinhVien,
+    updateClassNameByGiangVienName
 }
