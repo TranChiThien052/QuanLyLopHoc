@@ -22,13 +22,15 @@ export default function TeacherProfile() {
       const teacherId = user.magiangvien || user.username || user.id;
       
       try {
-        const response = await api.get('/teachers');
+        const response = await api.get('/teachers/info/teacher', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
         const profiles = response.data || [];
-        const myProfile = profiles.find(p => p.magiangvien === teacherId);
-        
+        const myProfile = Array.isArray(profiles) ? profiles.find(p => p.magiangvien === teacherId) : profiles;
+
         if (myProfile) {
           setFormData({
-            ma: teacherId,
+            ma: myProfile.magiangvien || "",
             holot: myProfile.holot || "",
             ten: myProfile.ten || "",
             ngaysinh: myProfile.ngaysinh ? myProfile.ngaysinh.substring(0, 10) : "",
@@ -64,7 +66,11 @@ export default function TeacherProfile() {
         sodienthoai: formData.sodienthoai
       };
       
-      await api.put(`/teachers/${formData.ma}`, payload);
+      await api.put(`/teachers/`, payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
       alert("Cập nhật thông tin giảng viên thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật giảng viên:", error);

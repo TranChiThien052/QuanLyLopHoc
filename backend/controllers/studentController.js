@@ -49,7 +49,6 @@ const getInfoStudentById = async (req, res) => {
         }
         else
             response = student
-        
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(
@@ -197,6 +196,32 @@ const updateInfoStudent = async (req,res) => {
         );
     }
 }
+
+const updateInfoStudentByAdmin = async (req,res) => {
+    try {
+        const masinhvien = req.params.masinhvien
+        const {ten,holot,ngaysinh,email,sodienthoai} = req.body
+        const student = await studentService.updateInfoStudent(masinhvien,ten,holot,ngaysinh,email,sodienthoai);
+
+        let response = {}
+        if(!student) {
+            response.code = 404,
+            response.message = "Không tìm thấy sinh viên !";
+        }
+        else
+            response = student
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            { 
+                code:999,
+                message: error.message 
+            }
+        );
+    }
+}
+
 const updateFaceIdStudent = async (req,res) => {
     try {
         const masinhvien = req.user.id
@@ -255,5 +280,6 @@ module.exports = {
     updateInfoStudent, 
     updateFaceIdStudent,
     getMonHocCuaSinhVien,
-    getInfoStudentById
+    getInfoStudentById,
+    updateInfoStudentByAdmin
 };

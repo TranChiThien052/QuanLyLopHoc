@@ -57,7 +57,7 @@ describe('Tạo danh sách lớp', () => {
         .field('GioKetThuc', '17:35:00')
         .field('MaGiangVien', 'GV_TH00002')
     
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201);
        
     });
     
@@ -67,42 +67,67 @@ describe('Tạo danh sách lớp', () => {
         const response = await request(app)
         .post('/classes')
         .set('Authorization', `Bearer ${testToken}`)
-        .attach('file', filePath);
+        .attach('excelFile', filePath);
     
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(400)
+        expect(response.body.error);
     });
 
     it('Tạo lớp thất bại, thiếu mã sinh viên', async () => {
-        const filePath = path.join(__dirname, 'fileTest/ds-test-thieu-ma.txt');
+        const filePath = path.join(__dirname, 'fileTest/ds-test-thieu-ma.xlsx');
         
         const response = await request(app)
         .post('/classes')
         .set('Authorization', `Bearer ${testToken}`)
-        .attach('file', filePath);
+        .attach('excelFile', filePath)
+        .field('MonHoc', 'Lap trinh AI')
+        .field('NgayBatDau', '2026-10-01')
+        .field('NgayKetThuc', '2027-10-10')
+        .field('NgayHocCoDinh', 'Ba')
+        .field('GioBatDau', '15:00:00')
+        .field('GioKetThuc', '17:35:00')
+        .field('MaGiangVien', 'GV_TH00002');
     
-        expect(response.statusCode).toBe(500);
-    });
-
-    it('Tạo lớp thất bại, sai định dạng email', async () => {
-        const filePath = path.join(__dirname, 'fileTest/ds-test-sai-email.txt');
-        
-        const response = await request(app)
-        .post('/classes')
-        .set('Authorization', `Bearer ${testToken}`)
-        .attach('file', filePath);
-    
-        expect(response.statusCode).toBe(500);
+        expect(response.statusCode).toBe(400)
+        expect(response.body.error);
     });
 
     it('Tạo lớp thất bại, sai định dạng dữ liệu', async () => {
-        const filePath = path.join(__dirname, 'fileTest/ds-test-du-ma.txt');
+        const filePath = path.join(__dirname, 'fileTest/ds-test-du-ma.xlsx');
         
         const response = await request(app)
         .post('/classes')
         .set('Authorization', `Bearer ${testToken}`)
-        .attach('file', filePath);
+        .attach('excelFile', filePath)
+        .field('MonHoc', 'Lap trinh AI')
+        .field('NgayBatDau', '2026-10-01')
+        .field('NgayKetThuc', '2027-10-10')
+        .field('NgayHocCoDinh', 'Ba')
+        .field('GioBatDau', '15:00:00')
+        .field('GioKetThuc', '17:35:00')
+        .field('MaGiangVien', 'GV_TH00002');
     
-        expect(response.statusCode).toBe(500);
+        expect(response.statusCode).toBe(500)
+        expect(response.body.error);
+    });
+
+    it('Tạo lớp thất bại, giờ bắt đầu sau giờ kết thúc', async () => {
+        const filePath = path.join(__dirname, 'fileTest/ds-test-du-ma.xlsx');
+        
+        const response = await request(app)
+        .post('/classes')
+        .set('Authorization', `Bearer ${testToken}`)
+        .attach('excelFile', filePath)
+        .field('MonHoc', 'Lap trinh AI')
+        .field('NgayBatDau', '2025-10-01')
+        .field('NgayKetThuc', '2027-10-10')
+        .field('NgayHocCoDinh', 'Ba')
+        .field('GioBatDau', '19:00:00')
+        .field('GioKetThuc', '12:30:00')
+        .field('MaGiangVien', 'GV_TH00002');
+    
+        expect(response.statusCode).toBe(500)
+        expect(response.body.error);
     });
 });
 

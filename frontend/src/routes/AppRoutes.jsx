@@ -11,6 +11,7 @@ import MainLayout from "../layouts/MainLayout";
 // Student
 import Profile from "../pages/student/Profile";
 import Attendance from "../pages/student/Attendance";
+import FaceRegistration from "../pages/student/FaceRegistration";
 import ResLesson from "../pages/student/ResLesson";
 import AttendanceHistory from "../pages/student/AttendanceHistory";
 import AttendanceDetail from "../pages/student/AttendanceDetail";
@@ -41,6 +42,7 @@ function AppRoutes() {
             <Route index element={<Navigate to="/student/profile" replace />} />
             <Route path="profile" element={<Profile />} />
             <Route path="attendance" element={<Attendance />} />
+            <Route path="register-face" element={<FaceRegistration />} />
             <Route path="attendance/resLesson" element={<ResLesson />} />
             <Route path="attendance-history" element={<AttendanceHistory />} />
             <Route path="attendance/:subjectId" element={<AttendanceDetail />} />

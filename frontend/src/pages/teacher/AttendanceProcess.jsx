@@ -181,6 +181,10 @@ export default function AttendanceProcess() {
                     trangThai: newStatus,
                     ghiChu: (student.note && student.note !== '--') ? student.note : ' ',
                     maNguoiCapNhat: maNguoiCapNhat
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
                 });
                 await fetchSingleStudentAttendance(mssv); // Refetch lấy madiemdanh mới tạo
             }
@@ -224,6 +228,10 @@ export default function AttendanceProcess() {
                     trangThai: student.status,
                     ghiChu: finalNote || ' ',
                     maNguoiCapNhat: maNguoiCapNhat
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
                 });
                 await fetchSingleStudentAttendance(mssv);
             }
@@ -261,7 +269,11 @@ export default function AttendanceProcess() {
                 if (student.madiemdanh) {
                     return api.put(`/diemDanh/${student.madiemdanh}`, { madiemdanh: student.madiemdanh, ...payload });
                 } else {
-                    return api.post(`/diemDanh/`, payload);
+                    return api.post(`/diemDanh/`, payload, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
                 }
             }));
             fetchAttendance(); // Tải lại chốt sổ cuối cùng độ chính xác 100%

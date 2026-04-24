@@ -1,6 +1,7 @@
 const studentRepository = require("../repositories/studentRepository");
 const accountRepository  = require("../repositories/accountRepository");
 const classRepository = require("../repositories/classRepository");
+
 const bcrypt = require('bcrypt');
 
 const getAll = async () => {
@@ -61,7 +62,7 @@ const updateInfoStudent = async (masinhvien,ten,holot,ngaysinh,email,sodienthoai
     if(ten.indexOf(" ") !== -1)
         throw new Error("Mã và tên không chứa khoảng trắng !");
 
-    if(!holot || !ten || !email || !sodienthoai || !ngaysinh)
+    if(!holot || !ten || !email)
         throw new Error("Thiếu thông tin đầu vào !")
     return await studentRepository.update(masinhvien, ten, holot, ngaysinh, email, sodienthoai);
 }
@@ -80,9 +81,8 @@ const updateFaceIdStudent = async (masinhvien,faceid) => {
 const monHocCuaSinhVien = async (idSinhVien) => {
     if(!idSinhVien)
         throw new Error("Chưa truyền mã sinh viên !")
-    const monhoc = await classRepository.findMonHocCuaSinhVien(idSinhVien);
         
-    return monhoc.length === 0 ? null : monhoc
+    return await classRepository.findMonHocCuaSinhVien(idSinhVien)
 }
 
 module.exports = { getAll, getStudentById, createStudent, createBulk, deleteStudentById, updateInfoStudent,updateFaceIdStudent,monHocCuaSinhVien};

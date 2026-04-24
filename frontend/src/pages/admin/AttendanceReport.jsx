@@ -1,53 +1,91 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useAuth } from '../../context/AuthContext'; // Đảm bảo đường dẫn này đúng
 import './AttendanceReport.css';
 
-// Tầng 1: Dữ liệu mẫu danh sách Lớp
-const MOCK_CLASSES = [
-  { maLop: 'D22_TH02', tenLop: 'Lập trình Web', khoa: 'CNTT', siSo: 55 },
-  { maLop: 'D23_QT11', tenLop: 'Quản trị kinh doanh', khoa: 'QTKD', siSo: 45 },
-  { maLop: 'D24_TH01', tenLop: 'Cấu trúc dữ liệu', khoa: 'CNTT', siSo: 50 },
-  { maLop: 'D22_TH13', tenLop: 'Mạng máy tính', khoa: 'CNTT', siSo: 60 },
-  { maLop: 'D22_TH08', tenLop: 'Hệ điều hành', khoa: 'CNTT', siSo: 40 },
-];
-
-// Tầng 2: Buổi học (Dữ liệu gốc của bạn)
-const MOCK_SESSIONS = [
-  { id: 'BH122026', maLop: 'D22_TH02', ngayHoc: '12/2/2026', batDau: '7:00', ketThuc: '12:00' },
-  { id: 'BH102026', maLop: 'D23_QT11', ngayHoc: '10/2/2026', batDau: '7:00', ketThuc: '12:00' },
-  { id: 'BH102126', maLop: 'D24_TH01', ngayHoc: '10/2/2026', batDau: '12:35', ketThuc: '15:00' },
-  { id: 'BH092026', maLop: 'D22_TH13', ngayHoc: '9/2/2026', batDau: '3:10', ketThuc: '17:40' },
-  { id: 'BH122027', maLop: 'D22_TH08', ngayHoc: '9/2/2026', batDau: '7:00', ketThuc: '9:35' },
-];
-
-// Tầng 3: Chi tiết điểm danh (Dữ liệu gốc của bạn)
-const MOCK_DETAILS = [
-  { mssv: 'DH51245', maLop: 'D22_TH02', thoiGian: '7:10', ghiChu: 'Đi trễ', trangThai: 'Đã điểm danh' },
-  { mssv: 'DH51246', maLop: 'D22_TH02', thoiGian: '7:09', ghiChu: 'Nghỉ có phép', trangThai: 'Vắng' },
-  { mssv: 'DH51247', maLop: 'D22_TH02', thoiGian: '7:00', ghiChu: '--', trangThai: 'Vắng' },
-  { mssv: 'DH51248', maLop: 'D22_TH02', thoiGian: '7:00', ghiChu: '--', trangThai: 'Đã điểm danh' },
-  { mssv: 'DH51249', maLop: 'D22_TH02', thoiGian: '7:05', ghiChu: '--', trangThai: 'Đã điểm danh' },
-];
-
 const AttendanceReport = () => {
-  const [selectedClass, setSelectedClass] = useState(null); // Quản lý Lớp đang chọn
-  const [selectedSession, setSelectedSession] = useState(null); // Quản lý Buổi đang chọn
+  const { user } = useAuth(); // Lấy role để điều hướng API
+  const [classList, setClassList] = useState([]);
+  const [sessionList, setSessionList] = useState([]);
+  const [attendanceDetails, setAttendanceDetails] = useState([]);
+
+  // Trạng thái điều hướng
+  const [selectedClass, setSelectedClass] = useState(null); 
+  const [selectedSession, setSelectedSession] = useState(null); 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
 
+  const API_URL = process.env.REACT_APP_API_URL;
+  const token = localStorage.getItem('token');
+
+  /**
+   * TẦNG 1: Lấy danh sách Lớp học (Admin lấy hết, Teacher lấy lớp của mình)
+   */
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedClass, selectedSession]);
+    const fetchClasses = async () => {
+      try {
+        // Vì ông đã sửa BE nên cả Admin và Teacher đều gọi được vào endpoint này
+        // Tuy nhiên, Admin thường muốn xem TẤT CẢ các lớp thay vì chỉ lớp mình dạy
+        const endpoint = user?.role === 'admin' ? '/classes' : '/teachers/ds/monhoc';
+        
+        const res = await axios.get(`${API_URL}${endpoint}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setClassList(res.data);
+      } catch (err) {
+        console.error("Lỗi lấy danh sách lớp:", err);
+      }
+    };
+    if (token && user) fetchClasses();
+  }, [API_URL, token, user]);
 
-  // Logic lấy dữ liệu theo tầng hiện tại
+  /**
+   * TẦNG 2: Lấy danh sách Buổi học
+   */
+  const handleSelectClass = async (cls) => {
+    try {
+      const res = await axios.get(`${API_URL}/lessons/lop/${cls.malop}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSessionList(res.data);
+      setSelectedClass(cls);
+      setSearchTerm('');
+      setCurrentPage(1); // Reset trang để tránh lỗi trắng bảng
+    } catch (err) {
+      setSessionList([]);
+      setSelectedClass(cls);
+      setCurrentPage(1);
+    }
+  };
+
+  /**
+   * TẦNG 3: Lấy chi tiết điểm danh
+   */
+  const handleSelectSession = async (session) => {
+    try {
+      const res = await axios.get(`${API_URL}/diemDanh/buoihoc/${session.mabuoihoc}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAttendanceDetails(res.data?.data || res.data || []);
+      setSelectedSession(session);
+      setSearchTerm('');
+      setCurrentPage(1); 
+    } catch (err) {
+      console.error("Lỗi lấy chi tiết điểm danh:", err);
+    }
+  };
+
+  // Logic lọc dữ liệu
   const getCurrentData = () => {
-    if (selectedSession) {
-      return MOCK_DETAILS.filter(d => d.mssv.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-    if (selectedClass) {
-      return MOCK_SESSIONS.filter(s => s.maLop === selectedClass.maLop && s.id.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-    return MOCK_CLASSES.filter(c => c.maLop.toLowerCase().includes(searchTerm.toLowerCase()) || c.tenLop.toLowerCase().includes(searchTerm.toLowerCase()));
+    const cleanSearch = searchTerm.toLowerCase();
+    if (selectedSession) return attendanceDetails.filter(d => d.masinhvien.toLowerCase().includes(cleanSearch));
+    if (selectedClass) return sessionList.filter(s => s.mabuoihoc.toLowerCase().includes(cleanSearch));
+    return classList.filter(c => 
+      c.malop.toString().includes(cleanSearch) || 
+      (c.tenlop && c.tenlop.toLowerCase().includes(cleanSearch)) ||
+      (c.monhoc && c.monhoc.toLowerCase().includes(cleanSearch))
+    );
   };
 
   const filteredData = getCurrentData();
@@ -57,11 +95,11 @@ const AttendanceReport = () => {
   const Pagination = () => (
     totalPages > 1 && (
       <div className="modern-pagination">
-        <button className="p-nav" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>‹</button>
+        <button className="p-nav" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>‹</button>
         {[...Array(totalPages)].map((_, i) => (
           <button key={i + 1} className={`p-num ${currentPage === i + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
         ))}
-        <button className="p-nav" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>›</button>
+        <button className="p-nav" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>›</button>
       </div>
     )
   );
@@ -69,37 +107,29 @@ const AttendanceReport = () => {
   return (
     <div className="attendance-page">
       <div className="main-card">
-        
         {/* TẦNG 1: DANH SÁCH LỚP HỌC */}
         {!selectedClass && (
           <div className="list-section">
             <div className="page-header">
               <div className="title-group">
                 <h2 className="main-title">Thống kê theo Lớp</h2>
-                <p className="sub-title">Chọn một lớp để xem danh sách các buổi học</p>
+                <p className="sub-title">{user?.role === 'admin' ? 'Chế độ quản trị viên' : 'Lớp học của tôi'}</p>
               </div>
               <div className="modern-search">
-                <input type="text" placeholder="Tìm mã lớp hoặc tên môn..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                <button className="search-icon-btn">🔍</button>
+                <input type="text" placeholder="Tìm mã hoặc tên lớp..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               </div>
             </div>
             <div className="glass-table-wrapper">
               <table className="modern-table">
-                <thead>
-                  <tr>
-                    <th>Mã Lớp</th>
-                    <th>Tên Môn Học</th>
-                    <th>Khoa</th>
-                    <th>Sĩ Số</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Mã Lớp</th><th>Tên Lớp</th><th>Thời gian</th><th>Ngày học</th><th>Giờ học</th></tr></thead>
                 <tbody>
                   {currentItems.map((c) => (
-                    <tr key={c.maLop} onClick={() => setSelectedClass(c)} className="clickable-row">
-                      <td className="session-tag">{c.maLop}</td>
-                      <td className="font-600">{c.tenLop}</td>
-                      <td>{c.khoa}</td>
-                      <td className="font-600">{c.siSo}</td>
+                    <tr key={c.malop} onClick={() => handleSelectClass(c)} className="clickable-row">
+                      <td className="session-tag">{c.malop}</td>
+                      <td className="font-600">{c.tenlop || c.monhoc}</td>
+                      <td>{c.ngaybatdau} - {c.ngayketthuc}</td>
+                      <td>{c.ngayhoccodinh}</td>
+                      <td className="font-600">{c.giobatdau} - {c.gioketthuc}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -109,37 +139,19 @@ const AttendanceReport = () => {
           </div>
         )}
 
-        {/* TẦNG 2: DANH SÁCH BUỔI HỌC CỦA LỚP */}
+        {/* TẦNG 2: DANH SÁCH BUỔI HỌC */}
         {selectedClass && !selectedSession && (
           <div className="list-section">
-            <div className="detail-header-row">
-              <button className="back-btn-modern" onClick={() => setSelectedClass(null)}>← Trở lại danh sách lớp</button>
-              <div className="modern-search">
-                <input type="text" placeholder="Tìm mã buổi học..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                <button className="search-icon-btn">🔍</button>
-              </div>
-            </div>
-            <div className="page-header">
-              <h2 className="main-title">Lớp: {selectedClass.maLop}</h2>
-              <p className="sub-title">{selectedClass.tenLop}</p>
-            </div>
+            <button className="back-btn-modern" onClick={() => {setSelectedClass(null); setCurrentPage(1);}}>← Trở lại</button>
+            <h2 className="main-title">Lớp: {selectedClass.tenlop || selectedClass.monhoc}</h2>
             <div className="glass-table-wrapper">
               <table className="modern-table">
-                <thead>
-                  <tr>
-                    <th>Mã buổi</th>
-                    <th>Ngày học</th>
-                    <th>Bắt đầu</th>
-                    <th>Kết thúc</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Mã buổi</th><th>Ngày học</th><th>Bắt đầu</th><th>Kết thúc</th></tr></thead>
                 <tbody>
                   {currentItems.map((s) => (
-                    <tr key={s.id} onClick={() => setSelectedSession(s)} className="clickable-row">
-                      <td className="session-tag">{s.id}</td>
-                      <td>{s.ngayHoc}</td>
-                      <td>{s.batDau}</td>
-                      <td>{s.ketThuc}</td>
+                    <tr key={s.mabuoihoc} onClick={() => handleSelectSession(s)} className="clickable-row">
+                      <td className="session-tag">{s.mabuoihoc}</td>
+                      <td>{s.ngayhoc}</td><td>{s.giobatdau}</td><td>{s.gioketthuc}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -149,52 +161,33 @@ const AttendanceReport = () => {
           </div>
         )}
 
-        {/* TẦNG 3: CHI TIẾT ĐIỂM DANH BUỔI HỌC */}
+        {/* TẦNG 3: CHI TIẾT ĐIỂM DANH */}
         {selectedSession && (
           <div className="detail-section">
-            <div className="detail-header-row">
-              <button className="back-btn-modern" onClick={() => setSelectedSession(null)}>← Trở lại danh sách buổi</button>
-              <div className="modern-search detail-search">
-                <input type="text" placeholder="Tìm MSSV..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                <button className="search-icon-btn">🔍</button>
-              </div>
-            </div>
+            <button className="back-btn-modern" onClick={() => {setSelectedSession(null); setCurrentPage(1);}}>← Trở lại</button>
             <div className="detail-top-card">
               <div className="session-summary">
-                <h3>Lớp: <span>{selectedClass.maLop}</span></h3>
-                <div className="summary-pills">
-                  <span>Mã buổi: {selectedSession.id}</span>
-                  <span>📅 {selectedSession.ngayHoc}</span>
-                </div>
+                <h3>Buổi: <span>{selectedSession.mabuoihoc}</span></h3>
+                <div className="summary-pills"><span>📅 {selectedSession.ngayhoc}</span></div>
               </div>
               <div className="session-metrics">
-                <div className="metric-item"><span className="m-val">{selectedClass.siSo}</span><span className="m-lbl">SĨ SỐ</span></div>
-                <div className="metric-item highlight"><span className="m-val">40</span><span className="m-lbl">HIỆN DIỆN</span></div>
+                <div className="metric-item highlight"><span className="m-val">{attendanceDetails.length}</span><span className="m-lbl">TỔNG SV</span></div>
+                <div className="metric-item highlight">
+                  <span className="m-val">{attendanceDetails.filter(d => d.trangthai === 'Có mặt').length}</span>
+                  <span className="m-lbl">HIỆN DIỆN</span>
+                </div>
               </div>
             </div>
             <div className="glass-table-wrapper">
               <table className="modern-table">
-                <thead>
-                  <tr>
-                    <th>MSSV</th>
-                    <th>MÃ LỚP</th>
-                    <th>CẬP NHẬT</th>
-                    <th className="hide-sm">GHI CHÚ</th>
-                    <th>TRẠNG THÁI</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>MSSV</th><th>THỜI GIAN QUÉT</th><th>GHI CHÚ</th><th>TRẠNG THÁI</th></tr></thead>
                 <tbody>
                   {currentItems.map((d, i) => (
                     <tr key={i}>
-                      <td className="font-600">{d.mssv}</td>
-                      <td>{d.maLop}</td>
-                      <td className="font-600">{d.thoiGian}</td>
-                      <td className="hide-sm">{d.ghiChu}</td>
-                      <td>
-                        <span className={`status-text ${d.trangThai === 'Đã điểm danh' ? 'text-present' : 'text-absent'}`}>
-                          {d.trangThai}
-                        </span>
-                      </td>
+                      <td className="font-600">{d.masinhvien}</td>
+                      <td>{d.thoigiancapnhat ? new Date(d.thoigiancapnhat).toLocaleTimeString('vi-VN') : '--:--'}</td>
+                      <td>{d.ghichu || '--'}</td>
+                      <td><span className={`status-text ${d.trangthai === 'Có mặt' ? 'text-present' : 'text-absent'}`}>{d.trangthai}</span></td>
                     </tr>
                   ))}
                 </tbody>
