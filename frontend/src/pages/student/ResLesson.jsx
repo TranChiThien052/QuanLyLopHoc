@@ -43,9 +43,9 @@ const ResLesson = () => {
           }
         );
 
-        console.log('Current student faceID:', studentInfo.faceid);
+        console.log('Current student faceID:', studentInfo.data.faceid);
 
-        setFaceId(studentInfo.faceid);
+        setFaceId(studentInfo.data.faceid);
 
         // Fetch all attendance records for this lesson
         const response = await axios.get(
