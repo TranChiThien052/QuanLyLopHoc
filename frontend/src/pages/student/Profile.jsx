@@ -17,6 +17,7 @@ export default function StudentProfile() {
     sodienthoai: ""
   });
   const [loading, setLoading] = useState(true);
+  const [hasFaceId, setHasFaceId] = useState(false); // Lưu trạng thái đã có FaceID hay chưa
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,6 +41,10 @@ export default function StudentProfile() {
             email: myProfile.email || "",
             sodienthoai: myProfile.sodienthoai || ""
           });
+
+          const checkFace = !!(myProfile.faceid && myProfile.faceid.length > 0);
+          setHasFaceId(checkFace);
+
         } else {
           setFormData(prev => ({ ...prev, ma: studentId }));
         }
@@ -169,11 +174,17 @@ export default function StudentProfile() {
             <button 
               className="btn-face-id-link" 
               onClick={() => navigate('/student/register-face')}
+              disabled={hasFaceId} 
+              style={hasFaceId ? { cursor: 'not-allowed', opacity: 0.6 } : {}}
             >
-              🔄 Cập nhật FaceID
+              {hasFaceId ? "✅ Đã đăng ký FaceID" : "🔄 Cập nhật FaceID"}
             </button>
           </div>
-
+          {hasFaceId && (
+            <p style={{ color: "#27ae60", fontSize: "13px", fontWeight: "600", marginTop: "10px", textAlign: "center" }}>
+              Bạn đã hoàn tất đăng ký nhận diện khuôn mặt. Vui lòng liên hệ Giáo vụ nếu cần đăng ký lại.
+            </p>
+          )}
         </div>
       </div>
     </div>

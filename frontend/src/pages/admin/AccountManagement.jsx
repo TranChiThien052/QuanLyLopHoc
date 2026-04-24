@@ -179,10 +179,24 @@ const AccountManagement = () => {
     e.preventDefault();
     try {
       const cleanId = formData.ma.trim();
-      const path = activeTab === 'sinhvien' ? `/students/${cleanId}` : `/teachers/${cleanId}`;
-      const updateData = { holot: formData.ho, ten: formData.ten, ngaysinh: formData.ngaySinh, email: formData.email, sodienthoai: formData.sodienthoai, ...(activeTab === 'sinhvien' && { malop: formData.malop }) };
-      await api.put(path, updateData);
-      alert("Cập nhật thành công!");
+      const path = activeTab === 'sinhvien' 
+        ? `/students/update/${cleanId}` 
+        : `/teachers/update/${cleanId}`;
+
+      const updateData = { 
+        holot: formData.ho, 
+        ten: formData.ten, 
+        ngaysinh: formData.ngaySinh, 
+        email: formData.email, 
+        sodienthoai: formData.sodienthoai, 
+        ...(activeTab === 'sinhvien' && { malop: formData.malop }) 
+      };
+
+      await api.put(path, updateData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+
+      alert("Cập nhật thông tin thành công!");
       setShowEditModal(false);
       loadProfiles();
     } catch (error) { alert("Lỗi cập nhật dữ liệu!"); }
@@ -191,7 +205,6 @@ const AccountManagement = () => {
   const handleResetPassword = async (username) => {
     if (window.confirm(`Reset mật khẩu cho ${username}?`)) {
       try {
-        // Khớp với Route /accounts/:username
         await api.put(`/accounts/${username}`, {
           mataikhoan: username,
           password: username,

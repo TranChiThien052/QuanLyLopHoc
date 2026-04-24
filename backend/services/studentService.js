@@ -2,6 +2,7 @@ const studentRepository = require("../repositories/studentRepository");
 const accountRepository  = require("../repositories/accountRepository");
 const classRepository = require("../repositories/classRepository");
 const lopsinhvienRepository = require("../repositories/lopsinhvienRepository");
+const diemdanhRepository = require("../repositories/diemdanhRepository");
 
 
 const bcrypt = require('bcrypt');
@@ -48,7 +49,8 @@ const deleteStudentById = async (masinhvien) => {
     if(!masinhvien)
         throw new Error("Vui lòng truyền mã !");
     await lopsinhvienRepository.xoaSinhVienKhoiLopHoc(masinhvien);
-    await accountRepository.xoaSinhVienKhoiLopHoc(masinhvien);
+    //await accountRepository.xoaSinhVienKhoiLopHoc(masinhvien);
+    await diemdanhRepository.xoaSinhVienKhoiLopHoc(masinhvien);
     let studentDelete = await studentRepository.destroy(masinhvien);
 
     if(!studentDelete)
