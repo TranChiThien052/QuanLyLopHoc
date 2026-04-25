@@ -52,8 +52,7 @@ const ResLesson = () => {
   const [madiemdanh, setMaDiemDanh] = useState(state?.madiemdanh || null);
   const [monhoc, setMonHoc] = useState(state?.monhoc || null);
   const [tenlop, setTenLop] = useState(state?.tenlop || null);
-  console.log('State received in ResLesson:', state);
-  console.log('URL params - mabuoihoc:', mabuoihoc);
+  const [deviceLocation] = useState(state?.deviceLocation || null);
 
   // Fetch student attendance data if navigating via URL
   useEffect(() => {
@@ -156,14 +155,12 @@ const ResLesson = () => {
     setMsg('Đang nhận diện mặt (5 lần)...');
 
     try {
-
       const studentInfo = await axios.get(
         `${process.env.REACT_APP_API_URL}/students/info/student`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }
       );
-      console.log('Fetched student info from API:', studentInfo.data);
       for (let i = 1; i <= 5; i += 1) {
         setMsg(`Quét mặt: ${i}/5...`);
         const detection = await faceapi
@@ -178,72 +175,81 @@ const ResLesson = () => {
       }
 
       if (descriptors.length === 0) {
-        throw new Error('Không thu được descriptor khuôn mặt');
-      }
+        trangThaiDiemDanh = 'Đang xem xét';
+        ghiChu = 'không thể quét được khuôn mặt';
 
-      const descriptorLength = descriptors[0].length;
-      const averageDescriptor = Array.from({ length: descriptorLength }, (_, idx) => {
-        const sum = descriptors.reduce((acc, descriptor) => acc + descriptor[idx], 0);
-        return sum / descriptors.length;
-      });
-      console.log("Student's average descriptor:", studentInfo.data.faceid);
-      console.log('Average descriptor:', averageDescriptor);
-
-      const distance = faceapi.euclideanDistance(averageDescriptor, studentInfo.data.faceid);
-
-      console.log('Distance to stored faceID:', distance);
-
-      if (distance > 0.4) {
-        const studentLocation = await getCurrentLocation();
-        gpsString = `${studentLocation.lat},${studentLocation.lon}`;
-        trangThaiDiemDanh = 'Xem xét';
-        ghiChu = 'Khuôn mặt không khớp';
-        
-        setMsg('Đang gửi dữ liệu lên máy chủ...');
-      }
-      else{
-      // ---- BẮT ĐẦU XỬ LÝ GPS ----
-      setMsg('Đang lấy vị trí hiện tại (GPS)...');
-      
-      
-      // Thay bằng tọa độ thực tế nơi diễn ra buổi học 
-      // (VD: Đây là toạ độ tham khảo lấy theo Google Maps)
-      const TARGET_LAT = 10.738028962835843; //Vĩ độ trường
-      const TARGET_LON = 106.67793576132826; //Kinh độ trường
-
-      // const TARGET_LAT = 10.747572888673872; //Vĩ độ STU
-      // const TARGET_LON = 106.68251246342655; //Kinh độ STU 10.747572888673872, 106.68251246342655
-      
-      try {
-        const studentLocation = await getCurrentLocation();
-        
-        // Tính khoảng cách
-        const distanceToClass = getDistanceInMeters(
-          studentLocation.lat, studentLocation.lon, 
-          TARGET_LAT, TARGET_LON
-        );
-        
-        console.log(`Khoảng cách đo được: ${distanceToClass.toFixed(2)} mét`);
-        
-        // Nếu cách xa hơn 50m => đưa vào trạng thái cần xem xét
-        if (distanceToClass > 50) {
-          trangThaiDiemDanh = 'Đang xem xét';
-          ghiChu = 'Sinh viên nằm ngoài vùng điểm danh';
+        try {
+          const studentLocation = await getCurrentLocation();
+          gpsString = `${studentLocation.lat},${studentLocation.lon}`;
+        } catch (geoError) {
+          console.error('Lỗi khi lấy GPS:', geoError);
         }
+
+        setMsg('Đang gửi dữ liệu lên máy chủ...');
+      } else {
+        const descriptorLength = descriptors[0].length;
+
+        const averageDescriptor = Array.from({ length: descriptorLength }, (_, idx) => {
+          const sum = descriptors.reduce((acc, descriptor) => acc + descriptor[idx], 0);
+          return sum / descriptors.length;
+        });
+
+        const distance = faceapi.euclideanDistance(averageDescriptor, studentInfo.data.faceid);
+
+        if (distance > 0.4) {
+          const studentLocation = await getCurrentLocation();
+          gpsString = `${studentLocation.lat},${studentLocation.lon}`;
+          trangThaiDiemDanh = 'Xem xét';
+          ghiChu = 'Khuôn mặt không khớp';
+
+          setMsg('Đang gửi dữ liệu lên máy chủ...');
+        } else {
+        // ---- BẮT ĐẦU XỬ LÝ GPS ----
+        setMsg('Đang lấy vị trí hiện tại (GPS)...');
         
-        // Format chuỗi GPS truyền lên Backend (Lat,Lon) nếu BE cần thiết lưu lịch sử vị trí
-        gpsString = studentLocation.lat + ',' + studentLocation.lon;
-        console.log('Vị trí GPS của sinh viên:', gpsString);
         
-      } catch (geoError) {
-        console.error('Lỗi khi lấy GPS:', geoError);
-        // Tùy theo logic dự án: nếu sinh viên không mở quyền truy cập GPS thì tự động đánh dấu "Xem xét"
-        trangThaiDiemDanh = 'Đang xem xét'; 
+        // Thay bằng tọa độ thực tế nơi diễn ra buổi học 
+        // (VD: Đây là toạ độ tham khảo lấy theo Google Maps)
+        const TARGET_LAT = deviceLocation?.latitude; //Vĩ độ lớp học tham chiếu
+        const TARGET_LON = deviceLocation?.longitude; //Kinh độ lớp học tham chiếu
+
+        // const TARGET_LAT = 10.747572888673872; //Vĩ độ STU
+        // const TARGET_LON = 106.68251246342655; //Kinh độ STU 10.747572888673872, 106.68251246342655
+        
+        try {
+          const studentLocation = await getCurrentLocation();
+          
+          // Tính khoảng cách
+          if (typeof TARGET_LAT !== 'number' || typeof TARGET_LON !== 'number') {
+            trangThaiDiemDanh = 'Đang xem xét';
+            ghiChu = 'Thiếu vị trí tham chiếu của buổi học';
+          } else {
+            const distanceToClass = getDistanceInMeters(
+              studentLocation.lat, studentLocation.lon,
+              TARGET_LAT, TARGET_LON
+            );
+          
+          // Nếu cách xa hơn 50m => đưa vào trạng thái cần xem xét
+            if (distanceToClass > 50) {
+              
+              trangThaiDiemDanh = 'Đang xem xét';
+              ghiChu = 'Sinh viên nằm ngoài vùng điểm danh';
+            }
+          }
+          
+          // Format chuỗi GPS truyền lên Backend (Lat,Lon) nếu BE cần thiết lưu lịch sử vị trí
+          gpsString = studentLocation.lat + ',' + studentLocation.lon;
+          console.log('Vị trí GPS của sinh viên:', gpsString);
+          
+        } catch (geoError) {
+          console.error('Lỗi khi lấy GPS:', geoError);
+          // Tùy theo logic dự án: nếu sinh viên không mở quyền truy cập GPS thì tự động đánh dấu "Xem xét"
+          trangThaiDiemDanh = 'Đang xem xét'; 
+        }
+        setMsg('Đang gửi dữ liệu lên máy chủ...');
+        }
       }
-      setMsg('Đang gửi dữ liệu lên máy chủ...');
-    }   
     } catch (error) {
-      console.log(error);
       setStep('error');
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
@@ -258,7 +264,7 @@ const ResLesson = () => {
         });
         setStep('success');
         setMsg(`ĐÃ LƯU DỮ LIỆU ĐIỂM DANH! (Trạng thái: ${trangThaiDiemDanh})`);
-  }, [madiemdanh, masinhvien]);
+  }, [madiemdanh, masinhvien, deviceLocation?.latitude, deviceLocation?.longitude]);
 
   // Luôn mở camera trước để ưu tiên thiết bị điện thoại.
   useEffect(() => {
@@ -327,6 +333,13 @@ const ResLesson = () => {
           <p>MSSV: <strong>{masinhvien || 'N/A'}</strong></p>
           <p>Môn: <strong>{monhoc || 'Đang tải...'}</strong></p>
           <p>Lớp: <strong>{tenlop || 'Đang tải...'}</strong></p>
+          <p>
+            Vị trí thiết bị: <strong>
+              {deviceLocation
+                ? `${deviceLocation.latitude.toFixed(6)}, ${deviceLocation.longitude.toFixed(6)} (±${Math.round(deviceLocation.accuracy)}m)`
+                : 'Không có dữ liệu'}
+            </strong>
+          </p>
         </div>
 
         <div className="viewport-cam">

@@ -4,6 +4,28 @@ import jsQR from 'jsqr'; // Đảm bảo đã chạy: npm install jsqr
 import axios from 'axios';
 import './Attendance.css';
 
+const getDeviceLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Trình duyệt không hỗ trợ geolocation.'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: position.timestamp
+        });
+      },
+      (error) => reject(error),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+};
+
 const Attendance = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -49,6 +71,13 @@ const Attendance = () => {
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
 
       if (record) {
+        let deviceLocation = null;
+        try {
+          deviceLocation = await getDeviceLocation();
+        } catch (locationError) {
+          console.warn('Không lấy được vị trí thiết bị:', locationError);
+        }
+
         const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lessons/${mabuoihoc}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
@@ -63,7 +92,8 @@ const Attendance = () => {
             masinhvien: student.masinhvien,
             madiemdanh: record.madiemdanh,
             tenlop: resClass.data.tenlop,
-            monhoc: resClass.data.monhoc
+            monhoc: resClass.data.monhoc,
+            deviceLocation
           }
         });
       } else {
@@ -76,7 +106,7 @@ const Attendance = () => {
     } finally {
       isProcessing.current = false;
     }
-  }, [student]);
+  }, [student, navigate]);
 
   /**
    * 3. Giải mã QR từ Camera
