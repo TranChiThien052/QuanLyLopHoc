@@ -1,4 +1,5 @@
 const diemDanhService = require('../services/diemDanhService');
+const { uploadAttendanceImage } = require('../config/cloudinary');
 
 const findAll = async (req, res) => {
     try {
@@ -82,22 +83,26 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     const { maDiemDanh } = req.params;
-    console.log("===> PAYLOAD RECEIVED:", req.body); // Check payload
-    // Hỗ trợ nhận cả gps (chữ thường) lẫn GPS (chữ hoa)
     const receivedGPS = req.body.gps !== undefined ? req.body.gps : req.body.GPS;
     const finalGPS = receivedGPS ? String(receivedGPS) : null;
-    console.log("===> FINAL GPS EXTRACTED:", finalGPS); // Check derived value
 
     const { trangThai, ghiChu, maNguoiCapNhat } = req.body;
     const thoiGianCapNhat = new Date();
     try {
+        let anhDiemDanhUrl = null;
+        if (req.file && req.file.buffer) {
+            const uploadResult = await uploadAttendanceImage(req.file.buffer, maDiemDanh);
+            anhDiemDanhUrl = uploadResult.secure_url;
+        }
+
         const updatedDiemDanh = await diemDanhService.update(
             maDiemDanh,
             trangThai,
-            ghiChu || null,
+            ghiChu,
             thoiGianCapNhat,
             maNguoiCapNhat,
-            finalGPS
+            finalGPS,
+            anhDiemDanhUrl
         );
         res.json(updatedDiemDanh);
     } catch (error) {

@@ -1,9 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as faceapi from '@vladmandic/face-api';
+import axios from 'axios';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import './FaceRegistration.css';
+
+const captureFrameFromVideo = (videoElement) => {
+  return new Promise((resolve) => {
+    if (!videoElement || !videoElement.videoWidth || !videoElement.videoHeight) {
+      resolve(null);
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+      resolve(null);
+      return;
+    }
+
+    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+  });
+};
 
 const FaceRegistration = () => {
   const { user } = useAuth();
@@ -81,9 +104,18 @@ const FaceRegistration = () => {
 
       const faceDescriptorArray = Array.from(detection.descriptor);
       const studentId = user?.masinhvien || user?.id;
+      const faceImageBlob = await captureFrameFromVideo(videoRef.current);
 
-      await api.put(`${process.env.REACT_APP_API_URL}/students/update-faceid`, 
-        { faceid: faceDescriptorArray },
+      if (!faceImageBlob) {
+        throw new Error('Khong chup duoc anh tu camera');
+      }
+
+      const formData = new FormData();
+      formData.append('faceid', JSON.stringify(faceDescriptorArray));
+      formData.append('faceImage', faceImageBlob, `${studentId || 'student'}.jpg`);
+
+      await axios.put(`${process.env.REACT_APP_API_URL}/students/update-faceid`, 
+        formData,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 

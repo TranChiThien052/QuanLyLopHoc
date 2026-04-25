@@ -1,6 +1,7 @@
 const studentService = require("../services/studentService");
 const accountService = require("../services/accountService");
 const XLSX = require('xlsx');
+const { uploadStudentFaceImage } = require('../config/cloudinary');
 
 const pickValue = (row, keys) => {
     for (const key of keys) {
@@ -225,8 +226,26 @@ const updateInfoStudentByAdmin = async (req,res) => {
 const updateFaceIdStudent = async (req,res) => {
     try {
         const masinhvien = req.user.id
-        const {faceid} = req.body
-        const student = await studentService.updateFaceIdStudent(masinhvien,faceid);
+        let { faceid } = req.body;
+
+        if (typeof faceid === 'string') {
+            try {
+                faceid = JSON.parse(faceid);
+            } catch (error) {
+                throw new Error('FaceID khong dung dinh dang JSON');
+            }
+        }
+
+        let imgUrl = null;
+        if (req.file && req.file.buffer) {
+            const uploadResult = await uploadStudentFaceImage(req.file.buffer, masinhvien);
+            imgUrl = uploadResult.secure_url;
+        }
+
+        const student = await studentService.updateFaceIdStudent(masinhvien, faceid, imgUrl);
+
+        console.log("FaceID sau khi cập nhật:", student.faceid);
+        console.log("URL ảnh sau khi cập nhật:", student.img_url);
 
         let response = {}
         if(!student) {

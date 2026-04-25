@@ -37,6 +37,28 @@ const getCurrentLocation = () => {
   });
 };
 
+const captureFrameFromVideo = (videoElement) => {
+  return new Promise((resolve) => {
+    if (!videoElement || !videoElement.videoWidth || !videoElement.videoHeight) {
+      resolve(null);
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+      resolve(null);
+      return;
+    }
+
+    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+  });
+};
+
 const ResLesson = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -150,6 +172,7 @@ const ResLesson = () => {
     let trangThaiDiemDanh = 'Có mặt';
     let ghiChu = '';
     let gpsString = '';
+    let attendanceImageBlob;
     
     isProcessing.current = true;
     setMsg('Đang nhận diện mặt (5 lần)...');
@@ -173,6 +196,8 @@ const ResLesson = () => {
         }
         await new Promise((resolve) => setTimeout(resolve, 220));
       }
+
+      attendanceImageBlob = await captureFrameFromVideo(videoRef.current)
 
       if (descriptors.length === 0) {
         trangThaiDiemDanh = 'Đang xem xét';
@@ -254,14 +279,19 @@ const ResLesson = () => {
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
     }
-      await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
-          trangThai: trangThaiDiemDanh,
-          maNguoiCapNhat: masinhvien,
-          ghiChu: ghiChu,
-          GPS: gpsString // Truyền thêm GPS string lên DB
-        }, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+      const formData = new FormData();
+      formData.append('trangThai', trangThaiDiemDanh);
+      formData.append('maNguoiCapNhat', masinhvien);
+      formData.append('ghiChu', ghiChu);
+      formData.append('GPS', gpsString);
+
+      if (attendanceImageBlob) {
+        formData.append('attendanceImage', attendanceImageBlob, `${madiemdanh}.jpg`);
+      }
+
+      await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, formData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
         setStep('success');
         setMsg(`ĐÃ LƯU DỮ LIỆU ĐIỂM DANH! (Trạng thái: ${trangThaiDiemDanh})`);
   }, [madiemdanh, masinhvien, deviceLocation?.latitude, deviceLocation?.longitude]);
