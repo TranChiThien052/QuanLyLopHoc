@@ -37,5 +37,6 @@ router.delete("/:masinhvien",authenController.authenticate,authenController.auth
 router.put("/", authenController.authenticate,authenController.authorize(['student']),studentController.updateInfoStudent);
 router.put("/update/:masinhvien", authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.updateInfoStudentByAdmin);
 router.put('/update-faceid',authenController.authenticate,authenController.authorize(['student']),studentController.updateFaceIdStudent);
+router.put('/reset-faceid/:masinhvien',authenController.authenticate,authenController.authorize(['admin']),studentController.resetFaceIdStudent);
 router.get('/ds/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 module.exports = router;

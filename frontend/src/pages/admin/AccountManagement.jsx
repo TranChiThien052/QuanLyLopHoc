@@ -235,12 +235,20 @@ const handleEditSubmit = async (e) => {
 
   // AccountManagement.jsx
 
-  const handleResetFaceID = () => {
+  const handleResetFaceID = async () => {
     const id = formData.ma;
     // Hiện confirm để tránh bấm nhầm
     if (window.confirm(`Bạn có muốn chuẩn bị Reset FaceID cho sinh viên ${id} không?`)) {
       console.log("Sẵn sàng Reset FaceID cho mã:", id);
-      alert("Nút đã sẵn sàng!");
+      try {
+        await api.put(`/students/reset-faceid/${id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        alert("Reset FaceID thành công!");
+      } catch (error) {
+        console.error("Lỗi reset FaceID:", error);
+        alert("Reset FaceID thất bại!");
+      }
     }
   };
 
