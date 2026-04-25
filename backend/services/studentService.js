@@ -89,4 +89,11 @@ const monHocCuaSinhVien = async (idSinhVien) => {
     return await classRepository.findMonHocCuaSinhVien(idSinhVien)
 }
 
-module.exports = { getAll, getStudentById, createStudent, createBulk, deleteStudentById, updateInfoStudent,updateFaceIdStudent,monHocCuaSinhVien};
+const resetFaceIdStudent = async (masinhvien) => {
+    let student = await studentRepository.resetFaceId(masinhvien);
+    if(!student)
+        throw new Error("Không tìm thấy sinh viên !")
+    return student
+}
+
+module.exports = { getAll, getStudentById, createStudent, createBulk, deleteStudentById, updateInfoStudent,updateFaceIdStudent,monHocCuaSinhVien, resetFaceIdStudent};

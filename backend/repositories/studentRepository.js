@@ -21,6 +21,14 @@ const update = async ( masinhvien,ten,holot,ngaysinh,email,sodienthoai) => {
     return await student.update({ ten,holot,ngaysinh,email,sodienthoai});
 };
 
+const resetFaceId = async (masinhvien) => {
+    const student = await SinhVien.findOne({
+        where: { masinhvien }
+    });
+    if (!student) return null;
+    return await student.update({ faceid: null });
+};
+
 const destroy = async (masinhvien) => {
   const student = await SinhVien.findOne({
     where: {
@@ -61,4 +69,4 @@ const updateFaceId = async ( masinhvien,faceid) => {
     return await student.update({faceid});
 };
 
-module.exports = { findAll, findByMaSinhVien, create, createBulk, update, destroy, updateFaceId };
+module.exports = { findAll, findByMaSinhVien, create, createBulk, update, destroy, updateFaceId, resetFaceId };

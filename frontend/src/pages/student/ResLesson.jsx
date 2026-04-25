@@ -146,14 +146,16 @@ const ResLesson = () => {
   const handleFaceID = useCallback(async () => {
     if (isProcessing.current || !madiemdanh || !masinhvien) return;
 
+
+    let descriptors = [];
+    let trangThaiDiemDanh = 'Có mặt';
+    let ghiChu = '';
+    let gpsString = '';
+    
     isProcessing.current = true;
     setMsg('Đang nhận diện mặt (5 lần)...');
 
     try {
-      let descriptors = [];
-      let trangThaiDiemDanh = 'Có mặt';
-      let ghiChu = '';
-      let gpsString = '';
 
       const studentInfo = await axios.get(
         `${process.env.REACT_APP_API_URL}/students/info/student`,
@@ -196,6 +198,8 @@ const ResLesson = () => {
         gpsString = `${studentLocation.lat},${studentLocation.lon}`;
         trangThaiDiemDanh = 'Xem xét';
         ghiChu = 'Khuôn mặt không khớp';
+        
+        setMsg('Đang gửi dữ liệu lên máy chủ...');
       }
       else{
       // ---- BẮT ĐẦU XỬ LÝ GPS ----
@@ -237,35 +241,23 @@ const ResLesson = () => {
         trangThaiDiemDanh = 'Đang xem xét'; 
       }
       setMsg('Đang gửi dữ liệu lên máy chủ...');
-      
-      await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
-        trangThai: trangThaiDiemDanh,
-        maNguoiCapNhat: masinhvien,
-        ghiChu: ghiChu,
-        GPS: gpsString // Truyền thêm GPS string lên DB
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setStep('success');
-      setMsg(`ĐIỂM DANH THÀNH CÔNG! ✅ (Trạng thái: ${trangThaiDiemDanh})`);
-    }
-      // ---- GỌI API CẬP NHẬT TRẠNG THÁI ----
-      
-
-      // await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
-      //   trangThai: 'Có mặt',
-      //   maNguoiCapNhat: masinhvien
-      // }, {
-      //   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      // });
-
-      
+    }   
     } catch (error) {
       console.log(error);
       setStep('error');
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
     }
+      await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, {
+          trangThai: trangThaiDiemDanh,
+          maNguoiCapNhat: masinhvien,
+          ghiChu: ghiChu,
+          GPS: gpsString // Truyền thêm GPS string lên DB
+        }, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        setStep('success');
+        setMsg(`ĐÃ LƯU DỮ LIỆU ĐIỂM DANH! (Trạng thái: ${trangThaiDiemDanh})`);
   }, [madiemdanh, masinhvien]);
 
   // Luôn mở camera trước để ưu tiên thiết bị điện thoại.

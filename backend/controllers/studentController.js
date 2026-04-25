@@ -271,6 +271,34 @@ const getMonHocCuaSinhVien =  async (req, res) => {
     }
 }
 
+const resetFaceIdStudent = async (req,res) => {
+    try {
+        const { masinhvien } = req.params;
+        if (!masinhvien || masinhvien.trim() === '') {
+            return res.status(400).json({ code: 400, message: "Mã sinh viên không hợp lệ!" });
+        }
+
+        const student = await studentService.resetFaceIdStudent(masinhvien);
+
+        let response = {};
+        if (!student) {
+            response.code = 404;
+            response.message = "Không tìm thấy sinh viên !";
+        } else {
+            response = student;
+        }
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(
+            { 
+                code: 999,
+                message: error.message 
+            }
+        );
+    }
+}
+
 module.exports = { 
     getAll, 
     getStudentById, 
@@ -281,5 +309,6 @@ module.exports = {
     updateFaceIdStudent,
     getMonHocCuaSinhVien,
     getInfoStudentById,
-    updateInfoStudentByAdmin
+    updateInfoStudentByAdmin,
+    resetFaceIdStudent
 };
