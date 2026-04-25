@@ -46,6 +46,10 @@ module.exports = (sequelize) => {
         type: DataTypes.ARRAY(DataTypes.DOUBLE),
         allowNull: true,
       },
+      img_url: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     {
       tableName: "sinhvien",

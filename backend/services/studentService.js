@@ -71,11 +71,11 @@ const updateInfoStudent = async (masinhvien,ten,holot,ngaysinh,email,sodienthoai
     return await studentRepository.update(masinhvien, ten, holot, ngaysinh, email, sodienthoai);
 }
 
-const updateFaceIdStudent = async (masinhvien,faceid) => {
+const updateFaceIdStudent = async (masinhvien,faceid,imgUrl) => {
     if(!Array.isArray(faceid) || !faceid)
         throw new Error("Sai faceId, vui lòng thử lại sau !");
 
-    let student = await studentRepository.updateFaceId(masinhvien,faceid);
+    let student = await studentRepository.updateFaceId(masinhvien,faceid,imgUrl);
     if(!student)
         throw new Error("Không tìm thấy sinh viên !")
 

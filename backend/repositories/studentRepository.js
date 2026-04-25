@@ -26,7 +26,7 @@ const resetFaceId = async (masinhvien) => {
         where: { masinhvien }
     });
     if (!student) return null;
-    return await student.update({ faceid: null });
+    return await student.update({ faceid: null, img_url: null });
 };
 
 const destroy = async (masinhvien) => {
@@ -60,13 +60,14 @@ const createBulk = async (listSinhVien) => {
     });
 }
 
-const updateFaceId = async ( masinhvien,faceid) => {
+const updateFaceId = async ( masinhvien,faceid,imgUrl) => {
     const student = await SinhVien.findOne({
         where: {
             masinhvien: masinhvien
         }});
     if (!student) return null;
-    return await student.update({faceid});
+    const finalImgUrl = imgUrl !== undefined && imgUrl !== null ? imgUrl : student.img_url;
+    return await student.update({faceid, img_url: finalImgUrl});
 };
 
 module.exports = { findAll, findByMaSinhVien, create, createBulk, update, destroy, updateFaceId, resetFaceId };

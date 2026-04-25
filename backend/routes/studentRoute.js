@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const studentController = require("../controllers/studentController");
 const authenController = require('../controllers/authController');
+const studentFaceImageUpload = require('../middlewares/studentFaceImageUpload');
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -36,7 +37,14 @@ router.post("/bulk", authenController.authenticate, authenController.authorize([
 router.delete("/:masinhvien",authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.deleteStudentById);
 router.put("/", authenController.authenticate,authenController.authorize(['student']),studentController.updateInfoStudent);
 router.put("/update/:masinhvien", authenController.authenticate,authenController.authorize(['admin','teacher']),studentController.updateInfoStudentByAdmin);
-router.put('/update-faceid',authenController.authenticate,authenController.authorize(['student']),studentController.updateFaceIdStudent);
+router.put('/update-faceid',authenController.authenticate,authenController.authorize(['student']), (req, res, next) => {
+    studentFaceImageUpload.single('faceImage')(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        next();
+    });
+}, studentController.updateFaceIdStudent);
 router.put('/reset-faceid/:masinhvien',authenController.authenticate,authenController.authorize(['admin']),studentController.resetFaceIdStudent);
 router.get('/ds/monhoc',authenController.authenticate,authenController.authorize(['student']),studentController.getMonHocCuaSinhVien);
 module.exports = router;

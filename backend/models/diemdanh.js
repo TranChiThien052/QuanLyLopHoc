@@ -32,6 +32,10 @@ module.exports = (sequelize) => {
       gps: {
         type: DataTypes.TEXT,
         allowNull: true
+      },
+      img_url: {
+        type: DataTypes.TEXT,
+        allowNull: true
       }
     },
     {
