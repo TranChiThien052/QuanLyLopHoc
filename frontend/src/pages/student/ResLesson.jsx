@@ -364,13 +364,6 @@ const ResLesson = () => {
           <p>MSSV: <strong>{masinhvien || 'N/A'}</strong></p>
           <p>Môn: <strong>{monhoc || 'Đang tải...'}</strong></p>
           <p>Lớp: <strong>{tenlop || 'Đang tải...'}</strong></p>
-          <p>
-            Vị trí thiết bị: <strong>
-              {deviceLocation
-                ? `${deviceLocation.latitude.toFixed(6)}, ${deviceLocation.longitude.toFixed(6)} (±${Math.round(deviceLocation.accuracy)}m)`
-                : 'Không có dữ liệu'}
-            </strong>
-          </p>
           <p>Độ lệch GPS cho phép: <strong>{gpsToleranceMeters}m</strong></p>
         </div>
 
