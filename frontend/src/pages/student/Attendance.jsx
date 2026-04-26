@@ -30,6 +30,7 @@ const Attendance = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get('sessionId'); // Lấy ID từ ?sessionId=...
+  const gpsToleranceFromLink = Number(searchParams.get('gpsTolerance'));
 
   const videoRef = useRef(null);
   const canvasRef = useRef(document.createElement('canvas')); 
@@ -57,11 +58,14 @@ const Attendance = () => {
   /**
    * 2. Xác thực Buổi học (Fix lỗi N/A)
    */
-  const handleVerifyQR = useCallback(async (mabuoihoc) => {
+  const handleVerifyQR = useCallback(async (mabuoihoc, gpsToleranceParam) => {
     if (!mabuoihoc || !student?.masinhvien || isProcessing.current) return;
     isProcessing.current = true;
     setStep('verifying');
     setMsg('Đã nhận mã! Đang kiểm tra danh sách lớp...');
+
+    const parsedTolerance = Number(gpsToleranceParam);
+    const gpsToleranceMeters = Number.isFinite(parsedTolerance) && parsedTolerance > 0 ? parsedTolerance : 50;
 
     try {
       const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`, {
@@ -93,7 +97,8 @@ const Attendance = () => {
             madiemdanh: record.madiemdanh,
             tenlop: resClass.data.tenlop,
             monhoc: resClass.data.monhoc,
-            deviceLocation
+            deviceLocation,
+            gpsToleranceMeters
           }
         });
       } else {
@@ -125,9 +130,11 @@ const Attendance = () => {
 
       if (code) {
         // Trích xuất ID từ link quét được
-        const params = new URLSearchParams(code.data.split('?')[1]);
+        const isLink = typeof code.data === 'string' && code.data.includes('?');
+        const params = new URLSearchParams(isLink ? code.data.split('?')[1] : '');
         const sid = params.get('sessionId') || code.data;
-        handleVerifyQR(sid);
+        const gpsTolerance = params.get('gpsTolerance');
+        handleVerifyQR(sid, gpsTolerance);
       }
     }
   }, [handleVerifyQR]);
@@ -165,9 +172,9 @@ const Attendance = () => {
   // Tự động chạy nếu link đã có sessionId sẵn
   useEffect(() => {
     if (sessionId && student?.masinhvien && step === 'idle') {
-      handleVerifyQR(sessionId);
+      handleVerifyQR(sessionId, gpsToleranceFromLink);
     }
-  }, [sessionId, student, step, handleVerifyQR]);
+  }, [sessionId, student, step, handleVerifyQR, gpsToleranceFromLink]);
 
   return (
     <div className="attendance-responsive-wrapper">

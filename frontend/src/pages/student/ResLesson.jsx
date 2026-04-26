@@ -75,6 +75,10 @@ const ResLesson = () => {
   const [monhoc, setMonHoc] = useState(state?.monhoc || null);
   const [tenlop, setTenLop] = useState(state?.tenlop || null);
   const [deviceLocation] = useState(state?.deviceLocation || null);
+  const [gpsToleranceMeters] = useState(() => {
+    const parsed = Number(state?.gpsToleranceMeters);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 50;
+  });
 
   // Fetch student attendance data if navigating via URL
   useEffect(() => {
@@ -254,9 +258,8 @@ const ResLesson = () => {
               TARGET_LAT, TARGET_LON
             );
           
-          // Nếu cách xa hơn 50m => đưa vào trạng thái cần xem xét
-            if (distanceToClass > 50) {
-              
+          // Nếu cách xa hơn ngưỡng cấu hình => đưa vào trạng thái cần xem xét
+            if (distanceToClass > gpsToleranceMeters) {
               trangThaiDiemDanh = 'Đang xem xét';
               ghiChu = 'Sinh viên nằm ngoài vùng điểm danh';
             }
@@ -264,21 +267,14 @@ const ResLesson = () => {
           
           // Format chuỗi GPS truyền lên Backend (Lat,Lon) nếu BE cần thiết lưu lịch sử vị trí
           gpsString = studentLocation.lat + ',' + studentLocation.lon;
-          console.log('Vị trí GPS của sinh viên:', gpsString);
           
         } catch (geoError) {
-          console.error('Lỗi khi lấy GPS:', geoError);
           // Tùy theo logic dự án: nếu sinh viên không mở quyền truy cập GPS thì tự động đánh dấu "Xem xét"
           trangThaiDiemDanh = 'Đang xem xét'; 
         }
         setMsg('Đang gửi dữ liệu lên máy chủ...');
         }
       }
-    } catch (error) {
-      setStep('error');
-      setMsg('Xác thực thất bại. Vui lòng thử lại.');
-      isProcessing.current = false;
-    }
       const formData = new FormData();
       formData.append('trangThai', trangThaiDiemDanh);
       formData.append('maNguoiCapNhat', masinhvien);
@@ -292,9 +288,14 @@ const ResLesson = () => {
       await axios.put(`${process.env.REACT_APP_API_URL}/diemDanh/${madiemdanh}`, formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-        setStep('success');
-        setMsg(`ĐÃ LƯU DỮ LIỆU ĐIỂM DANH! (Trạng thái: ${trangThaiDiemDanh})`);
-  }, [madiemdanh, masinhvien, deviceLocation?.latitude, deviceLocation?.longitude]);
+      setStep('success');
+      setMsg(`ĐÃ LƯU DỮ LIỆU ĐIỂM DANH! (Trạng thái: ${trangThaiDiemDanh})`);
+    } catch (error) {
+      setStep('error');
+      setMsg('Xác thực thất bại. Vui lòng thử lại.');
+      isProcessing.current = false;
+    }
+  }, [madiemdanh, masinhvien, deviceLocation?.latitude, deviceLocation?.longitude, gpsToleranceMeters]);
 
   // Luôn mở camera trước để ưu tiên thiết bị điện thoại.
   useEffect(() => {
@@ -363,13 +364,7 @@ const ResLesson = () => {
           <p>MSSV: <strong>{masinhvien || 'N/A'}</strong></p>
           <p>Môn: <strong>{monhoc || 'Đang tải...'}</strong></p>
           <p>Lớp: <strong>{tenlop || 'Đang tải...'}</strong></p>
-          <p>
-            Vị trí thiết bị: <strong>
-              {deviceLocation
-                ? `${deviceLocation.latitude.toFixed(6)}, ${deviceLocation.longitude.toFixed(6)} (±${Math.round(deviceLocation.accuracy)}m)`
-                : 'Không có dữ liệu'}
-            </strong>
-          </p>
+          <p>Độ lệch GPS cho phép: <strong>{gpsToleranceMeters}m</strong></p>
         </div>
 
         <div className="viewport-cam">
