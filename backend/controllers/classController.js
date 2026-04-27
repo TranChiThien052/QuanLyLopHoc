@@ -155,34 +155,27 @@ const findMonHocCuaGiangVien = async (req, res) => {
 const getAttendanceRateByClass = async (req, res) => {
     const { id } = req.params;
     try {
-        // Lấy danh sách điểm danh
         const diemDanhRecords = await diemDanhService.findByClassId(id);
-        
-        // Lấy danh sách sinh viên có trong lớp
-        const studentsInClass = await lopSinhVienService.getLopSinhVienById(id);
-        const totalStudents = studentsInClass ? studentsInClass.length : 0;
+        const attendanceRecords = Array.isArray(diemDanhRecords) ? diemDanhRecords : [];
 
-        if (totalStudents === 0) {
-            return res.json({ rate: 0, totalPresent: 0, totalStudents: 0 });
-        }
+        const validAttendanceRecords = attendanceRecords.filter((record) => {
+            const status = typeof record.trangthai === 'string' ? record.trangthai.trim() : '';
+            return status !== '' && status !== 'Lựa chọn';
+        });
 
-        let totalPresent = 0;
-        if (diemDanhRecords && diemDanhRecords.length > 0) {
-            diemDanhRecords.forEach(dd => {
-                if (dd.trangthai === 'Có mặt' || dd.trangthai === 'Đi trễ' || dd.trangthai === 'Đã điểm danh') {
-                    totalPresent++;
-                }
-            });
-        }
+        const totalAttendance = validAttendanceRecords.length;
+        const totalPresent = validAttendanceRecords.filter((record) => {
+            const status = typeof record.trangthai === 'string' ? record.trangthai.trim() : '';
+            return status === 'Có mặt';
+        }).length;
 
-        // Tính tỉ lệ phần trăm theo tổng số sinh viên có trong lớp (theo đúng yêu cầu: chia cho tổng sinh viên chứ không phải lượt điểm danh)
-        const rate = (totalPresent / totalStudents) * 100;
+        const rate = totalAttendance === 0 ? 0 : (totalPresent / totalAttendance) * 100;
         
         res.json({
             classId: id,
             rate: parseFloat(rate.toFixed(2)),
             totalPresent,
-            totalStudents
+            totalAttendance
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
