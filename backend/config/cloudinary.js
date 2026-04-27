@@ -25,7 +25,9 @@ const uploadAttendanceImage = (fileBuffer, maDiemDanh) => {
       {
         folder: "diem-danh",
         resource_type: "image",
-        public_id: `${maDiemDanh}_${Date.now()}`,
+        public_id: `${maDiemDanh}`,
+        overwrite: true,
+        invalidate: true,
       },
       (error, result) => {
         if (error) {
@@ -50,7 +52,9 @@ const uploadStudentFaceImage = (fileBuffer, maSinhVien) => {
       {
         folder: "student-faceid",
         resource_type: "image",
-        public_id: `${maSinhVien}_${Date.now()}`,
+        public_id: `${maSinhVien}`,
+        overwrite: true,
+        invalidate: true,
       },
       (error, result) => {
         if (error) {
