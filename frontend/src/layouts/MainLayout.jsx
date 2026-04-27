@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logoImg from './Logo_STU.png';
 import "./MainLayout.css";
 
 export default function MainLayout() {
@@ -39,7 +40,13 @@ export default function MainLayout() {
 
       {/* SIDEBAR */}
       <aside className={`sidebar ${open ? "open" : ""}`}>
-        <h3 className="logo">STU</h3>
+        <div className="logo-container">
+          <img 
+            src={logoImg} 
+            alt="STU Logo" 
+            className="sidebar-logo" 
+          />
+        </div>
 
         <nav>
           {menuItems.map((item) => (

@@ -95,6 +95,7 @@ body {
 .role {
     font-size: 12px;
     opacity: 0.9;
+    font-weight: bold;
 }
 
 /* ===== CONTENT ===== */
@@ -103,6 +104,22 @@ body {
     background: #f5f7fa;
     /* nhẹ hơn */
     min-height: calc(100vh - 55px);
+}
+
+/* Container bao quanh logo để căn giữa */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 10px; /* Khoảng cách trên dưới cho thoáng */
+}
+
+/* Tùy chỉnh kích thước hình ảnh */
+.sidebar-logo {
+  max-width: 80%;    /* Để logo không chạm mép sidebar */
+  height: auto;      /* Giữ tỉ lệ ảnh không bị móp */
+  display: block;
+  object-fit: contain;
 }
 
 /* ========================= */

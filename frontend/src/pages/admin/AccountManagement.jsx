@@ -74,52 +74,85 @@ const AccountManagement = () => {
     setShowEditModal(true);
   };
 
-  // 4. Xóa hồ sơ
-  const handleDelete = async (id) => {
-    const cleanId = id.toString().trim();
-    if (!window.confirm(`Bạn có chắc muốn xoá vĩnh viễn tài khoản ${cleanId}?`)) return;
+  // 4. Xóa hồ sơ (Tạm ẩn đi)
+  // const handleDelete = async (id) => {
+  //   const cleanId = id.toString().trim();
+  //   if (!window.confirm(`Bạn có chắc muốn xoá vĩnh viễn tài khoản ${cleanId}?`)) return;
 
-    try {
-      // Xác định đường dẫn dựa trên Tab hiện tại
-      const profilePath = activeTab === 'sinhvien' ? `/students/${cleanId}` : `/teachers/${cleanId}`;
+  //   try {
+  //     // Xác định đường dẫn dựa trên Tab hiện tại
+  //     const profilePath = activeTab === 'sinhvien' ? `/students/${cleanId}` : `/teachers/${cleanId}`;
       
-      await api.delete(profilePath, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+  //     await api.delete(profilePath, {
+  //       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  //     });
 
-      alert("Đã xoá thành công!");
-      loadProfiles();
-    } catch (error) {
-      console.error("Lỗi xóa:", error);
-      alert("Lỗi 401/403: Không thể xóa. Hãy kiểm tra lại quyền Admin!");
-    }
-  };
+  //     alert("Đã xoá thành công!");
+  //     loadProfiles();
+  //   } catch (error) {
+  //     console.error("Lỗi xóa:", error);
+  //     alert("Lỗi 401/403: Không thể xóa. Hãy kiểm tra lại quyền Admin!");
+  //   }
+  // };
 
   // 5. Kiểm tra dữ liệu Form (Validate)
   const validate = (isEdit = false) => {
     let newErrors = {};
-    const cleanMa = formData.ma.trim();
-    const cleanHo = formData.ho.trim();
-    const cleanTen = formData.ten.trim();
-    const cleanEmail = formData.email.trim();
-    const cleanSdt = formData.sodienthoai.trim();
 
+    // Sử dụng ?. để tránh lỗi nếu formData các trường bị undefined
+    const cleanMa = formData.ma?.trim() || "";
+    const cleanHo = formData.ho?.trim() || "";
+    const cleanTen = formData.ten?.trim() || "";
+    const cleanEmail = formData.email?.trim() || "";
+    const cleanNgaysinh = formData.ngaySinh; // Lưu ý: trùng tên với state 'ngaySinh'
+    const cleanSdt = formData.sodienthoai?.trim() || "";
+    const cleanMalop = formData.malop?.trim() || "";
+
+    // 1. Kiểm tra Mã tài khoản (Chỉ khi thêm mới)
     if (!isEdit) {
-      if (!cleanMa) newErrors.ma = "Mã tài khoản không được trống";
-      else if (allProfiles.some(p => (p.masinhvien || p.magiangvien || "").toString().trim().toLowerCase() === cleanMa.toLowerCase())) {
+      if (!cleanMa) {
+        newErrors.ma = "Mã tài khoản không được trống";
+      } else if (allProfiles.some(p => (p.masinhvien || p.magiangvien || "").toString().trim().toLowerCase() === cleanMa.toLowerCase())) {
         newErrors.ma = "Mã này đã tồn tại!";
       }
     }
 
+    // 2. Kiểm tra Họ và Tên (Bắt buộc cho cả hai)
     if (!cleanHo) newErrors.ho = "Vui lòng nhập họ lót";
     if (!cleanTen) newErrors.ten = "Vui lòng nhập tên";
 
+    // 3. Kiểm tra Email (Bắt buộc và đúng định dạng)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!cleanEmail || !emailRegex.test(cleanEmail)) newErrors.email = "Email không hợp lệ";
+    if (!cleanEmail) {
+      newErrors.email = "Vui lòng nhập email";
+    } else if (!emailRegex.test(cleanEmail)) {
+      newErrors.email = "Email không hợp lệ";
+    }
 
-    const phoneRegex = /^[0-9]{10}$/;
-    if (cleanSdt && !phoneRegex.test(cleanSdt)) {
-      newErrors.sodienthoai = "SĐT nếu nhập phải đủ 10 chữ số";
+    // 4. KIỂM TRA RIÊNG THEO TAB
+    if (activeTab === 'sinhvien') {
+      // Sinh viên: Bắt buộc mã lớp
+      if (!cleanMalop) newErrors.malop = "Vui lòng nhập mã lớp";
+    } 
+    
+    if (activeTab === 'giangvien') {
+      // Giảng viên: Bắt buộc Ngày sinh và SĐT
+      if (!cleanNgaysinh) {
+        newErrors.ngaySinh = "Vui lòng nhập ngày sinh";
+      }
+
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!cleanSdt) {
+        newErrors.sodienthoai = "Vui lòng nhập số điện thoại";
+      } else if (!phoneRegex.test(cleanSdt)) {
+        newErrors.sodienthoai = "SĐT phải đủ 10 chữ số";
+      }
+    } else {
+      // Nếu là sinh viên nhưng có nhập SĐT thì vẫn kiểm tra định dạng (không bắt buộc nhập)
+      const phoneRegex = /^[0-9]{10}$/;
+      if (cleanSdt && !phoneRegex.test(cleanSdt)) {
+        newErrors.sodienthoai = "SĐT không hợp lệ";
+      }
     }
 
     setErrors(newErrors);
@@ -216,7 +249,7 @@ const handleEditSubmit = async (e) => {
       loadProfiles();
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
-      alert("Cập nhật thất bại. Hãy kiểm tra Console để xem lỗi cụ thể!");
+      alert("Cập nhật thất bại.");
     }
   };
 
@@ -289,7 +322,7 @@ const handleEditSubmit = async (e) => {
                   <td>{activeTab === 'sinhvien' ? p.malop : p.email}</td>
                   <td>
                     <div className="action-box">
-                      <button className="icon-btn delete" onClick={() => handleDelete(p.masinhvien || p.magiangvien)}>🗑️</button>
+                      {/* <button className="icon-btn delete" onClick={() => handleDelete(p.masinhvien || p.magiangvien)}>🗑️</button> */}
                       <button className="icon-btn edit" onClick={() => openEditModal(p)}>📝</button>
                     </div>
                   </td>
@@ -310,7 +343,7 @@ const handleEditSubmit = async (e) => {
         )}
       </div>
 
-      {/* MODAL THÊM MỚI (PHONG CÁCH TỐI GIẢN) */}
+      {/* MODAL THÊM MỚI */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -322,11 +355,36 @@ const handleEditSubmit = async (e) => {
                 <div className="form-group-centered" style={{ flex: 1 }}><label>Tên</label><input type="text" onChange={e => setFormData({ ...formData, ten: e.target.value })} />{errors.ten && <span className="error-message-text">{errors.ten}</span>}</div>
               </div>
               <div className="form-row">
-                <div className="form-group-centered" style={{ flex: 1 }}><label>Ngày sinh</label><input type="date" onChange={e => setFormData({ ...formData, ngaySinh: e.target.value })} /></div>
-                <div className="form-group-centered" style={{ flex: 1 }}><label>SĐT</label><input type="text" onChange={e => setFormData({ ...formData, sodienthoai: e.target.value })} /></div>
+                <div className="form-group-centered" style={{ flex: 1 }}>
+                  <label>Ngày sinh</label>
+                  <input 
+                    type="date" 
+                    value={formData.ngaySinh || ''} // value phải nằm ở thẻ input
+                    onChange={e => setFormData({ ...formData, ngaySinh: e.target.value })} 
+                  />
+                  {/* Chỉ hiện lỗi nếu là giảng viên và chưa nhập */}
+                  {activeTab === 'giangvien' && errors.ngaySinh && (
+                    <span className="error-message-text">{errors.ngaySinh}</span>
+                  )}
+                </div>
+
+                {/* CỘT SỐ ĐIỆN THOẠI */}
+                <div className="form-group-centered" style={{ flex: 1 }}>
+                  <label>SĐT</label>
+                  <input 
+                    type="text" 
+                    placeholder="09xxx..."
+                    value={formData.sodienthoai || ''}
+                    onChange={e => setFormData({ ...formData, sodienthoai: e.target.value })} 
+                  />{errors.sodienthoai && <span className="error-message-text">{errors.sodienthoai}</span>}
+                  {/* Chỉ hiện lỗi nếu là giảng viên và chưa nhập */}
+                  {activeTab === 'giangvien' && errors.sodienthoai && (
+                    <span className="error-message-text">{errors.sodienthoai}</span>
+                  )}
+                </div>
               </div>
-              <div className="form-group-centered"><label>Email</label><input type="email" onChange={e => setFormData({ ...formData, email: e.target.value })} /></div>
-              {activeTab === 'sinhvien' && (<div className="form-group-centered"><label>Mã lớp</label><input type="text" onChange={e => setFormData({ ...formData, malop: e.target.value })} /></div>)}
+              <div className="form-group-centered"><label>Email</label><input type="email" onChange={e => setFormData({ ...formData, email: e.target.value })} />{errors.email && <span className="error-message-text">{errors.email}</span>}</div>
+              {activeTab === 'sinhvien' && (<div className="form-group-centered"><label>Mã lớp</label><input type="text" onChange={e => setFormData({ ...formData, malop: e.target.value })} />{errors.malop && <span className="error-message-text">{errors.malop}</span>}</div>)}
               <div className="modal-footer-centered"><button type="button" className="btn-cancel-round" onClick={() => setShowAddModal(false)}>Hủy</button><button type="submit" className="btn-submit-round">Lưu hồ sơ</button></div>
             </form>
           </div>
