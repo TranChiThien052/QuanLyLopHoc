@@ -93,16 +93,9 @@ export default function AttendanceManagementClass() {
                   <td data-label="Thao tác" className="actions-cell">
                     <button
                       className="btn-create-code"
-                      style={{ backgroundColor: '#28a745' }}
-                      onClick={() => navigate(`/teacher/class-statistics/${cls.malop}`)}
-                    >
-                      Thống kê lớp
-                    </button>
-                    <button
-                      className="btn-create-code"
                       onClick={() => navigate(`/teacher/attendance/${cls.malop}`, { state: { cls } })}
                     >
-                      Xem buổi học
+                      Xem danh sách buổi học
                     </button>
                   </td>
                 </tr>

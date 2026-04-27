@@ -122,13 +122,7 @@ export default function AttendanceManagement() {
                      {session.giobatdau ? session.giobatdau.substring(0, 5) : ''} - {session.gioketthuc ? session.gioketthuc.substring(0, 5) : ''}
                   </td>
                   <td data-label="Thao tác" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                    <button
-                      className="btn-create-code"
-                      style={{ backgroundColor: '#28a745' }}
-                      onClick={() => navigate(`/teacher/statistics/${session.mabuoihoc}`, { state: { className: displayClassName } })}
-                    >
-                      Thống kê buổi
-                    </button>
+                  
                     <button
                       className="btn-create-code"
                       onClick={() => navigate(`/teacher/attendance/process/${session.mabuoihoc}?type=face`, { state: { session, cls: passedClass, className: displayClassName } })}

@@ -412,9 +412,9 @@ export default function AttendanceProcess() {
                     </div>
 
                     <div className="stats-box">
-                        <div className="stat-item present">Điểm danh: {sessionInfo.present}/{sessionInfo.students}</div>
+                        <div className="stat-item present">Điểm danh: {sessionInfo.present}/{sessionInfo.students}</div>      
                         <div className="stat-item absent">Vắng: {sessionInfo.absent}</div>
-                        <button className="btn-bulk" disabled={showQRModal}>Điểm danh hàng loạt</button>
+                      
                     </div>
                 </div>
             </div>
