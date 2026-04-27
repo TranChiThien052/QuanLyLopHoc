@@ -21,6 +21,7 @@ const upload = multer({
 
 router.get('/', classController.findAll);
 router.get('/:id', classController.findById);
+router.get('/:id/attendance-rate', classController.getAttendanceRateByClass);
 router.post('/', (req, res, next) => {
 	upload.single('excelFile')(req, res, (err) => {
 		if (err) {
