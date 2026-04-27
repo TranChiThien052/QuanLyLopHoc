@@ -85,7 +85,7 @@ const initList = async (listSinhVien, listBuoiHoc) => {
                 madiemdanh: maDiemDanh,
                 masinhvien: maSinhVien,
                 mabuoihoc: maBuoiHoc,
-                trangthai: 'vắng không phép',
+                trangthai: 'Lựa chọn',
                 ghichu: '',
                 thoigiancapnhat: new Date(),
                 manguoicapnhat: 'system',

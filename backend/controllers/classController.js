@@ -152,11 +152,42 @@ const findMonHocCuaGiangVien = async (req, res) => {
     }
 };
 
+const getAttendanceRateByClass = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const diemDanhRecords = await diemDanhService.findByClassId(id);
+        const attendanceRecords = Array.isArray(diemDanhRecords) ? diemDanhRecords : [];
+
+        const validAttendanceRecords = attendanceRecords.filter((record) => {
+            const status = typeof record.trangthai === 'string' ? record.trangthai.trim() : '';
+            return status !== '' && status !== 'Lựa chọn';
+        });
+
+        const totalAttendance = validAttendanceRecords.length;
+        const totalPresent = validAttendanceRecords.filter((record) => {
+            const status = typeof record.trangthai === 'string' ? record.trangthai.trim() : '';
+            return status === 'Có mặt';
+        }).length;
+
+        const rate = totalAttendance === 0 ? 0 : (totalPresent / totalAttendance) * 100;
+        
+        res.json({
+            classId: id,
+            rate: parseFloat(rate.toFixed(2)),
+            totalPresent,
+            totalAttendance
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     findAll,
     findById,
     create,
     update,
     deleteClass,
-    findMonHocCuaGiangVien
+    findMonHocCuaGiangVien,
+    getAttendanceRateByClass
 };
