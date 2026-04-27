@@ -21,8 +21,7 @@ import TeacherProfile from "../pages/teacher/Profile";
 import ClassManagement from "../pages/teacher/ClassManagement";
 import AttendanceManagementClass from "../pages/teacher/AttendanceManagementClass";
 import AttendanceManagement from "../pages/teacher/AttendanceManagement";
-import Statistics from "../pages/teacher/Statistics";
-import ClassStatistics from "../pages/teacher/ClassStatistics";
+
 import AttendanceProcess from "../pages/teacher/AttendanceProcess";
 
 // Admin
@@ -58,8 +57,7 @@ function AppRoutes() {
             <Route path="classes" element={<ClassManagement />} />
             <Route path="attendance" element={<AttendanceManagementClass />} />
             <Route path="attendance/:classId" element={<AttendanceManagement />} />
-            <Route path="statistics/:sessionId" element={<Statistics />} />
-            <Route path="class-statistics/:classId" element={<ClassStatistics />} />
+            
             <Route path="attendance/process/:sessionId" element={<AttendanceProcess />} />
           </Route>
         </Route>
