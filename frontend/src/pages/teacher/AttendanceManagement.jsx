@@ -11,6 +11,7 @@ export default function AttendanceManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [classSessions, setClassSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [attendanceRate, setAttendanceRate] = useState(null);
   const itemsPerPage = 5;
 
   // Lọc reset trang
@@ -34,8 +35,23 @@ export default function AttendanceManagement() {
         setLoading(false);
       }
     };
-    
+
     if (classId) fetchLessons();
+  }, [classId]);
+
+  useEffect(() => {
+    const fetchAttendanceRate = async () => {
+      try {
+        const response = await api.get(`/classes/${classId}/attendance-rate`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        setAttendanceRate(response.data.rate);
+      } catch (error) {
+        console.error("Lỗi khi tải tỷ lệ điểm danh:", error);
+      }
+    };
+
+    if (classId) fetchAttendanceRate();
   }, [classId]);
 
   const filteredSessions = classSessions.filter((session) => {
@@ -69,10 +85,13 @@ export default function AttendanceManagement() {
       </div>
 
       {passedClass && (
-        <div style={{ backgroundColor: '#fff', padding: '15px 20px', borderRadius: '12px', marginBottom: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          <div><strong style={{color: '#6c757d', fontSize: '13px'}}>Tên lớp học</strong> <div style={{fontSize: '16px', fontWeight: 'bold'}}>{passedClass.tenlop}</div></div>
-          <div><strong style={{color: '#6c757d', fontSize: '13px'}}>Mã lớp học</strong> <div style={{fontSize: '16px', fontWeight: 'bold', color: '#1a73e8'}}>{passedClass.malop}</div></div>
-          <div><strong style={{color: '#6c757d', fontSize: '13px'}}>Môn học</strong> <div style={{fontSize: '16px', fontWeight: 'bold'}}>{passedClass.monhoc}</div></div>
+        <div style={{ backgroundColor: '#fff', padding: '15px 20px', borderRadius: '12px', marginBottom: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', display: 'flex', gap: '20px', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <div><strong style={{ color: '#6c757d', fontSize: '13px' }}>Tên lớp học</strong> <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{passedClass.tenlop}</div></div>
+          <div><strong style={{ color: '#6c757d', fontSize: '13px' }}>Mã lớp học</strong> <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#1a73e8' }}>{passedClass.malop}</div></div>
+          <div><strong style={{ color: '#6c757d', fontSize: '13px' }}>Môn học</strong> <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{passedClass.monhoc}</div></div>
+          {attendanceRate !== null && (
+            <div><strong style={{ color: '#6c757d', fontSize: '13px' }}>Tỉ lệ có mặt</strong> <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#28a745' }}>{attendanceRate}%</div></div>
+          )}
         </div>
       )}
 
@@ -119,10 +138,10 @@ export default function AttendanceManagement() {
                   <td data-label="Nội dung">{session.noidungbuoihoc || 'N/A'}</td>
                   <td data-label="Ngày học">{session.ngayhoc ? session.ngayhoc.substring(0, 10) : 'N/A'}</td>
                   <td data-label="Thời gian">
-                     {session.giobatdau ? session.giobatdau.substring(0, 5) : ''} - {session.gioketthuc ? session.gioketthuc.substring(0, 5) : ''}
+                    {session.giobatdau ? session.giobatdau.substring(0, 5) : ''} - {session.gioketthuc ? session.gioketthuc.substring(0, 5) : ''}
                   </td>
                   <td data-label="Thao tác" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                  
+
                     <button
                       className="btn-create-code"
                       onClick={() => navigate(`/teacher/attendance/process/${session.mabuoihoc}?type=face`, { state: { session, cls: passedClass, className: displayClassName } })}
