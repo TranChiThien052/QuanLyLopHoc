@@ -296,8 +296,8 @@ const ResLesson = () => {
       const savedReason = ghiChu.trim();
       setMsg(
         savedReason
-          ? `Đã lưu lên cơ sở dữ liệu: ${trangThaiDiemDanh} + ${savedReason}`
-          : `Đã lưu lên cơ sở dữ liệu: ${trangThaiDiemDanh}`
+          ? `Đã lưu thông tin: ${trangThaiDiemDanh} (${savedReason})`
+          : `Đã lưu thông tin: ${trangThaiDiemDanh}`
       );
     } catch (error) {
       setStep('error');
