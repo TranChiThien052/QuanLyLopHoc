@@ -229,7 +229,7 @@ const ResLesson = () => {
         if (distance > 0.4) {
           const studentLocation = await getCurrentLocation();
           gpsString = `${studentLocation.lat},${studentLocation.lon}`;
-          trangThaiDiemDanh = 'Xem xét';
+          trangThaiDiemDanh = 'Đang xem xét';
           ghiChu = 'Khuôn mặt không khớp';
 
           setMsg('Đang gửi dữ liệu lên máy chủ...');
@@ -258,7 +258,9 @@ const ResLesson = () => {
               studentLocation.lat, studentLocation.lon,
               TARGET_LAT, TARGET_LON
             );
-          
+          console.log(`Vị trí lớp học: (${TARGET_LAT}, ${TARGET_LON})`);
+          console.log(`Vị trí sinh viên: (${studentLocation.lat}, ${studentLocation.lon})`);
+          console.log(`Khoảng cách đến lớp học: ${distanceToClass.toFixed(2)}m`);
           // Nếu cách xa hơn ngưỡng cấu hình => đưa vào trạng thái cần xem xét
             if (distanceToClass > gpsToleranceMeters) {
               trangThaiDiemDanh = 'Đang xem xét';
@@ -271,7 +273,8 @@ const ResLesson = () => {
           
         } catch (geoError) {
           // Tùy theo logic dự án: nếu sinh viên không mở quyền truy cập GPS thì tự động đánh dấu "Xem xét"
-          trangThaiDiemDanh = 'Đang xem xét'; 
+          trangThaiDiemDanh = 'Đang xem xét';
+          ghiChu = 'Không thể lấy vị trí GPS';
         }
         setMsg('Đang gửi dữ liệu lên máy chủ...');
         }
@@ -290,7 +293,12 @@ const ResLesson = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setStep('success');
-      setMsg(`ĐÃ LƯU DỮ LIỆU ĐIỂM DANH! (Trạng thái: ${trangThaiDiemDanh})`);
+      const savedReason = ghiChu.trim();
+      setMsg(
+        savedReason
+          ? `Đã lưu lên cơ sở dữ liệu: ${trangThaiDiemDanh} + ${savedReason}`
+          : `Đã lưu lên cơ sở dữ liệu: ${trangThaiDiemDanh}`
+      );
     } catch (error) {
       setStep('error');
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
