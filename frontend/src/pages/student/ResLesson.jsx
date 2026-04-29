@@ -205,12 +205,13 @@ const ResLesson = () => {
 
       if (descriptors.length === 0) {
         trangThaiDiemDanh = 'Đang xem xét';
-        ghiChu = 'không thể quét được khuôn mặt';
+        ghiChu = 'Không thể quét được khuôn mặt ';
 
         try {
           const studentLocation = await getCurrentLocation();
           gpsString = `${studentLocation.lat},${studentLocation.lon}`;
         } catch (geoError) {
+          ghiChu += 'Không thể lấy vị trí GPS';
           console.error('Lỗi khi lấy GPS:', geoError);
         }
 
