@@ -45,6 +45,7 @@ export default function AttendanceProcess() {
     const itemsPerPage = 5;
 
     const [students, setStudents] = useState([]);
+    const [msg, setMsg] = useState('');
 
     // --- NEW STATES FOR QR ---
     const [isGenerating, setIsGenerating] = useState(false);
