@@ -96,9 +96,9 @@ const Login = () => {
             </div>
           </div>
 
-          <button type="button" className="forgot-link-btn" disabled={isLoading}>
+          {/* <button type="button" className="forgot-link-btn" disabled={isLoading}>
             Quên mật khẩu?
-          </button>
+          </button> */}
 
           <button type="submit" className="btn-login-modern" disabled={isLoading}>
             {isLoading ? "ĐANG ĐĂNG NHẬP..." : "ĐĂNG NHẬP"}

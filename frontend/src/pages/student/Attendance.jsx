@@ -4,10 +4,33 @@ import jsQR from 'jsqr'; // Đảm bảo đã chạy: npm install jsqr
 import axios from 'axios';
 import './Attendance.css';
 
+const getDeviceLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Trình duyệt không hỗ trợ geolocation.'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: position.timestamp
+        });
+      },
+      (error) => reject(error),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+};
+
 const Attendance = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get('sessionId'); // Lấy ID từ ?sessionId=...
+  const gpsToleranceFromLink = Number(searchParams.get('gpsTolerance'));
 
   const videoRef = useRef(null);
   const canvasRef = useRef(document.createElement('canvas')); 
@@ -35,11 +58,14 @@ const Attendance = () => {
   /**
    * 2. Xác thực Buổi học (Fix lỗi N/A)
    */
-  const handleVerifyQR = useCallback(async (mabuoihoc) => {
+  const handleVerifyQR = useCallback(async (mabuoihoc, gpsToleranceParam) => {
     if (!mabuoihoc || !student?.masinhvien || isProcessing.current) return;
     isProcessing.current = true;
     setStep('verifying');
     setMsg('Đã nhận mã! Đang kiểm tra danh sách lớp...');
+
+    const parsedTolerance = Number(gpsToleranceParam);
+    const gpsToleranceMeters = Number.isFinite(parsedTolerance) && parsedTolerance > 0 ? parsedTolerance : 50;
 
     try {
       const resAt = await axios.get(`${process.env.REACT_APP_API_URL}/diemDanh/sinhvien/${student.masinhvien}`, {
@@ -49,6 +75,13 @@ const Attendance = () => {
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
 
       if (record) {
+        let deviceLocation = null;
+        try {
+          deviceLocation = await getDeviceLocation();
+        } catch (locationError) {
+          console.warn('Không lấy được vị trí thiết bị:', locationError);
+        }
+
         const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lessons/${mabuoihoc}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
@@ -63,7 +96,9 @@ const Attendance = () => {
             masinhvien: student.masinhvien,
             madiemdanh: record.madiemdanh,
             tenlop: resClass.data.tenlop,
-            monhoc: resClass.data.monhoc
+            monhoc: resClass.data.monhoc,
+            deviceLocation,
+            gpsToleranceMeters
           }
         });
       } else {
@@ -76,7 +111,7 @@ const Attendance = () => {
     } finally {
       isProcessing.current = false;
     }
-  }, [student]);
+  }, [student, navigate]);
 
   /**
    * 3. Giải mã QR từ Camera
@@ -95,9 +130,11 @@ const Attendance = () => {
 
       if (code) {
         // Trích xuất ID từ link quét được
-        const params = new URLSearchParams(code.data.split('?')[1]);
+        const isLink = typeof code.data === 'string' && code.data.includes('?');
+        const params = new URLSearchParams(isLink ? code.data.split('?')[1] : '');
         const sid = params.get('sessionId') || code.data;
-        handleVerifyQR(sid);
+        const gpsTolerance = params.get('gpsTolerance');
+        handleVerifyQR(sid, gpsTolerance);
       }
     }
   }, [handleVerifyQR]);
@@ -135,9 +172,9 @@ const Attendance = () => {
   // Tự động chạy nếu link đã có sessionId sẵn
   useEffect(() => {
     if (sessionId && student?.masinhvien && step === 'idle') {
-      handleVerifyQR(sessionId);
+      handleVerifyQR(sessionId, gpsToleranceFromLink);
     }
-  }, [sessionId, student, step, handleVerifyQR]);
+  }, [sessionId, student, step, handleVerifyQR, gpsToleranceFromLink]);
 
   return (
     <div className="attendance-responsive-wrapper">

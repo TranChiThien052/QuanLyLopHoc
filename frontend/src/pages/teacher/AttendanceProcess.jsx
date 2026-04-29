@@ -27,8 +27,11 @@ export default function AttendanceProcess() {
     // --- NEW STATES FOR QR ---
     const [isGenerating, setIsGenerating] = useState(false);
     const [duration, setDuration] = useState(60); // giây
+    const [gpsToleranceMeters, setGpsToleranceMeters] = useState(50); // mét
     const [timeLeft, setTimeLeft] = useState(0);
     const [showQRModal, setShowQRModal] = useState(false);
+    const [selectedReviewStudent, setSelectedReviewStudent] = useState(null);
+    const [isUpdatingReviewStatus, setIsUpdatingReviewStatus] = useState(false);
 
     // Get Attendance List from BE (Lấy Sĩ số + Lấy Điểm danh)
     const fetchAttendance = useCallback(async () => {
@@ -96,7 +99,9 @@ export default function AttendanceProcess() {
                     updateTime: parsedTime,
                     note: ddRecord?.ghichu || '--',
                     status: ddRecord?.trangthai || 'Lựa chọn', // Tiếng việt mặc định
-                    madiemdanh: ddRecord?.madiemdanh || null
+                    madiemdanh: ddRecord?.madiemdanh || null,
+                    profileImgUrl: studentBase?.img_url || '',
+                    attendanceImgUrl: ddRecord?.img_url || ''
                 };
             });
 
@@ -139,7 +144,8 @@ export default function AttendanceProcess() {
                         updateTime: parsedTime,
                         note: ddRecord.ghichu || '--',
                         status: ddRecord.trangthai || 'Lựa chọn',
-                        madiemdanh: ddRecord.madiemdanh
+                        madiemdanh: ddRecord.madiemdanh,
+                        attendanceImgUrl: ddRecord.img_url || ''
                     } : s
                 ));
             }
@@ -299,6 +305,10 @@ export default function AttendanceProcess() {
     }, [showQRModal, timeLeft]); // Không cho handleCloseQRProcess vào để tránh đứt gãy Đồng hồ đếm ngược
 
     const startQR = () => {
+        const normalizedTolerance = Number(gpsToleranceMeters);
+        if (!Number.isFinite(normalizedTolerance) || normalizedTolerance <= 0) {
+            setGpsToleranceMeters(50);
+        }
         setTimeLeft(duration);
         setShowQRModal(true);
         setIsGenerating(false);
@@ -325,7 +335,7 @@ export default function AttendanceProcess() {
 
     // Tạo link dẫn thẳng tới trang điểm danh của sinh viên
     //const attendanceURL = `${window.location.origin}/student/attendance/${sessionId}`;
-    const attendanceURL = `${window.location.origin}/student/attendance?sessionId=${sessionId}`;
+    const attendanceURL = `${window.location.origin}/student/attendance?sessionId=${sessionId}&gpsTolerance=${encodeURIComponent(gpsToleranceMeters)}`;
     const qrDataString = encodeURIComponent(attendanceURL);
 
     
@@ -355,8 +365,83 @@ export default function AttendanceProcess() {
     // Bốc riêng các bạn Bị Lỗi (Đang xem xét) sang lưới cách ly
     const reviewStudents = students.filter(s => s.status === 'Đang xem xét');
 
+    const openReviewImageModal = (student) => {
+        if (showQRModal) return;
+        setSelectedReviewStudent(student);
+    };
+
+    const closeReviewImageModal = () => {
+        if (isUpdatingReviewStatus) return;
+        setSelectedReviewStudent(null);
+    };
+
+    const handleReviewModalStatusUpdate = async (newStatus) => {
+        if (!selectedReviewStudent || isUpdatingReviewStatus) return;
+
+        try {
+            setIsUpdatingReviewStatus(true);
+            await handleStatusChange(selectedReviewStudent.mssv, newStatus);
+            setSelectedReviewStudent(null);
+        } finally {
+            setIsUpdatingReviewStatus(false);
+        }
+    };
+
     return (
         <div className={`process-container ${showQRModal ? 'locked' : ''}`}>
+            {selectedReviewStudent && (
+                <div className="review-image-modal-overlay" onClick={closeReviewImageModal}>
+                    <div className="review-image-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            className="btn-close-review-modal"
+                            onClick={closeReviewImageModal}
+                            disabled={isUpdatingReviewStatus}
+                            aria-label="Đóng modal"
+                        >
+                            X
+                        </button>
+                        <h3>So sánh ảnh điểm danh</h3>
+                        <p>
+                            <strong>{selectedReviewStudent.tenSV}</strong> ({selectedReviewStudent.mssv})
+                        </p>
+                        <div className="review-image-compare-grid">
+                            <div className="review-image-card">
+                                <div className="review-image-label">Ảnh profile sinh viên</div>
+                                {selectedReviewStudent.profileImgUrl ? (
+                                    <img src={selectedReviewStudent.profileImgUrl} alt={`Profile ${selectedReviewStudent.mssv}`} />
+                                ) : (
+                                    <div className="review-no-image">Không có ảnh profile</div>
+                                )}
+                            </div>
+                            <div className="review-image-card">
+                                <div className="review-image-label">Ảnh từ điểm danh</div>
+                                {selectedReviewStudent.attendanceImgUrl ? (
+                                    <img src={selectedReviewStudent.attendanceImgUrl} alt={`Diem danh ${selectedReviewStudent.mssv}`} />
+                                ) : (
+                                    <div className="review-no-image">Không có ảnh điểm danh</div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="review-modal-actions">
+                            <button
+                                className="btn-rv approve"
+                                onClick={() => handleReviewModalStatusUpdate('Có mặt')}
+                                disabled={isUpdatingReviewStatus || showQRModal}
+                            >
+                                Có mặt
+                            </button>
+                            <button
+                                className="btn-rv reject"
+                                onClick={() => handleReviewModalStatusUpdate('Vắng không phép')}
+                                disabled={isUpdatingReviewStatus || showQRModal}
+                            >
+                                Vắng không phép
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* MODAL QR CENTERED */}
             {showQRModal && (
                 <div className="qr-modal-overlay">
@@ -395,6 +480,14 @@ export default function AttendanceProcess() {
                             onChange={(e) => setDuration(Number(e.target.value))}
                             min="10"
                             max="300"
+                        />
+                        <label>Độ lệch vị trí GPS cho phép (mét):</label>
+                        <input
+                            type="number"
+                            value={gpsToleranceMeters}
+                            onChange={(e) => setGpsToleranceMeters(Number(e.target.value))}
+                            min="5"
+                            max="500"
                         />
                         <div className="setup-actions">
                             <button className="btn-confirm-qr" onClick={startQR}>Xác nhận</button>
@@ -536,20 +629,26 @@ export default function AttendanceProcess() {
                         <tbody>
                             {reviewStudents.length > 0 ? (
                                 reviewStudents.map(student => (
-                                    <tr key={student.mssv}>
+                                    <tr key={student.mssv} className="review-row-clickable" onClick={() => openReviewImageModal(student)}>
                                         <td style={{ fontWeight: 700 }}>{student.mssv}</td>
                                         <td>{student.tenSV}</td>
                                         <td>
                                             <div className="review-actions">
                                                 <button
                                                     className="btn-rv approve"
-                                                    onClick={() => handleStatusChange(student.mssv, 'Có mặt')}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleStatusChange(student.mssv, 'Có mặt');
+                                                    }}
                                                     disabled={showQRModal}
                                                 >Có mặt
                                                 </button>
                                                 <button
                                                     className="btn-rv reject"
-                                                    onClick={() => handleStatusChange(student.mssv, 'Vắng không phép')}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleStatusChange(student.mssv, 'Vắng không phép');
+                                                    }}
                                                     disabled={showQRModal}
                                                 >Vắng
                                                 </button>

@@ -61,7 +61,7 @@ const findByClassAndSinhVienId = async (malop, maSinhVien) => {
   }
 };
 
-const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS) => {
+const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS, imgUrl = null) => {
     const maDiemDanh = maSinhVien + "_" + maBuoiHoc;
     return await DiemDanh.create({
         madiemdanh: maDiemDanh,
@@ -72,6 +72,7 @@ const create = async (maSinhVien, maBuoiHoc, trangThai, ghiChu, thoiGianCapNhat,
         thoigiancapnhat: thoiGianCapNhat,
         manguoicapnhat: maNguoiCapNhat,
         gps: GPS,
+        img_url: imgUrl,
     });
 };
 
@@ -84,11 +85,12 @@ const initList = async (listSinhVien, listBuoiHoc) => {
                 madiemdanh: maDiemDanh,
                 masinhvien: maSinhVien,
                 mabuoihoc: maBuoiHoc,
-                trangthai: 'vắng không phép',
+                trangthai: 'Lựa chọn',
                 ghichu: '',
                 thoigiancapnhat: new Date(),
                 manguoicapnhat: 'system',
-                gps: null
+                gps: null,
+                img_url: null
             };
         });
         const createdDiemDanh = await DiemDanh.bulkCreate(diemDanhObjects, {
@@ -99,7 +101,7 @@ const initList = async (listSinhVien, listBuoiHoc) => {
     return createDiemDanh;
 }
 
-const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS) => {
+const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCapNhat, GPS, anhDiemDanhUrl) => {
     const diemdanh = await DiemDanh.findOne(
         {
             where: 
@@ -111,15 +113,19 @@ const update = async (maDiemDanh, trangThai, ghiChu, thoiGianCapNhat, maNguoiCap
     if (!diemdanh) {
         throw new Error("Điểm danh không tồn tại");
     }
-    
-    console.log("===> Repo is applying GPS:", GPS); // LOG TESTING
+
+    const finalGhiChu = ghiChu !== undefined ? ghiChu : diemdanh.ghichu;
+    const finalImgUrl = anhDiemDanhUrl !== null && anhDiemDanhUrl !== undefined
+        ? anhDiemDanhUrl
+        : diemdanh.img_url;
 
     return await diemdanh.update({
         trangthai: trangThai,
-        ghichu: ghiChu,
+        ghichu: finalGhiChu,
         thoigiancapnhat: thoiGianCapNhat,
         manguoicapnhat: maNguoiCapNhat,
-        gps: GPS
+        gps: GPS,
+        img_url: finalImgUrl
     });
 }
 
@@ -148,7 +154,8 @@ const createBulk = async (listDiemDanh) => {
             ghichu: diemDanh.ghiChu,
             thoigiancapnhat: diemDanh.thoiGianCapNhat,
             manguoicapnhat: diemDanh.maNguoiCapNhat,
-            gps: diemDanh.gps
+            gps: diemDanh.gps,
+            img_url: diemDanh.imgUrl || null
         };
     });
     return await DiemDanh.bulkCreate(diemDanhObjects, {
@@ -157,7 +164,8 @@ const createBulk = async (listDiemDanh) => {
             'ghichu', 
             'thoigiancapnhat', 
             'manguoicapnhat',
-            'gps'
+            'gps',
+            'img_url'
         ]
     });
 }
