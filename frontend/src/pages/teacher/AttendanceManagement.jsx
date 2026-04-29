@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import './AttendanceManagement.css';
@@ -7,37 +7,46 @@ export default function AttendanceManagement() {
   const { classId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const passedClass = location.state?.cls;
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [classSessions, setClassSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [attendanceRate, setAttendanceRate] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [lessonDate, setLessonDate] = useState('');
+  const [lessonStartTime, setLessonStartTime] = useState('');
+  const [lessonEndTime, setLessonEndTime] = useState('');
+  const [lessonContent, setLessonContent] = useState('');
   const itemsPerPage = 5;
+  const classLabel = passedClass?.tenlop || `Lớp ${classId}`;
+  const classCode = passedClass?.malop || classId;
 
   // Lọc reset trang
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  const passedClass = location.state?.cls;
-  const displayClassName = passedClass?.tenlop || `Lớp ${classId}`;
+  const displayClassName = classLabel;
+
+  const fetchLessons = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/lessons/lop/${classId}`);
+      const data = response.data?.data || response.data || [];
+      setClassSessions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Lỗi tải danh sách buổi học:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [classId]);
 
   useEffect(() => {
-    const fetchLessons = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/lessons/lop/${classId}`);
-        const data = response.data?.data || response.data || [];
-        setClassSessions(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Lỗi tải danh sách buổi học:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (classId) fetchLessons();
-  }, [classId]);
+  }, [classId, fetchLessons]);
 
   useEffect(() => {
     const fetchAttendanceRate = async () => {
@@ -53,6 +62,55 @@ export default function AttendanceManagement() {
 
     if (classId) fetchAttendanceRate();
   }, [classId]);
+
+  const openCreateModal = () => {
+    setFormError('');
+    setLessonDate('');
+    setLessonStartTime('');
+    setLessonEndTime('');
+    setLessonContent('');
+    setIsCreateModalOpen(true);
+  };
+
+  const closeCreateModal = () => {
+    if (isSubmitting) return;
+    setIsCreateModalOpen(false);
+    setFormError('');
+  };
+
+  const handleCreateLesson = async (event) => {
+    event.preventDefault();
+
+    if (!lessonDate || !lessonStartTime || !lessonEndTime || !lessonContent.trim()) {
+      setFormError('Vui lòng nhập đầy đủ ngày học, giờ bắt đầu, giờ kết thúc và nội dung buổi học.');
+      return;
+    }
+
+    if (lessonStartTime >= lessonEndTime) {
+      setFormError('Giờ kết thúc phải lớn hơn giờ bắt đầu.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setFormError('');
+      const payload = {
+        malop: classCode,
+        ngayhoc: lessonDate,
+        giobatdau: lessonStartTime,
+        gioketthuc: lessonEndTime,
+        noidungbuoihoc: lessonContent.trim(),
+      };
+      await api.post(`${process.env.REACT_APP_API_BASE_URL}/lessons`, payload);
+      await fetchLessons();
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      const message = error.response?.data?.message || 'Không thể tạo buổi học. Vui lòng thử lại.';
+      setFormError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const filteredSessions = classSessions.filter((session) => {
     const searchLow = searchTerm.toLowerCase();
@@ -81,6 +139,9 @@ export default function AttendanceManagement() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button className="btn-search">Tìm kiếm</button>
+          <button className="btn-create-session" onClick={openCreateModal} type="button">
+            Tạo buổi học
+          </button>
         </div>
       </div>
 
@@ -146,7 +207,7 @@ export default function AttendanceManagement() {
                       className="btn-create-code"
                       onClick={() => navigate(`/teacher/attendance/process/${session.mabuoihoc}?type=face`, { state: { session, cls: passedClass, className: displayClassName } })}
                     >
-                      Tạo điểm danh
+                      Xem buổi học
                     </button>
                   </td>
                 </tr>
@@ -190,6 +251,69 @@ export default function AttendanceManagement() {
           >
             ›
           </button>
+        </div>
+      )}
+
+      {isCreateModalOpen && (
+        <div className="modal-overlay" onClick={closeCreateModal}>
+          <div className="modal-content lesson-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Tạo buổi học mới</h3>
+            <form className="lesson-form" onSubmit={handleCreateLesson}>
+              <label className="lesson-field">
+                <span>Ngày học</span>
+                <input
+                  type="date"
+                  value={lessonDate}
+                  onChange={(e) => setLessonDate(e.target.value)}
+                  required
+                />
+              </label>
+
+              <div className="lesson-time-row">
+                <label className="lesson-field">
+                  <span>Giờ bắt đầu</span>
+                  <input
+                    type="time"
+                    value={lessonStartTime}
+                    onChange={(e) => setLessonStartTime(e.target.value)}
+                    required
+                  />
+                </label>
+
+                <label className="lesson-field">
+                  <span>Giờ kết thúc</span>
+                  <input
+                    type="time"
+                    value={lessonEndTime}
+                    onChange={(e) => setLessonEndTime(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
+
+              <label className="lesson-field">
+                <span>Nội dung buổi học</span>
+                <textarea
+                  rows="4"
+                  value={lessonContent}
+                  onChange={(e) => setLessonContent(e.target.value)}
+                  placeholder="Nhập nội dung buổi học..."
+                  required
+                />
+              </label>
+
+              {formError && <div className="lesson-form-error">{formError}</div>}
+
+              <div className="lesson-actions">
+                <button type="button" className="btn-cancel" onClick={closeCreateModal} disabled={isSubmitting}>
+                  Hủy
+                </button>
+                <button type="submit" className="btn-confirm" disabled={isSubmitting}>
+                  {isSubmitting ? 'Đang tạo...' : 'Xác nhận'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

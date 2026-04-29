@@ -40,15 +40,15 @@ const getLessonsByMaLop = async (malop) =>{
     return await lessonRepository.findByMaLop(malop);
 }
 
-const createLesson = async (malop, giobatdau, gioketthuc, noidungbuoihoc) => {
+const createLesson = async (malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc) => {
     if (!malop || !giobatdau || !gioketthuc) {
         const err = new Error("Thiếu thông tin để tạo buổi học");
         err.status = 400;
         throw err;
     }
 
-    const ngayhoc = getTodayDate();
-    const mabuoihoc = makeMaBuoiHoc(malop, ngayhoc);
+    const lessonDate = ngayhoc || getTodayDate();
+    const mabuoihoc = makeMaBuoiHoc(malop, lessonDate);
     const existed = await lessonRepository.findByMaBuoiHoc(mabuoihoc);
     if (existed) {
         const err = new Error("Buổi học của lớp này trong ngày đã tồn tại");
@@ -56,7 +56,7 @@ const createLesson = async (malop, giobatdau, gioketthuc, noidungbuoihoc) => {
         throw err;
     }
     
-    const newLesson = await lessonRepository.create(mabuoihoc, malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
+    const newLesson = await lessonRepository.create(mabuoihoc, malop, lessonDate, giobatdau, gioketthuc, noidungbuoihoc);
     
     try {
         const danhSachSinhVien = await lopsinhvienService.getLopSinhVienById(malop);
