@@ -4,6 +4,28 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import './AttendanceProcess.css';
 
+const getTeacherLocation = () => {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error('Trình duyệt không hỗ trợ geolocation.'));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    timestamp: position.timestamp
+                });
+            },
+            (error) => reject(error),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    });
+};
+
 export default function AttendanceProcess() {
     const { sessionId } = useParams();
     const [searchParams] = useSearchParams();
@@ -28,6 +50,7 @@ export default function AttendanceProcess() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [duration, setDuration] = useState(60); // giây
     const [gpsToleranceMeters, setGpsToleranceMeters] = useState(50); // mét
+    const [teacherLocation, setTeacherLocation] = useState(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const [showQRModal, setShowQRModal] = useState(false);
     const [selectedReviewStudent, setSelectedReviewStudent] = useState(null);
@@ -310,14 +333,24 @@ export default function AttendanceProcess() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showQRModal, timeLeft]); // Không cho handleCloseQRProcess vào để tránh đứt gãy Đồng hồ đếm ngược
 
-    const startQR = () => {
+    const startQR = async () => {
         const normalizedTolerance = Number(gpsToleranceMeters);
         if (!Number.isFinite(normalizedTolerance) || normalizedTolerance <= 0) {
             setGpsToleranceMeters(50);
         }
-        setTimeLeft(duration);
-        setShowQRModal(true);
-        setIsGenerating(false);
+
+        try {
+            const location = await getTeacherLocation();
+            setTeacherLocation(location);
+            setTimeLeft(duration);
+            setShowQRModal(true);
+            setIsGenerating(false);
+        } catch (error) {
+            console.error('Không lấy được vị trí thiết bị giáo viên:', error);
+            setTeacherLocation(null);
+            setShowQRModal(false);
+            setMsg('Không lấy được GPS của thiết bị giáo viên. Vui lòng cấp quyền vị trí rồi thử lại.');
+        }
     };
 
     const cancelQR = () => {
@@ -341,8 +374,10 @@ export default function AttendanceProcess() {
 
     // Tạo link dẫn thẳng tới trang điểm danh của sinh viên
     //const attendanceURL = `${window.location.origin}/student/attendance/${sessionId}`;
-    const attendanceURL = `${window.location.origin}/student/attendance?sessionId=${sessionId}&gpsTolerance=${encodeURIComponent(gpsToleranceMeters)}`;
-    const qrDataString = encodeURIComponent(attendanceURL);
+    const attendanceURL = teacherLocation
+        ? `${window.location.origin}/student/attendance?sessionId=${sessionId}&gpsTolerance=${encodeURIComponent(gpsToleranceMeters)}&originLatitude=${encodeURIComponent(teacherLocation.latitude)}&originLongitude=${encodeURIComponent(teacherLocation.longitude)}&originAccuracy=${encodeURIComponent(teacherLocation.accuracy ?? '')}`
+        : `${window.location.origin}/student/attendance?sessionId=${sessionId}&gpsTolerance=${encodeURIComponent(gpsToleranceMeters)}`;
+    const qrDataString = attendanceURL;
 
     
     const sessionInfo = {
@@ -454,7 +489,7 @@ export default function AttendanceProcess() {
                     <div className="qr-modal-content">
                         <h2>Mã QR Điểm Danh</h2>
                         <div className="qr-display">
-                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrDataString}`} alt="QR" />
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrDataString)}`} alt="QR" />
                         </div>
                         <div className="timer-display">
                             Thời gian còn lại: <strong>{timeLeft}s</strong>

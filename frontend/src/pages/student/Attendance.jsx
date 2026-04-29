@@ -4,28 +4,6 @@ import jsQR from 'jsqr'; // Đảm bảo đã chạy: npm install jsqr
 import axios from 'axios';
 import './Attendance.css';
 
-const getDeviceLocation = () => {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Trình duyệt không hỗ trợ geolocation.'));
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp
-        });
-      },
-      (error) => reject(error),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-  });
-};
-
 const Attendance = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -58,7 +36,7 @@ const Attendance = () => {
   /**
    * 2. Xác thực Buổi học (Fix lỗi N/A)
    */
-  const handleVerifyQR = useCallback(async (mabuoihoc, gpsToleranceParam) => {
+  const handleVerifyQR = useCallback(async (mabuoihoc, gpsToleranceParam, qrOriginLocation = null) => {
     if (!mabuoihoc || !student?.masinhvien || isProcessing.current) return;
     isProcessing.current = true;
     setStep('verifying');
@@ -75,12 +53,24 @@ const Attendance = () => {
       const record = attendanceData.find(i => String(i.mabuoihoc) === String(mabuoihoc));
 
       if (record) {
-        let deviceLocation = null;
-        try {
-          deviceLocation = await getDeviceLocation();
-        } catch (locationError) {
-          console.warn('Không lấy được vị trí thiết bị:', locationError);
-        }
+        const classLocation = qrOriginLocation || (() => {
+          const originLatitudeParam = searchParams.get('originLatitude');
+          const originLongitudeParam = searchParams.get('originLongitude');
+          const originAccuracyParam = searchParams.get('originAccuracy');
+          const originLatitude = Number(originLatitudeParam);
+          const originLongitude = Number(originLongitudeParam);
+          const originAccuracy = Number(originAccuracyParam);
+
+          if (originLatitudeParam !== null && originLongitudeParam !== null && Number.isFinite(originLatitude) && Number.isFinite(originLongitude)) {
+            return {
+              latitude: originLatitude,
+              longitude: originLongitude,
+              accuracy: Number.isFinite(originAccuracy) ? originAccuracy : null
+            };
+          }
+
+          return null;
+        })();
 
         const resLesson = await axios.get(`${process.env.REACT_APP_API_URL}/lessons/${mabuoihoc}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -97,7 +87,7 @@ const Attendance = () => {
             madiemdanh: record.madiemdanh,
             tenlop: resClass.data.tenlop,
             monhoc: resClass.data.monhoc,
-            deviceLocation,
+            classLocation,
             gpsToleranceMeters
           }
         });
@@ -111,7 +101,7 @@ const Attendance = () => {
     } finally {
       isProcessing.current = false;
     }
-  }, [student, navigate]);
+  }, [searchParams, student, navigate]);
 
   /**
    * 3. Giải mã QR từ Camera
@@ -134,7 +124,20 @@ const Attendance = () => {
         const params = new URLSearchParams(isLink ? code.data.split('?')[1] : '');
         const sid = params.get('sessionId') || code.data;
         const gpsTolerance = params.get('gpsTolerance');
-        handleVerifyQR(sid, gpsTolerance);
+        const originLatitudeParam = params.get('originLatitude');
+        const originLongitudeParam = params.get('originLongitude');
+        const originAccuracyParam = params.get('originAccuracy');
+        const originLatitude = Number(originLatitudeParam);
+        const originLongitude = Number(originLongitudeParam);
+        const originAccuracy = Number(originAccuracyParam);
+        const qrOriginLocation = originLatitudeParam !== null && originLongitudeParam !== null && Number.isFinite(originLatitude) && Number.isFinite(originLongitude)
+          ? {
+              latitude: originLatitude,
+              longitude: originLongitude,
+              accuracy: Number.isFinite(originAccuracy) ? originAccuracy : null
+            }
+          : null;
+        handleVerifyQR(sid, gpsTolerance, qrOriginLocation);
       }
     }
   }, [handleVerifyQR]);
@@ -172,7 +175,21 @@ const Attendance = () => {
   // Tự động chạy nếu link đã có sessionId sẵn
   useEffect(() => {
     if (sessionId && student?.masinhvien && step === 'idle') {
-      handleVerifyQR(sessionId, gpsToleranceFromLink);
+      const originLatitudeParam = searchParams.get('originLatitude');
+      const originLongitudeParam = searchParams.get('originLongitude');
+      const originAccuracyParam = searchParams.get('originAccuracy');
+      const originLatitude = Number(originLatitudeParam);
+      const originLongitude = Number(originLongitudeParam);
+      const originAccuracy = Number(originAccuracyParam);
+      const qrOriginLocation = originLatitudeParam !== null && originLongitudeParam !== null && Number.isFinite(originLatitude) && Number.isFinite(originLongitude)
+        ? {
+            latitude: originLatitude,
+            longitude: originLongitude,
+            accuracy: Number.isFinite(originAccuracy) ? originAccuracy : null
+          }
+        : null;
+
+      handleVerifyQR(sessionId, gpsToleranceFromLink, qrOriginLocation);
     }
   }, [sessionId, student, step, handleVerifyQR, gpsToleranceFromLink]);
 

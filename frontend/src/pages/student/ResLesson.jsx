@@ -74,7 +74,7 @@ const ResLesson = () => {
   const [madiemdanh, setMaDiemDanh] = useState(state?.madiemdanh || null);
   const [monhoc, setMonHoc] = useState(state?.monhoc || null);
   const [tenlop, setTenLop] = useState(state?.tenlop || null);
-  const [deviceLocation] = useState(state?.deviceLocation || null);
+  const [classLocation] = useState(state?.classLocation || null);
   const [gpsToleranceMeters] = useState(() => {
     const parsed = Number(state?.gpsToleranceMeters);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 50;
@@ -240,8 +240,8 @@ const ResLesson = () => {
         
         // Thay bằng tọa độ thực tế nơi diễn ra buổi học 
         // (VD: Đây là toạ độ tham khảo lấy theo Google Maps)
-        const TARGET_LAT = deviceLocation?.latitude; //Vĩ độ lớp học tham chiếu
-        const TARGET_LON = deviceLocation?.longitude; //Kinh độ lớp học tham chiếu
+        const TARGET_LAT = classLocation?.latitude; //Vĩ độ lớp học tham chiếu
+        const TARGET_LON = classLocation?.longitude; //Kinh độ lớp học tham chiếu
 
         // const TARGET_LAT = 10.747572888673872; //Vĩ độ STU
         // const TARGET_LON = 106.68251246342655; //Kinh độ STU 10.747572888673872, 106.68251246342655
@@ -304,7 +304,7 @@ const ResLesson = () => {
       setMsg('Xác thực thất bại. Vui lòng thử lại.');
       isProcessing.current = false;
     }
-  }, [madiemdanh, masinhvien, deviceLocation?.latitude, deviceLocation?.longitude, gpsToleranceMeters]);
+  }, [madiemdanh, masinhvien, classLocation?.latitude, classLocation?.longitude, gpsToleranceMeters]);
 
   // Luôn mở camera trước để ưu tiên thiết bị điện thoại.
   useEffect(() => {
