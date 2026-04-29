@@ -400,7 +400,7 @@ const ClassManagement = () => {
                       <td onClick={(e) => e.stopPropagation()}>
                         <div className="action-flex">
                           <button className="icon-btn edit" onClick={() => handleEditClick(c)}>✏️</button>
-                          <button className="icon-btn delete" onClick={() => handleDeleteClass(c.malop)}>🗑️</button>
+                          {/* <button className="icon-btn delete" onClick={() => handleDeleteClass(c.malop)}>🗑️</button> */}
                         </div>
                       </td>
                     </tr>
@@ -420,7 +420,7 @@ const ClassManagement = () => {
                     <span className="badge">{c.malop}</span>
                     <div className="card-actions" onClick={(e) => e.stopPropagation()}>
                       <button className="action-small" onClick={() => handleEditClick(c)}>✏️</button>
-                      <button className="action-small" onClick={() => handleDeleteClass(c.malop)}>🗑️</button>
+                      {/* <button className="action-small" onClick={() => handleDeleteClass(c.malop)}>🗑️</button> */}
                     </div>
                   </div>
                   <h3>Lớp {c.tenlop}</h3>
