@@ -32,7 +32,9 @@
   display: flex;
   gap: 10px;
   flex-grow: 1;
-  max-width: 550px;
+  max-width: 720px;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .search-input {
@@ -52,6 +54,24 @@
   font-weight: 700;
   cursor: pointer;
   transition: 0.3s;
+}
+
+.btn-create-session {
+  background: #12b886;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-search:hover,
+.btn-create-session:hover,
+.btn-create-code:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 /* DATE BANNER */
@@ -139,6 +159,87 @@
   border: none;
 }
 
+.lesson-modal {
+  max-width: 620px;
+  text-align: left;
+}
+
+.lesson-modal h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.lesson-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lesson-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  color: #333;
+}
+
+.lesson-field input,
+.lesson-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border-black);
+  font: inherit;
+  resize: vertical;
+}
+
+.lesson-time-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lesson-form-error {
+  color: #dc3545;
+  font-weight: 700;
+  background: #fff1f2;
+  border: 1px solid #f5c2c7;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.lesson-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-cancel,
+.btn-confirm {
+  border: none;
+  border-radius: 18px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: #e9ecef;
+  color: #333;
+}
+
+.btn-confirm {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.btn-cancel:disabled,
+.btn-confirm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 /* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
   .mgmt-title {
@@ -148,6 +249,14 @@
   }
 
   .search-group {
+    width: 100%;
+    max-width: none;
+    justify-content: stretch;
+  }
+
+  .search-input,
+  .btn-search,
+  .btn-create-session {
     width: 100%;
   }
 
@@ -184,6 +293,19 @@
   .btn-create-code {
     width: auto;
     padding: 8px 20px;
+  }
+
+  .lesson-time-row {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel,
+  .btn-confirm {
+    width: 100%;
   }
 }
 
@@ -336,4 +458,4 @@
 
 .error-state {
   color: #dc3545;
-}
+}

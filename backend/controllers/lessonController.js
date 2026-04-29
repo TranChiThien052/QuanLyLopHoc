@@ -37,8 +37,8 @@ const getLessonsByMaLop = async (req, res) => {
 
 const createLesson = async (req, res) => {
     try {
-        const { malop, giobatdau, gioketthuc, noidungbuoihoc } = req.body;
-        const lesson = await lessonService.createLesson(malop, giobatdau, gioketthuc, noidungbuoihoc);
+        const { malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc } = req.body;
+        const lesson = await lessonService.createLesson(malop, ngayhoc, giobatdau, gioketthuc, noidungbuoihoc);
         return res.status(201).json(lesson);
     } catch (error) {
         const status = error.status || 500;
