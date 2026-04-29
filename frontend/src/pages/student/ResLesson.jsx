@@ -121,7 +121,7 @@ const ResLesson = () => {
 
         // Fetch full student details
         const studentResponse = await axios.get(
-          `${process.env.REACT_APP_API_URL}/student/${currentStudentRecord.masinhvien}`,
+          `${process.env.REACT_APP_API_URL}/students/${currentStudentRecord.masinhvien}`,
           {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           }
@@ -198,7 +198,7 @@ const ResLesson = () => {
         if (detection) {
           descriptors.push(Array.from(detection.descriptor));
         }
-        await new Promise((resolve) => setTimeout(resolve, 220));
+        await new Promise((resolve) => setTimeout(resolve, 180));
       }
 
       attendanceImageBlob = await captureFrameFromVideo(videoRef.current)
