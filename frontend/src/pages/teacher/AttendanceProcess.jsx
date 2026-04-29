@@ -106,8 +106,10 @@ export default function AttendanceProcess() {
             });
 
             setStudents(mappedStudents);
+            return mappedStudents;
         } catch (error) {
             console.error("Lỗi tải danh sách điểm danh UI:", error);
+            return [];
         }
     }, [sessionId, maLop]);
 
@@ -249,11 +251,15 @@ export default function AttendanceProcess() {
 
     // Hàm tự động quét và chốt danh sách vắng thi / vắng học
     const handleCloseQRProcess = async () => {
-        const missingStudents = students.filter(s => s.status === 'Lựa chọn' || s.status === 'choice');
+        const latestStudents = await fetchAttendance();
+        const sourceStudents = latestStudents.length > 0 ? latestStudents : students;
+        const missingStudents = sourceStudents.filter(s => s.status === 'Lựa chọn' || s.status === 'choice');
         const maNguoiCapNhat = user?.id || user?.username || 'admin';
 
         if (missingStudents.length === 0) {
-            fetchAttendance();
+            if (!latestStudents.length) {
+                fetchAttendance();
+            }
             return;
         }
 

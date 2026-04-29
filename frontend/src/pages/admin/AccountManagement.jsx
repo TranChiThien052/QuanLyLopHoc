@@ -274,9 +274,13 @@ const handleEditSubmit = async (e) => {
     if (window.confirm(`Bạn có muốn chuẩn bị Reset FaceID cho sinh viên ${id} không?`)) {
       console.log("Sẵn sàng Reset FaceID cho mã:", id);
       try {
-        await api.put(`/students/reset-faceid/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.put(
+          `/students/reset-faceid/${id}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }
+        );
         alert("Reset FaceID thành công!");
       } catch (error) {
         console.error("Lỗi reset FaceID:", error);
