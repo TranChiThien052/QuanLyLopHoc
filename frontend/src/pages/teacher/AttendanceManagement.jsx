@@ -101,7 +101,7 @@ export default function AttendanceManagement() {
         gioketthuc: lessonEndTime,
         noidungbuoihoc: lessonContent.trim(),
       };
-      await api.post(`${process.env.REACT_APP_API_BASE_URL}/lessons`, payload);
+      await api.post(`/lessons`, payload);
       await fetchLessons();
       setIsCreateModalOpen(false);
     } catch (error) {
