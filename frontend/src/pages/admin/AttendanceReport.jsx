@@ -146,7 +146,7 @@ const AttendanceReport = () => {
             <h2 className="main-title">Lớp: {selectedClass.tenlop || selectedClass.monhoc}</h2>
             <div className="glass-table-wrapper">
               <table className="modern-table">
-                <thead><tr><th>Mã buổi</th><th>Ngày học</th><th>Bắt đầu</th><th>Kết thúc</th></tr></thead>
+                <thead><tr><th>Mã buổi</th><th>Ngày Bắt Đầu Buổi Học</th><th>Giờ Bắt đầu</th><th>Giờ Kết thúc</th></tr></thead>
                 <tbody>
                   {currentItems.map((s) => (
                     <tr key={s.mabuoihoc} onClick={() => handleSelectSession(s)} className="clickable-row">
