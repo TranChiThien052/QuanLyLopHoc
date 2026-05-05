@@ -389,10 +389,6 @@ const handleEditSubmit = async (e) => {
                     value={formData.sodienthoai || ''}
                     onChange={e => setFormData({ ...formData, sodienthoai: e.target.value })} 
                   />{errors.sodienthoai && <span className="error-message-text">{errors.sodienthoai}</span>}
-                  {/* Chỉ hiện lỗi nếu là giảng viên và chưa nhập */}
-                  {activeTab === 'giangvien' && errors.sodienthoai && (
-                    <span className="error-message-text">{errors.sodienthoai}</span>
-                  )}
                 </div>
               </div>
               <div className="form-group-centered"><label>Email</label><input type="email" onChange={e => setFormData({ ...formData, email: e.target.value })} />{errors.email && <span className="error-message-text">{errors.email}</span>}</div>
