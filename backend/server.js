@@ -33,5 +33,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(3001, () => {
-  console.log("Server chạy tại http://localhost:3000");
+  console.log("Server chạy tại http://localhost:3001");
 });
