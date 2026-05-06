@@ -226,7 +226,7 @@ const ResLesson = () => {
 
         const distance = faceapi.euclideanDistance(averageDescriptor, studentInfo.data.faceid);
 
-        if (distance > 0.4) {
+        if (distance > 0.4) { // Thông số khớp khuôn mặt dùng để điều chỉnh tỉ lệ chấp nhận
           const studentLocation = await getCurrentLocation();
           gpsString = `${studentLocation.lat},${studentLocation.lon}`;
           trangThaiDiemDanh = 'Đang xem xét';
@@ -301,7 +301,7 @@ const ResLesson = () => {
       );
     } catch (error) {
       setStep('error');
-      setMsg('Xác thực thất bại. Vui lòng thử lại.');
+      setMsg('Xác thực thất bại. Vui lòng thử lại.' + (error.response?.data?.message ? ` (${error.response.data.message})` : ''));
       isProcessing.current = false;
     }
   }, [madiemdanh, masinhvien, classLocation?.latitude, classLocation?.longitude, gpsToleranceMeters]);

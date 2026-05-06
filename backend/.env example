@@ -1,0 +1,15 @@
+DATABASE_URL=postgresql://username:password@host/databasename
+
+DB_HOST = host
+DB_PORT = 5432
+DB_USER = username
+DB_PASSWORD = password
+DB_NAME = databasename
+
+JWT_SECRET = your_jwt_secret_key
+JWT_EXPIRES_IN = your_jwt_expiration_time // Ví dụ: 15m, 1h, 1d
+SALT_ROUNDS = 10 // Không thay đổi SALT_ROUNDS nếu không cần thiết, vì nó ảnh hưởng đến hiệu suất và bảo mật của ứng dụng.
+
+CLOUDINARY_API_KEY = your_cloudinary_api_key
+CLOUDINARY_API_SECRET = your_cloudinary_api_secret
+CLOUDINARY_CLOUD_NAME = your_cloudinary_cloud_name
