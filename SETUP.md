@@ -69,17 +69,15 @@
    # Database
    DATABASE_URL=postgresql://username:password@localhost:5432/quan_ly_lop_hoc
 
-   # Server
-   PORT=5000
-   NODE_ENV=development
-
    # JWT
-   JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
+   JWT_SECRET=your_jwt_secret_key
 
    # Cloudinary
    ``
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   
    CLOUDINARY_API_KEY=your_cloudinary_api_key
+   
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
    ``
 
