@@ -73,13 +73,11 @@
    JWT_SECRET=your_jwt_secret_key
 
    # Cloudinary
-   ``
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   ``
 
 6. **Tạo database**
    Sử dụng file init.sql bên trong thư mục db để tạo database và thêm tài khoản admin
