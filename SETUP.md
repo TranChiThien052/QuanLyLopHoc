@@ -77,14 +77,16 @@
    JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
 
    # Cloudinary
+   ``
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   ``
 
-5. **Tạo database**
+6. **Tạo database**
    Sử dụng file init.sql bên trong thư mục db để tạo database và thêm tài khoản admin
 
-6. **Chạy backend**
+7. **Chạy backend**
    npm run dev
 
    Server sẽ chạy tại: `http://localhost:3001`
