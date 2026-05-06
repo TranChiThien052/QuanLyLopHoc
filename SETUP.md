@@ -60,24 +60,24 @@
 
 3. **Tạo file `.env`**
    ```bash
-   # Windows
-   copy .env.example .env
-   # Hoặc tạo file .env thủ công
+   Sử dụng file .env example để cấu hình các biến môi trường và sửa tên file thành .env
    ```
 
 4. **Cấu hình file `.env`**
    # Database
-   DATABASE_URL=postgresql://username:password@localhost:5432/quan_ly_lop_hoc
+   DATABASE_URL=postgresql://username:password@localhost:port/databasename
 
    # JWT
    JWT_SECRET=your_jwt_secret_key
 
    # Cloudinary
+   ```bash
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   ```
 
 6. **Tạo database**
    Sử dụng file init.sql bên trong thư mục db để tạo database và thêm tài khoản admin
