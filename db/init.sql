@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS sinhvien (
   ten VARCHAR(20) NOT NULL,
   holot VARCHAR(30) NOT NULL,
   ngaysinh DATE,
-  email VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(50) UNIQUE,
   sodienthoai CHAR(10) UNIQUE,
   malop CHAR(10),
   faceid DOUBLE PRECISION[],
