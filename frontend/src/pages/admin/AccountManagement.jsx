@@ -161,24 +161,130 @@ const AccountManagement = () => {
 
   const handleImportExcel = async (e) => {
     const file = e.target.files[0];
-    if (!file || activeTab === 'giangvien') return;
+    
+    // ✅ Check 1: File được chọn không
+    if (!file) {
+      alert('❌ Vui lòng chọn file Excel');
+      return;
+    }
+
+    // ✅ Check 2: Chỉ cho phép sinh viên
+    if (activeTab === 'giangvien') {
+      alert('⚠️ Tính năng import chỉ cho sinh viên');
+      return;
+    }
+
+    // ✅ Check 3: Kiểm tra định dạng file
+    const validExtensions = ['.xlsx', '.xls'];
+    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!validExtensions.includes(fileExt)) {
+      alert('❌ File phải là .xlsx hoặc .xls');
+      e.target.value = null;
+      return;
+    }
+
+    // ✅ Check 4: Kiểm tra kích thước file (tối đa 10MB)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('❌ File quá lớn (tối đa 10MB)');
+      e.target.value = null;
+      return;
+    }
+
+    console.log('📤 Bắt đầu upload file:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      token: localStorage.getItem('token') ? '✅ Có' : '❌ Không'
+    });
+
     const data = new FormData();
     data.append('excelFile', file);
+
     try {
-      // Gọi đúng Route /students/bulk
       const response = await api.post('/students/bulk', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      if (response.data.code === 200) {
-        alert(response.data.message);
+
+      console.log('✅ Response từ server:', response.data);
+
+      // ✅ Check 5: Kiểm tra response
+      if (response.status === 200 && response.data.code === 200) {
+        alert(`✅ ${response.data.message}\n✓ Sinh viên: ${response.data.data.createdStudents}\n✓ Tài khoản: ${response.data.data.createdAccounts}`);
         loadProfiles();
+        e.target.value = null; // Reset input
+      } else {
+        console.warn('⚠️ Response không bình thường:', response.data);
+        alert(`⚠️ Thao tác hoàn thành nhưng có cảnh báo: ${response.data.message}`);
       }
+
     } catch (err) {
-      alert("Lỗi Import: Kiểm tra định dạng cột trong file Excel!");
-    } finally { e.target.value = null; }
+      const errorDetails = {
+        message: err.message,
+        status: err.response?.status,
+        error: err.response?.data?.error,
+        detail: err.response?.data?.detail,
+        row: err.response?.data?.row
+      };
+      
+      console.error('❌ Chi tiết lỗi:', errorDetails);
+
+      let alertMessage = '❌ Lỗi không xác định';
+
+      // ✅ 400: Bad request / Data error
+      if (err.response?.status === 400) {
+        const errorMsg = err.response?.data?.error || err.response?.data?.message;
+        
+        if (errorMsg?.includes('Dòng')) {
+          alertMessage = `❌ ${errorMsg}`;
+        } else if (errorMsg?.includes('Không có file')) {
+          alertMessage = '❌ Vui lòng chọn file Excel';
+        } else if (errorMsg?.includes('Email')) {
+          alertMessage = `❌ Email không hợp lệ hoặc bị trùng: ${errorMsg}`;
+        } else if (errorMsg?.includes('Số điện thoại')) {
+          alertMessage = `❌ Số điện thoại không hợp lệ: ${errorMsg}`;
+        } else if (errorMsg?.includes('trùng')) {
+          alertMessage = `❌ Dữ liệu bị trùng (có thể sinh viên đã tồn tại): ${errorMsg}`;
+        } else if (errorMsg?.includes('Excel')) {
+          alertMessage = `❌ Lỗi file Excel: ${errorMsg}`;
+        } else {
+          alertMessage = `❌ Lỗi: ${errorMsg}`;
+        }
+      }
+      // ✅ 401/403: Authorization error
+      else if (err.response?.status === 401 || err.response?.status === 403) {
+        alertMessage = '❌ Lỗi quyền: Bạn phải là Admin để import sinh viên\n(Hãy đăng xuất & đăng nhập lại)';
+      }
+      // ✅ 500: Server error
+      else if (err.response?.status === 500) {
+        const errorMsg = err.response?.data?.error || err.response?.data?.message;
+        if (errorMsg?.includes('Email')) {
+          alertMessage = '❌ Email bị trùng hoặc không hợp lệ\nKiểm tra lại dữ liệu trong file';
+        } else if (errorMsg?.includes('Số điện thoại')) {
+          alertMessage = '❌ Số điện thoại không hợp lệ (phải 10 chữ số)\nKiểm tra lại dữ liệu trong file';
+        } else if (errorMsg?.includes('sinh viên')) {
+          alertMessage = `❌ Lỗi tạo sinh viên:\n${errorMsg}\n\nCó thể dữ liệu bị trùng, hãy kiểm tra lại`;
+        } else if (errorMsg?.includes('tài khoản')) {
+          alertMessage = `❌ Lỗi tạo tài khoản:\n${errorMsg}\n\nCó thể mã sinh viên đã tồn tại`;
+        } else {
+          alertMessage = `❌ Lỗi server: ${errorMsg}`;
+        }
+      }
+      // ✅ Network error
+      else if (err.message === 'Network Error') {
+        alertMessage = '❌ Lỗi kết nối: Kiểm tra backend có chạy không\nChạy: cd backend && npm run dev';
+      }
+      // ✅ Other errors
+      else {
+        alertMessage = `❌ ${err.message || 'Không thể upload file'}`;
+      }
+
+      alert(alertMessage);
+      e.target.value = null; // Reset input
+    }
   };
 
   const handleAddSubmit = async (e) => {
