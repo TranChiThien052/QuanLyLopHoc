@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS taikhoan (
 
 -- Table: giangvien
 CREATE TABLE IF NOT EXISTS giangvien (
-  magiangvien VARCHAR(10) PRIMARY KEY,
+  magiangvien CHAR(10) PRIMARY KEY,
   ten VARCHAR(20) NOT NULL,
   holot VARCHAR(30) NOT NULL,
   ngaysinh DATE NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS lophoc (
   ngayhoccodinh VARCHAR(20) NOT NULL,
   giobatdau TIME NOT NULL,
   gioketthuc TIME NOT NULL,
-  magiangvien VARCHAR(10) NOT NULL,
+  magiangvien CHAR(10) NOT NULL,
   CONSTRAINT fk_lophoc_giangvien FOREIGN KEY(magiangvien) REFERENCES giangvien(magiangvien)
 );
 

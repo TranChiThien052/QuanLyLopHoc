@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
     "GiangVien",
     {
       magiangvien: {
-        type: DataTypes.STRING(10),
+        type: DataTypes.CHAR(10),
         primaryKey: true,
         unique: true,
         allowNull: false,

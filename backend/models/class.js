@@ -40,7 +40,7 @@ module.exports = (sequelize) => {
                 allowNull: false,
             },
             magiangvien: {
-                type: DataTypes.STRING(10),
+                type: DataTypes.CHAR(10),
                 allowNull: false,
             },
         },
