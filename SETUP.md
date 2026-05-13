@@ -39,8 +39,8 @@
      ```sql
      CREATE DATABASE quan_ly_lop_hoc;
      ```
-   - Tạo bảng và thêm dữ liệu cho database bằng file init.sql trong thư mục db
-   - Tài khoản và mật khẩu của quản trị viên: admin - admin123@
+   - Truy cập vào database vừa tạo, sử dụng file init.sql trong thư mục db để tạo cơ sở dữ liệu
+   - Tên tài khoản và mật khẩu của admin lần lượt là: admin và admin123@
 
 3. **Clone Repository**
    ```bash
