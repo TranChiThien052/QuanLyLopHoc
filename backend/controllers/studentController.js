@@ -102,48 +102,163 @@ const createStudent = async (req,res) => {
 
 const createBulkStudents = async (req, res) => {
     try {
-        const listSinhVien = [];
-        if(req.file) {
-            const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
-            const sheetName = workbook.SheetNames[0];
-            if (!sheetName) {
-                return res.status(400).json({ error: 'File Excel không có sheet dữ liệu' });
-            }
-
-            const sheet = workbook.Sheets[sheetName];
-            const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-            if (!rows.length) {
-                return res.status(400).json({ error: 'File Excel không có dữ liệu' });
-            }
-
-            for (let i = 0; i < rows.length; i++) {
-                const parsed = normalizeStudentInput(rows[i]);
-                const data = parsed;
-                if (!data.MaSinhVien || !data.Ten || !data.HoLot || !data.MaLop) {
-                    return res.status(400).json({ error: `Dòng ${i + 2} thiếu dữ liệu bắt buộc (Mã sinh viên, Họ lót, Tên, Mã lớp)` });
-                }
-                listSinhVien.push(data);
-            }
-            const result1 = await studentService.createBulk(listSinhVien);
-            const result2 = await accountService.createBulk(listSinhVien);
-            const result = {
-                createdStudents: result1.length,
-                createdAccounts: result2.length
-            }
-            res.status(200).json({
-                code: 200,
-                message: `Tạo lớp sinh viên thành công với ${result1.length} sinh viên.`,
-                data: result
+        // ✅ CHECK 1: File có được upload không
+        if (!req.file) {
+            return res.status(400).json({
+                code: 400,
+                error: 'Không có file Excel được upload',
+                message: 'Vui lòng chọn file Excel (.xlsx hoặc .xls)'
             });
         }
-    } catch (error) {
-        res.status(500).json(
-            { 
-                code:999,
-                message: error.message,
-                detail: error.stack
+
+        const listSinhVien = [];
+        
+        // ✅ CHECK 2: File có hợp lệ không
+        if (!req.file.buffer || req.file.buffer.length === 0) {
+            return res.status(400).json({
+                code: 400,
+                error: 'File Excel rỗng hoặc không hợp lệ'
+            });
+        }
+
+        // ✅ CHECK 3: Parse Excel file
+        let workbook;
+        try {
+            workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        } catch (parseError) {
+            return res.status(400).json({
+                code: 400,
+                error: 'Lỗi đọc file Excel: ' + parseError.message,
+                message: 'File Excel có thể bị hỏng, vui lòng thử file khác'
+            });
+        }
+
+        const sheetName = workbook.SheetNames[0];
+        
+        if (!sheetName) {
+            return res.status(400).json({
+                code: 400,
+                error: 'File Excel không có sheet dữ liệu'
+            });
+        }
+
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        
+        if (!rows.length) {
+            return res.status(400).json({
+                code: 400,
+                error: 'File Excel không có dữ liệu sinh viên'
+            });
+        }
+
+        // ✅ CHECK 4: Validate & normalize dữ liệu
+        for (let i = 0; i < rows.length; i++) {
+            const parsed = normalizeStudentInput(rows[i]);
+            const data = parsed;
+            
+            if (!data.MaSinhVien || !data.Ten || !data.HoLot || !data.MaLop) {
+                return res.status(400).json({
+                    code: 400,
+                    error: `Dòng ${i + 2} thiếu dữ liệu bắt buộc (Mã sinh viên, Họ lót, Tên, Mã lớp)`,
+                    row: i + 2,
+                    data: rows[i]
+                });
             }
-        );
+
+            // ✅ Validate email format
+            if (data.Email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.Email)) {
+                return res.status(400).json({
+                    code: 400,
+                    error: `Dòng ${i + 2}: Email không hợp lệ "${data.Email}"`,
+                    row: i + 2
+                });
+            }
+
+            // ✅ Validate phone format (nếu có)
+            if (data.SoDienThoai && !/^[0-9]{10}$/.test(data.SoDienThoai.toString())) {
+                return res.status(400).json({
+                    code: 400,
+                    error: `Dòng ${i + 2}: Số điện thoại phải là 10 chữ số "${data.SoDienThoai}"`,
+                    row: i + 2
+                });
+            }
+
+            listSinhVien.push(data);
+        }
+
+        // ✅ CHECK 5: Tạo sinh viên
+        let result1, result2;
+        try {
+            result1 = await studentService.createBulk(listSinhVien);
+            console.log(`✅ Tạo ${result1.length} sinh viên`);
+        } catch (serviceError) {
+            console.error('❌ Lỗi tạo sinh viên:', serviceError.message);
+            return res.status(500).json({
+                code: 999,
+                error: 'Lỗi tạo sinh viên: ' + serviceError.message,
+                message: 'Kiểm tra lại dữ liệu (tên cột, định dạng email/sdt, mã lớp tồn tại)'
+            });
+        }
+
+        // ✅ CHECK 6: Tạo tài khoản
+        try {
+            result2 = await accountService.createBulk(listSinhVien);
+            console.log(`✅ Tạo ${result2.length} tài khoản`);
+        } catch (serviceError) {
+            console.error('❌ Lỗi tạo tài khoản:', serviceError.message);
+            return res.status(500).json({
+                code: 999,
+                error: 'Lỗi tạo tài khoản: ' + serviceError.message,
+                message: 'Có thể mã sinh viên đã tồn tại, vui lòng kiểm tra'
+            });
+        }
+        
+        const result = {
+            createdStudents: result1.length,
+            createdAccounts: result2.length,
+            totalRequested: listSinhVien.length
+        };
+        
+        console.log(`✅ Import hoàn thành: ${result1.length}/${listSinhVien.length} sinh viên`);
+        
+        res.status(200).json({
+            code: 200,
+            message: `Tạo sinh viên thành công: ${result1.length}/${listSinhVien.length} sinh viên được thêm (một số có thể bị bỏ qua nếu trùng).`,
+            data: result
+        });
+
+    } catch (error) {
+        console.error('❌ Lỗi createBulkStudents:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+
+        // ✅ Handle database constraint error
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({
+                code: 400,
+                error: 'Dữ liệu bị trùng: ' + error.errors?.[0]?.message || error.message,
+                message: 'Kiểm tra lại dữ liệu (email, số điện thoại, mã sinh viên có thể bị trùng)'
+            });
+        }
+
+        if (error.name === 'SequelizeValidationError') {
+            return res.status(400).json({
+                code: 400,
+                error: 'Dữ liệu không hợp lệ: ' + error.errors?.[0]?.message || error.message,
+                message: 'Kiểm tra lại định dạng dữ liệu (email, số điện thoại, ...)'
+            });
+        }
+
+        // ✅ Generic server error
+        res.status(500).json({
+            code: 999,
+            message: 'Lỗi xử lý file Excel',
+            error: error.message,
+            detail: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 }
 

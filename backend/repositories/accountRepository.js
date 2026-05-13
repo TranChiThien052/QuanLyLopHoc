@@ -50,10 +50,32 @@ const createBulk = async (listAccount) => {
             role: account.role
         };
     });
-    return await Account.bulkCreate(accountObjects, {
-        ignoreDuplicates: true 
-    });
-}
+    
+    try {
+        // ✅ Thử tạo với ignoreDuplicates
+        const result = await Account.bulkCreate(accountObjects, {
+            ignoreDuplicates: true,
+            validate: true
+        });
+        return result;
+    } catch (error) {
+        // ✅ Nếu lỗi constraint, tạo từng cái một
+        console.warn('⚠️  Account bulkCreate fail, trying individual create:', error.message);
+        const results = [];
+        
+        for (const obj of accountObjects) {
+            try {
+                const created = await Account.create(obj);
+                results.push(created);
+            } catch (e) {
+                // ✅ Log lỗi nhưng tiếp tục
+                console.warn(`⚠️  Lỗi tạo tài khoản ${obj.username}:`, e.message);
+                // Không throw, chỉ skip record này
+            }
+        }
+        return results;
+    }
+};
 
 const update = async (mataikhoan, username, password, role) => {
     const account = await Account.findOne(

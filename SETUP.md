@@ -32,7 +32,7 @@
    - Tải từ https://nodejs.org/ (LTS version)
    - Xác nhận cài đặt: `node --version` và `npm --version`
 
-2. **Cài đặt PostgreSQL** (nếu chưa có)
+2. **Cài đặt PostgreSQL**
    - Tải từ https://www.postgresql.org/download/
    - Ghi nhớ username và password khi cài đặt
    - Tạo database mới:
@@ -42,11 +42,15 @@
    - Truy cập vào database vừa tạo, sử dụng file init.sql trong thư mục db để tạo cơ sở dữ liệu
    - Tên tài khoản và mật khẩu của admin lần lượt là: admin và admin123@
 
-3. **Clone Repository** (nếu chưa có)
+3. **Clone Repository**
    ```bash
    git clone <repository-url>
    cd QuanLyLopHoc
    ```
+
+4. **Tạo tài khoản và lấy key Cloudinary**
+   - Truy cập vào trang web: https://cloudinary.com/ và đăng ký tài khoản
+   - Vào phần Settings, chọn API Keys, lưu lại API Key, API Secret, và Cloud Name
 
 ### Bước 2: Cài Đặt Backend
 
@@ -62,31 +66,26 @@
 
 3. **Tạo file `.env`**
    ```bash
-   # Windows
-   copy .env.example .env
-   # Hoặc tạo file .env thủ công
+   Sử dụng file .env example để cấu hình các biến môi trường và sửa tên file thành .env
    ```
 
 4. **Cấu hình file `.env`**
    # Database
-   DATABASE_URL=postgresql://username:password@localhost:5432/quan_ly_lop_hoc
-
-   # Server
-   PORT=5000
-   NODE_ENV=development
+   DATABASE_URL=postgresql://username:password@localhost:port/databasename
 
    # JWT
-   JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
+   JWT_SECRET=your_jwt_secret_key
 
    # Cloudinary
+   ```bash
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   
    CLOUDINARY_API_KEY=your_cloudinary_api_key
+   
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   ```
 
-5. **Tạo database**
-   Sử dụng file init.sql bên trong thư mục db để tạo database và thêm tài khoản admin
-
-6. **Chạy backend**
+5. **Chạy backend**
    npm run dev
 
    Server sẽ chạy tại: `http://localhost:3001`
@@ -121,7 +120,6 @@
 ### Tổng Quan
 - **Backend**: Deploy trên **Render** (Node.js + PostgreSQL)
 - **Frontend**: Deploy trên **Vercel** (React)
-- **Ưu điểm**: Tự động HTTPS, CI/CD, scale dễ dàng, free tier có sẵn
 
 ---
 
@@ -309,8 +307,3 @@
 
 1. **Backend URL**: đường_dẫn_backend
 2. **Frontend URL**: đường_dẫn_frontend
-
-## Cấu hình biến môi trường cho frontend
-   ``
-   REACT_APP_API_URL = đường_dẫn_backend
-   ``

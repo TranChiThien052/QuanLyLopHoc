@@ -55,10 +55,32 @@ const createBulk = async (listSinhVien) => {
             malop: sinhvien.MaLop
         };
     });
-    return await SinhVien.bulkCreate(sinhVienObjects, {
-        ignoreDuplicates: true 
-    });
-}
+    
+    try {
+        // ✅ Thử tạo với ignoreDuplicates
+        const result = await SinhVien.bulkCreate(sinhVienObjects, {
+            ignoreDuplicates: true,
+            validate: true
+        });
+        return result;
+    } catch (error) {
+        // ✅ Nếu lỗi constraint, tạo từng cái một
+        console.warn('⚠️  bulkCreate fail, trying individual create:', error.message);
+        const results = [];
+        
+        for (const obj of sinhVienObjects) {
+            try {
+                const created = await SinhVien.create(obj);
+                results.push(created);
+            } catch (e) {
+                // ✅ Log lỗi nhưng tiếp tục
+                console.warn(`⚠️  Lỗi tạo sinh viên ${obj.masinhvien}:`, e.message);
+                // Không throw, chỉ skip record này
+            }
+        }
+        return results;
+    }
+};
 
 const updateFaceId = async ( masinhvien,faceid,imgUrl) => {
     const student = await SinhVien.findOne({
