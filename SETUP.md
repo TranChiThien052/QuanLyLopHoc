@@ -24,7 +24,7 @@
 
 ---
 
-## 🏠 Cài Đặt Local
+## 🏠 Cài Đặt Local (Không khuyến khích do không thể kết nối bằng điện thoại đến máy chủ host)
 
 ### Bước 1: Chuẩn Bị
 
@@ -118,192 +118,79 @@
 ## 🌐 Cài Đặt Production/Online (Render + Vercel)
 
 ### Tổng Quan
+- **Cloudinary**: Lưu trữ ảnh cho chức năng điểm danh
 - **Backend**: Deploy trên **Render** (Node.js + PostgreSQL)
 - **Frontend**: Deploy trên **Vercel** (React)
 
 ---
-
-## 🚀 Phần 1: Deploy Backend trên Render
-
-### Bước 1: Chuẩn Bị Repository
-
-1. **Đảm bảo có file `render.yaml`** hoặc cấu hình trong Render Dashboard
-2. **Kiểm tra file `.gitignore`**
-   ```
-   node_modules/
-   .env
-   .env.local
-   .DS_Store
-   build/
-   dist/
-   ```
-
-3. **Tạo hoặc cập nhật `package.json` (backend)**
-   ```json
-   {
-     "name": "backend",
-     "version": "1.0.0",
-     "engines": {
-       "node": "18.x"
-     },
-     "scripts": {
-       "start": "node server.js",
-       "dev": "nodemon server.js"
-     }
-   }
-   ```
-
-4. **Push code lên GitHub**
-   ```bash
-   git add .
-   git commit -m "Prepare for Render deployment"
-   git push origin main
-   ```
-
-### Bước 2: Tạo PostgreSQL Database trên Render
-
-1. **Truy cập** https://dashboard.render.com
-2. **Đăng nhập hoặc đăng ký** với GitHub account
-3. **Tạo Database mới:**
-   - Click "New +" → "PostgreSQL"
-   - Điền thông tin:
-     - **Name**: `quan-ly-lop-hoc-db`
-     - **Database**: `quan_ly_lop_hoc`
-     - **User**: `admin`
-     - Chọn **Region** gần bạn nhất
-     - Chọn **Plan**: Free (hoặc Standard nếu production)
-   - Click "Create Database"
-
-4. **Sao chép Connection String**
-   - Trang Database → Copy Internal Database URL
-   - Format: `postgresql://user:password@host:port/database`
-   - Lưu giữ để sử dụng sau
-
-### Bước 3: Deploy Backend Service
-
-1. **Tạo Web Service**
-   - Truy cập https://dashboard.render.com
-   - Click "New +" → "Web Service"
-   - Kết nối GitHub repository
-   - Chọn repository `QuanLyLopHoc`
-
-2. **Cấu hình Service**
-   - **Name**: `quan-ly-lop-hoc`
-   - **Environment**: Node
-   - **Build Command**: 
-     ```bash
-     cd backend && npm install
-     ```
-   - **Start Command**: 
-     ```bash
-     cd backend && npm start
-     ```
-   - **Branch**: main
-   - **Plan**: Free (hoặc Starter)
-
-3. **Thêm Environment Variables**
-   - Trong Web Service → "Environment"
-   - Thêm các biến sau:
-     ```
-     DATABASE_URL
-     JWT_SECRET
-     JWT_EXPIRES_IN
-     SALT_ROUNDS
-     CLOUDINARY_CLOUD_NAME
-     CLOUDINARY_API_KEY
-     CLOUDINARY_API_SECRET
-     ```
-
-4. **Chờ Deployment**
-   - Render sẽ tự động build và deploy
-   - URL backend sẽ được tự bởi dịch vụ Render
+## Phần 1: Chuẩn bị GitHub Repository để deploy
+### Bước 1: Tạo Repository
+- Tạo Repository trên GitHub và đặt tên theo ý muốn
+- Lưu trữ lại đường dẫn của Repository trên GitHub
+### Bước 2: Tải dự án về máy
+- Tạo thư mục lưu trữ dự án
+- Mở ứng dụng Command Prompt hoặc sử dụng Terminal trên IDE
+- Clone dự án:
+  ```bash
+  git clone https://github.com/TranChiThien052/QuanLyLopHoc.git
+  ```
+### Bước 3: Đưa dự án lên Repository mới
+- Cập nhật lại repository remote của dự án bằng các lệnh sau:
+  ```bash
+  git remote remove origin
+  git remote add origin <đường_dẫn_của_repository_mới>
+  ```
+- Push code lên repository mới:
+  ```bash
+  git checkout main
+  git push -u origin main
+  ```
 
 ---
+## Phần 2: Tạo tài Service Cloudinary
+- Truy cập vào trang web: https://cloudinary.com/ và đăng nhập hoặc đăng ký tài khoản
+- Vào phần Settings, chọn API Keys, lưu lại API Key, API Secret, và Cloud Name
 
-## 🚀 Phần 2: Deploy Frontend trên Vercel
+---
+## Phần 3: Tạo host trên Render
+### Bước 1: Đăng nhập
+- Đăng nhập vào trang Render bằng tài khoản GitHub có repository chứa dự án
+### Bước 2: Tạo Project
+- Nếu chưa có Project hoặc muốn tạo một Project mới để sử dụng, chọn Create new project tại trang dashboard
+- Đặt tên cho Project
+### Bước 3: Tạo Webservice (host backend)
+- Chọn "+ New", chọn Web Service
+- Tại phần Git Provider của trang tiếp theo, chọn repository chứa dự án
+- Chọn Node cho phần Language
+- Tại Root Directory, điền vào giá trị "backend"
+- Chọn Deploy Web Service
+### Bước 4: Tạo Database
+- Chọn "+ New", chọn Postgres tại giao diện Dashboard của Project
+- Nhập các giá trị tên (Postgres Instance), tên database, tên người dùng (user)
+- Tại phần Plan Options, chọn theo nhu cầu (có thể sử dụng Free với mục đích dùng thử hệ thống)
+- Chọn Create Database  
+### Bước 5: Cấu hình biến môi trường cho backend
+- Truy cập vào Webservice đã tạo để deploy backend
+- Vào phần Environments, tại Environment, Environment Variables chọn Edit và nhập các biến môi trường (tương tự trong file .env.example), kết nối với Database đã tạo bằng cách chọn Datastore URL trong phần Add variable
+- Chọn Save and Deploy sau khi cấu hình xong
+### Bước 6: Kiểm tra
+- Kiểm tra Web Service (backend) đã hoạt động chưa bằng cách click vào đường dẫn tại dashboard
+### Bước 7: Khởi tạo database
+- Truy cập vào database đã được tạo trên Render
+- Lưu lại các thông tin tại phần Info
+- Sử dụng pgAdmin4, chuột phải tại bất kỳ Server Group đã được tạo hoặc tạo mới Server Group, chọn Register
+- Nhập các thông tin của database trong pgAdmin
+- Sau khi kết nối thành công, sử dụng Query Tool để nhập nội dung file init.sql ở thư mục db và chạy
 
-### Bước 1: Chuẩn Bị Frontend
-
-1. **Cập nhật `frontend/package.json`**
-   ```json
-   {
-     "name": "frontend",
-     "version": "0.1.0",
-     "private": true,
-     "scripts": {
-       "start": "react-scripts start",
-       "build": "CI=false react-scripts build",
-       "test": "react-scripts test",
-       "eject": "react-scripts eject"
-     }
-   }
-   ```
-
-2. **Tạo `frontend/.env`**
-   ```env
-   REACT_APP_API_URL = đường_dẫn_backend
-   ```
-
-3. **Tạo `frontend/vercel.json`**
-   ```json
-   {
-     "buildCommand": "npm run build",
-     "outputDirectory": "build",
-     "env": {
-       "REACT_APP_API_URL": "@REACT_APP_API_URL"
-     },
-     "redirects": [
-       {
-         "source": "/(.*)",
-         "destination": "/index.html",
-         "statusCode": 200
-       }
-     ]
-   }
-   ```
-
-4. **Push code**
-   ```bash
-   git add .
-   git commit -m "Prepare for Vercel deployment"
-   git push origin main
-   ```
-
-### Bước 2: Deploy trên Vercel
-
-1. **Truy cập** https://vercel.com
-2. **Đăng nhập hoặc đăng ký** với GitHub
-3. **Import Project**
-   - Click "Add New ..." → "Project"
-   - Chọn repository: Tên_repository
-
-4. **Cấu hình Project**
-   - **Project Name**: `quan-ly-lop-hoc`
-   - **Framework Preset**: React
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `build`
-   - **Install Command**: `npm install`
-
-5. **Thêm Environment Variables**
-   - Trong Project Settings → "Environment Variables"
-   - Thêm biến:
-     ```
-     REACT_APP_API_URL = đường_dẫn_backend
-     GENERATE_SOURCEMAP = false
-     CI = false
-     ```
-
-6. **Deploy**
-   - Click "Deploy"
-   - Vercel sẽ tự động build và deploy
-   - URL frontend sẽ được nền tảng Vercel tạo
-
-### ✅ Kiểm Tra Frontend
-
-## 🔗 Kết Nối Backend & Frontend
-
-### Sau Deploy:
-
-1. **Backend URL**: đường_dẫn_backend
-2. **Frontend URL**: đường_dẫn_frontend
+---
+## Phần 4: Tạo host trên Vercel
+### Bước 1: Đăng nhập
+- Đăng nhập vào trang Vercel bằng tài khoản GitHub có repository chứa dự án
+### Bước 2: Tạo host
+- Bấm vào mục Add New...
+- Chọn Project
+- Tại phần Import Git Repository, chọn Continue with GitHub
+- Chọn repository chứa dự án, chọn import
+- Tại phần Application Preset trong trang tiếp theo, chọn thư mục frontend
+- Chọn Deploy
+### Bước 3: Cấu hình biến môi trường

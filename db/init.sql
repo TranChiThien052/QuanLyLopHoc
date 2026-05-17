@@ -1,6 +1,3 @@
--- Init SQL for QuanLyLopHoc
--- Creates tables matching backend Sequelize models and inserts initial admin account
-
 BEGIN;
 
 -- Table: taikhoan
