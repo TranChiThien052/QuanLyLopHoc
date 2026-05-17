@@ -171,7 +171,7 @@
 - Chọn Create Database  
 ### Bước 5: Cấu hình biến môi trường cho backend
 - Truy cập vào Webservice đã tạo để deploy backend
-- Vào phần Environments, tại Environment, Environment Variables chọn Edit và nhập các biến môi trường (tương tự trong file .env.example), kết nối với Database đã tạo bằng cách chọn Datastore URL trong phần Add variable
+- Vào phần Environments, tại Environment, Environment Variables chọn Edit và nhập các biến môi trường (tham khảo file /backend/.env.example), kết nối với Database đã tạo bằng cách chọn Datastore URL trong phần Add variable
 - Chọn Save and Deploy sau khi cấu hình xong
 ### Bước 6: Kiểm tra
 - Kiểm tra Web Service (backend) đã hoạt động chưa bằng cách click vào đường dẫn tại dashboard
@@ -194,3 +194,6 @@
 - Tại phần Application Preset trong trang tiếp theo, chọn thư mục frontend
 - Chọn Deploy
 ### Bước 3: Cấu hình biến môi trường
+- Tại mục Dashboard của Project, chọn mục Settings
+- Vào phần Environments, chọn Production
+- Trong giao diện Production, Chọn Add Environment Variable, thêm các biến môi trường (tham khảo file /frontend/.env.example)
