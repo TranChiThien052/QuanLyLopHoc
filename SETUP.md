@@ -2,8 +2,8 @@
 
 ## 📖 Mục Lục
 1. [Yêu Cầu Hệ Thống](#yêu-cầu-hệ-thống)
-2. [Cài Đặt Local](#cài-đặt-local)
-3. [Cài Đặt Production/Online](#cài-đặt-productiononline)
+2. [Cài Đặt Local (Không khuyến khích do không thể kết nối bằng điện thoại đến máy chủ host)](#cài-đặt-local) 
+3. [Cài Đặt Production/Online (Khuyến khích do có thể dùng điện thoại cho các chức năng của sinh viên)](#cài-đặt-productiononline)
 ---
 
 ## 🔧 Yêu Cầu Hệ Thống
@@ -197,3 +197,10 @@
 - Tại mục Dashboard của Project, chọn mục Settings
 - Vào phần Environments, chọn Production
 - Trong giao diện Production, Chọn Add Environment Variable, thêm các biến môi trường (tham khảo file /frontend/.env.example)
+
+---
+## Phần 5: Sử dụng
+### Đăng nhập:
+- Sau khi cấu hình, có thể sử dụng tài khoản admin (username: admin & password: admin123@) để đăng nhập
+- Trong giao diện admin có thể tạo thêm các tài khoản sinh viên và giảng viên để sử dụng các tính năng khác
+- Mật khẩu mặc định của tài khoản sinh viên và giảng viên trùng với tên đăng nhập (mã giảng viên/mã sinh viên)
