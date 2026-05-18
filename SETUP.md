@@ -200,7 +200,6 @@
 
 ---
 ## Phần 5: Sử dụng
-### Đăng nhập:
 - Sau khi cấu hình, có thể sử dụng tài khoản admin (username: admin & password: admin123@) để đăng nhập
 - Trong giao diện admin có thể tạo thêm các tài khoản sinh viên và giảng viên để sử dụng các tính năng khác
 - Mật khẩu mặc định của tài khoản sinh viên và giảng viên trùng với tên đăng nhập (mã giảng viên/mã sinh viên)
